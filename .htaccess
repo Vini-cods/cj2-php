@@ -1,0 +1,45 @@
+# ============================================================
+# .htaccess — CJ2Tech Sistema de Consulta
+# Compatível com HostGator compartilhado (Apache)
+# ============================================================
+
+Options -Indexes
+Options -MultiViews
+
+# ── Rewrite ──────────────────────────────────────────────────
+RewriteEngine On
+
+# HTTPS redirect (ative após configurar SSL)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ── CORS headers para a pasta api/ ──────────────────────────
+<FilesMatch "\.(php)$">
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+</FilesMatch>
+
+# ── Protege arquivos sensíveis ────────────────────────────────
+<FilesMatch "(config\.php|db\.php|auth\.php|response\.php|\.sql)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# ── Cache para assets estáticos ──────────────────────────────
+<FilesMatch "\.(html|css|js)$">
+    Header set Cache-Control "max-age=3600, must-revalidate"
+</FilesMatch>
+
+# ── Compressão ────────────────────────────────────────────────
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json
+</IfModule>
+
+# ── PHP settings (HostGator compartilhado) ────────────────────
+<IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    php_value max_execution_time 60
+    php_value memory_limit 128M
+</IfModule>

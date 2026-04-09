@@ -1,0 +1,4448 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title id="page-title">CJ2Tech Sistema de Consulta</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-deep: #05070f;
+        --bg-dark: #080c1a;
+        --bg-card: #0c1220;
+        --bg-card2: #101828;
+        --border: rgba(99, 102, 241, 0.2);
+        --border-glow: rgba(99, 102, 241, 0.4);
+        --blue-1: #1e3a8a;
+        --blue-2: #2563eb;
+        --blue-3: #3b82f6;
+        --blue-4: #818cf8;
+        --purple: #7c3aed;
+        --purple-dim: #6d28d9;
+        --cyan: #22d3ee;
+        --cyan-dim: #0891b2;
+        --text-1: #f1f5f9;
+        --text-2: #94a3b8;
+        --text-3: #475569;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --font: "Inter", sans-serif;
+        --mono: "JetBrains Mono", monospace;
+        --topbar-bg: rgba(5, 7, 15, 0.92);
+        --grid-line: rgba(99, 102, 241, 0.03);
+        --scrollbar-track: #080c1a;
+        --glow-blue: 0 0 30px rgba(37, 99, 235, 0.25);
+        --glow-purple: 0 0 30px rgba(124, 58, 237, 0.2);
+        --card-shadow:
+          0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+      }
+
+      html.light {
+        --bg-deep: #f0f4ff;
+        --bg-dark: #e4eaf8;
+        --bg-card: #ffffff;
+        --bg-card2: #f5f8ff;
+        --border: rgba(99, 102, 241, 0.15);
+        --blue-4: #4f46e5;
+        --cyan: #0284c7;
+        --cyan-dim: #0369a1;
+        --purple: #7c3aed;
+        --text-1: #0f172a;
+        --text-2: #334155;
+        --text-3: #64748b;
+        --success: #059669;
+        --warning: #d97706;
+        --danger: #dc2626;
+        --topbar-bg: rgba(255, 255, 255, 0.95);
+        --grid-line: rgba(99, 102, 241, 0.05);
+        --scrollbar-track: #e4eaf8;
+        --card-shadow:
+          0 4px 24px rgba(99, 102, 241, 0.08),
+          0 1px 0 rgba(255, 255, 255, 0.8) inset;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: var(--font);
+        background: var(--bg-deep);
+        color: var(--text-1);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(var(--grid-line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+        background-size: 44px 44px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      body::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 600px;
+        background:
+          radial-gradient(
+            ellipse 80% 50% at 20% -10%,
+            rgba(99, 102, 241, 0.12),
+            transparent
+          ),
+          radial-gradient(
+            ellipse 60% 40% at 80% 0%,
+            rgba(124, 58, 237, 0.08),
+            transparent
+          );
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      ::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: var(--scrollbar-track);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(var(--blue-2), var(--purple));
+        border-radius: 3px;
+      }
+
+      #screen-login {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: stretch;
+        z-index: 100;
+        background: var(--bg-deep);
+        background-size: cover;
+        background-position: center;
+      }
+
+      #screen-login::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to right,
+          rgba(2, 5, 16, 0.6) 0%,
+          rgba(2, 5, 16, 0.15) 55%,
+          rgba(2, 5, 16, 0.78) 100%
+        );
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      #screen-login.no-image::after {
+        background: none;
+      }
+
+      .login-orb-fallback {
+        display: none;
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+      }
+
+      #screen-login.no-image .login-orb-fallback {
+        display: block;
+      }
+
+      .orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.18;
+        animation: float 8s ease-in-out infinite;
+      }
+
+      .orb-1 {
+        width: 500px;
+        height: 500px;
+        background: #1d4ed8;
+        top: -100px;
+        left: -100px;
+      }
+
+      .orb-2 {
+        width: 400px;
+        height: 400px;
+        background: #7c3aed;
+        bottom: -80px;
+        left: 30%;
+        animation-delay: -3s;
+      }
+
+      .orb-3 {
+        width: 300px;
+        height: 300px;
+        background: #0ea5e9;
+        top: 40%;
+        left: 20%;
+        animation-delay: -5s;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0) scale(1);
+        }
+
+        50% {
+          transform: translateY(-30px) scale(1.05);
+        }
+      }
+
+      .login-left {
+        flex: 1;
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 56px 60px;
+        max-width: calc(100% - 420px);
+      }
+
+      .login-brand-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(37, 99, 235, 0.2);
+        border: 1px solid rgba(59, 130, 246, 0.35);
+        border-radius: 20px;
+        padding: 6px 16px;
+        font-size: 11px;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        color: var(--blue-4);
+        margin-bottom: 20px;
+        backdrop-filter: blur(8px);
+        width: fit-content;
+      }
+
+      .dot-pulse {
+        width: 7px;
+        height: 7px;
+        background: var(--cyan);
+        border-radius: 50%;
+        box-shadow: 0 0 8px var(--cyan);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+
+        50% {
+          opacity: 0.5;
+          transform: scale(0.85);
+        }
+      }
+
+      .login-headline {
+        font-size: clamp(28px, 3.5vw, 48px);
+        font-weight: 800;
+        line-height: 1.15;
+        color: #fff;
+        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+        margin-bottom: 16px;
+        max-width: 540px;
+      }
+
+      .login-headline span {
+        color: var(--cyan);
+      }
+
+      .login-sub {
+        font-size: 15px;
+        color: rgba(255, 255, 255, 0.65);
+        max-width: 420px;
+        line-height: 1.6;
+        margin-bottom: 36px;
+        text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+      }
+
+      .login-features {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
+      .feat-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+        padding: 9px 14px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(6px);
+      }
+
+      .feat-pill svg {
+        color: var(--cyan);
+        flex-shrink: 0;
+      }
+
+      .login-right {
+        width: 420px;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 36px;
+        background: rgba(6, 13, 31, 0.74);
+        border-left: 1px solid rgba(59, 130, 246, 0.15);
+        backdrop-filter: blur(24px);
+      }
+
+      html.light .login-right {
+        background: rgba(255, 255, 255, 0.86);
+        border-left-color: rgba(37, 99, 235, 0.15);
+      }
+
+      .login-card {
+        position: relative;
+        width: 100%;
+        animation: slideUp 0.5s ease;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .login-logo {
+        text-align: center;
+        margin-bottom: 28px;
+      }
+
+      .logo-svg-wrap {
+        display: inline-block;
+        width: 80px;
+        height: 80px;
+      }
+
+      .login-logo h2 {
+        margin-top: 8px;
+        font-size: 11px;
+        letter-spacing: 4px;
+        color: var(--text-3);
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+
+      .logo-dark {
+        display: inline;
+      }
+
+      .logo-light {
+        display: none;
+      }
+
+      html.light .logo-dark {
+        display: none;
+      }
+
+      html.light .logo-light {
+        display: inline;
+      }
+
+      @media (max-width: 768px) {
+        .login-left {
+          display: none;
+        }
+
+        .login-right {
+          width: 100%;
+          border-left: none;
+        }
+      }
+
+      .form-group {
+        margin-bottom: 14px;
+      }
+
+      .form-group label,
+      .sim-field label {
+        display: block;
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text-3);
+        margin-bottom: 6px;
+        font-weight: 500;
+      }
+
+      .form-group input,
+      .sim-field input,
+      .sim-field select {
+        width: 100%;
+        padding: 11px 13px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        color: var(--text-1);
+        font-family: var(--font);
+        font-size: 14px;
+        outline: none;
+        transition:
+          border 0.2s,
+          box-shadow 0.2s;
+      }
+
+      .form-group input:focus,
+      .sim-field input:focus,
+      .sim-field select:focus {
+        border-color: var(--blue-3);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+      }
+
+      html.light .form-group input,
+      html.light .sim-field input,
+      html.light .sim-field select {
+        background: #f8faff;
+      }
+
+      .sim-field {
+        margin-bottom: 12px;
+      }
+
+      .login-error {
+        color: var(--danger);
+        font-size: 12px;
+        text-align: center;
+        margin-top: 10px;
+        display: none;
+      }
+
+      .btn-primary {
+        width: 100%;
+        padding: 13px;
+        background: linear-gradient(135deg, var(--blue-2), var(--blue-1));
+        border: none;
+        border-radius: 9px;
+        color: #fff;
+        font-family: var(--font);
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: 4px;
+      }
+
+      .btn-primary:hover {
+        box-shadow: 0 0 28px rgba(59, 130, 246, 0.4);
+        transform: translateY(-1px);
+      }
+
+      .btn-search {
+        height: 50px;
+        padding: 0 26px;
+        background: linear-gradient(135deg, var(--blue-2), var(--blue-1));
+        border: none;
+        border-radius: 11px;
+        color: #fff;
+        font-family: var(--font);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+      }
+
+      .btn-search:hover {
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        transform: translateY(-1px);
+      }
+
+      .btn-search:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .btn-sm {
+        padding: 7px 13px;
+        border-radius: 8px;
+        font-family: var(--font);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .btn-simulate {
+        background: linear-gradient(135deg, #0ea5e9, #0284c7);
+        color: #fff;
+      }
+
+      .btn-simulate:hover {
+        box-shadow: 0 0 12px rgba(14, 165, 233, 0.4);
+        transform: translateY(-1px);
+      }
+
+      .btn-detail {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--border) !important;
+        color: var(--text-2);
+      }
+
+      .btn-detail:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-1);
+      }
+
+      .btn-calcular {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, var(--cyan-dim), #0369a1);
+        border: none;
+        border-radius: 9px;
+        color: #fff;
+        font-family: var(--font);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .btn-calcular:hover {
+        box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+        transform: translateY(-1px);
+      }
+
+      .btn-logout {
+        padding: 7px 14px;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text-2);
+        font-family: var(--font);
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .btn-logout:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+
+      .btn-theme {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-2);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        font-size: 15px;
+      }
+
+      .btn-theme:hover {
+        border-color: var(--blue-3);
+      }
+
+      .btn-admin {
+        padding: 7px 14px;
+        background: rgba(37, 99, 235, 0.15);
+        border: 1px solid rgba(37, 99, 235, 0.3);
+        border-radius: 8px;
+        color: var(--blue-4);
+        font-family: var(--font);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .btn-admin:hover {
+        background: rgba(37, 99, 235, 0.25);
+      }
+
+      #screen-app {
+        display: none;
+        min-height: 100vh;
+        position: relative;
+        z-index: 1;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 28px;
+        height: 62px;
+        background: var(--topbar-bg);
+        border-bottom: 1px solid var(--border);
+        backdrop-filter: blur(24px);
+        box-shadow: 0 1px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .topbar-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .topbar-logo .logo-svg-wrap {
+        width: 36px;
+        height: 36px;
+      }
+
+      .topbar-logo-img {
+        width: 36px;
+        height: 36px;
+        object-fit: contain;
+        border-radius: 6px;
+      }
+
+      .topbar-brand {
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        color: var(--text-1);
+      }
+
+      .topbar-brand span {
+        background: linear-gradient(135deg, var(--blue-3), var(--purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .topbar-user {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-2);
+      }
+
+      .user-avatar {
+        width: 30px;
+        height: 30px;
+        background: linear-gradient(135deg, var(--blue-2), var(--purple));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        color: #fff;
+      }
+
+      .main-content {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 24px 28px;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .section-header .dot {
+        width: 7px;
+        height: 7px;
+        background: linear-gradient(135deg, var(--blue-3), var(--purple));
+        border-radius: 50%;
+        box-shadow: 0 0 8px var(--blue-3);
+      }
+
+      .section-header h3 {
+        font-size: 10px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--text-3);
+        font-weight: 500;
+      }
+
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 22px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--blue-3),
+          var(--purple),
+          transparent
+        );
+        opacity: 0.4;
+      }
+
+      .search-block {
+        margin-bottom: 22px;
+      }
+
+      .search-row {
+        display: flex;
+        gap: 10px;
+        align-items: stretch;
+      }
+
+      .search-input-wrap {
+        flex: 1;
+        position: relative;
+      }
+
+      .search-input-wrap svg {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-3);
+      }
+
+      .search-input {
+        width: 100%;
+        height: 50px;
+        padding: 0 16px 0 44px;
+        background: var(--bg-card2);
+        border: 1px solid var(--border);
+        border-radius: 11px;
+        color: var(--text-1);
+        font-family: var(--mono);
+        font-size: 16px;
+        letter-spacing: 2px;
+        outline: none;
+        transition:
+          border 0.2s,
+          box-shadow 0.2s;
+      }
+
+      .search-input::placeholder {
+        color: var(--text-3);
+        font-family: var(--font);
+        letter-spacing: 0;
+        font-size: 14px;
+      }
+
+      .search-input:focus {
+        border-color: var(--blue-3);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+      }
+
+      html.light .search-input {
+        background: #f8faff;
+      }
+
+      .search-type-row {
+        display: flex;
+        gap: 20px;
+        margin-top: 10px;
+      }
+
+      .radio-option {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        font-size: 13px;
+        color: var(--text-2);
+        user-select: none;
+      }
+
+      .radio-option input {
+        display: none;
+      }
+
+      .radio-custom {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        position: relative;
+        transition: border-color 0.2s;
+        flex-shrink: 0;
+      }
+
+      .radio-option input:checked + .radio-custom {
+        border-color: var(--blue-3);
+      }
+
+      .radio-option input:checked + .radio-custom::after {
+        content: "";
+        position: absolute;
+        inset: 2px;
+        background: var(--blue-3);
+        border-radius: 50%;
+      }
+
+      .client-block {
+        margin-bottom: 22px;
+        display: none;
+      }
+
+      .client-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .client-avatar-big {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--blue-2), var(--cyan-dim));
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 19px;
+        font-weight: 800;
+        color: #fff;
+        flex-shrink: 0;
+      }
+
+      .client-name-wrap h2 {
+        font-size: 17px;
+        font-weight: 700;
+      }
+
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 11px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        margin-top: 5px;
+      }
+
+      .status-badge::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+
+      .status-ativo {
+        background: rgba(16, 185, 129, 0.15);
+        color: var(--success);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+      }
+
+      .status-inativo {
+        background: rgba(239, 68, 68, 0.15);
+        color: var(--danger);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
+
+      .client-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+        gap: 10px;
+      }
+
+      .client-field {
+        background: var(--bg-card2);
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        padding: 11px 13px;
+      }
+
+      .client-field .label {
+        font-size: 10px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text-3);
+        margin-bottom: 4px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .client-field .value {
+        font-size: 13px;
+        font-weight: 500;
+        font-family: var(--mono);
+      }
+
+      html.light .client-field {
+        background: #f1f5fb;
+      }
+
+      .contracts-block {
+        margin-bottom: 22px;
+        display: none;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1000px;
+      }
+
+      thead th {
+        padding: 10px 11px;
+        text-align: left;
+        font-size: 10px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text-3);
+        font-weight: 600;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+
+      tbody tr {
+        border-bottom: 1px solid rgba(30, 90, 200, 0.1);
+        transition: background 0.15s;
+      }
+
+      tbody tr:hover {
+        background: rgba(37, 99, 235, 0.05);
+      }
+
+      tbody td {
+        padding: 12px 11px;
+        font-size: 13px;
+        vertical-align: middle;
+        white-space: nowrap;
+      }
+
+      html.light tbody td {
+        color: var(--text-1);
+      }
+
+      .td-banco {
+        font-weight: 600;
+        color: var(--blue-4);
+      }
+
+      html.light .td-banco {
+        color: var(--blue-2);
+      }
+
+      .td-contrato {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-2);
+      }
+
+      .td-parcela {
+        font-weight: 700;
+      }
+
+      .td-taxa {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--warning);
+        font-weight: 600;
+      }
+
+      html.light .td-taxa {
+        color: #b45309;
+      }
+
+      .td-quitacao {
+        font-weight: 700;
+        color: var(--cyan);
+        font-family: var(--mono);
+      }
+
+      html.light .td-quitacao {
+        color: var(--cyan-dim);
+      }
+
+      .td-parcelas-pagas {
+        font-weight: 600;
+        color: var(--cyan-dim);
+        font-family: var(--mono);
+      }
+
+      .badge-restantes {
+        display: inline-block;
+        padding: 2px 9px;
+        background: rgba(59, 130, 246, 0.15);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--blue-4);
+        font-family: var(--mono);
+      }
+
+      html.light .badge-restantes {
+        background: rgba(37, 99, 235, 0.1);
+        color: var(--blue-2);
+      }
+
+      .simulation-block {
+        display: none;
+        margin-bottom: 22px;
+      }
+
+      .sim-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+      }
+
+      .sim-header h3 {
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .sim-header .sub {
+        font-size: 12px;
+        color: var(--text-3);
+        margin-top: 2px;
+      }
+
+      .btn-close-sim {
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text-2);
+        padding: 5px 11px;
+        cursor: pointer;
+        font-size: 12px;
+        font-family: var(--font);
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .btn-close-sim:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+
+      .sim-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      @media (max-width: 700px) {
+        .sim-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .sim-inputs h4,
+      .sim-results h4 {
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text-3);
+        margin-bottom: 12px;
+        font-weight: 500;
+      }
+
+      .result-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+      }
+
+      .result-card {
+        background: var(--bg-card2);
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        padding: 13px;
+        text-align: center;
+      }
+
+      html.light .result-card {
+        background: #f1f5fb;
+      }
+
+      .result-card.highlight {
+        border-color: var(--cyan-dim);
+        background: rgba(8, 145, 178, 0.1);
+      }
+
+      html.light .result-card.highlight {
+        background: rgba(2, 132, 199, 0.08);
+      }
+
+      .result-card .rc-label {
+        font-size: 10px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text-3);
+        margin-bottom: 6px;
+      }
+
+      .result-card .rc-value {
+        font-size: 16px;
+        font-weight: 700;
+        font-family: var(--mono);
+      }
+
+      .result-card.highlight .rc-value {
+        color: var(--cyan);
+      }
+
+      .loading-bar {
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--blue-3),
+          var(--cyan),
+          transparent
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.2s infinite;
+        border-radius: 2px;
+        margin-bottom: 16px;
+        display: none;
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: -200% 0;
+        }
+
+        100% {
+          background-position: 200% 0;
+        }
+      }
+
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 200;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-overlay.open {
+        display: flex;
+      }
+
+      .modal-box {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 26px;
+        width: 520px;
+        max-width: 95vw;
+        max-height: 90vh;
+        overflow-y: auto;
+        animation: slideUp 0.3s ease;
+      }
+
+      html.light .modal-box {
+        background: #fff;
+      }
+
+      .modal-box.wide {
+        width: 700px;
+      }
+
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+      }
+
+      .modal-header h3 {
+        font-size: 15px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-close-modal {
+        background: transparent;
+        border: none;
+        color: var(--text-3);
+        cursor: pointer;
+        font-size: 22px;
+        line-height: 1;
+        transition: color 0.2s;
+      }
+
+      .btn-close-modal:hover {
+        color: var(--text-1);
+      }
+
+      .modal-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 11px;
+      }
+
+      .modal-field .label {
+        font-size: 10px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text-3);
+        margin-bottom: 4px;
+      }
+
+      .modal-field .value {
+        font-size: 13px;
+        font-weight: 500;
+        font-family: var(--mono);
+        word-break: break-all;
+      }
+
+      .admin-tabs {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 10px;
+        flex-wrap: wrap;
+      }
+
+      .admin-tab-btn {
+        padding: 6px 13px;
+        border-radius: 7px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--text-2);
+        font-family: var(--font);
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .admin-tab-btn.active {
+        background: var(--bg-card2);
+        border-color: var(--border);
+        color: var(--text-1);
+      }
+
+      .admin-tab-btn:not(.active):hover {
+        color: var(--text-1);
+      }
+
+      .api-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+
+      .api-badge::before {
+        content: "";
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+
+      .api-badge.ok {
+        background: rgba(16, 185, 129, 0.15);
+        color: var(--success);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+      }
+
+      .api-badge.err {
+        background: rgba(239, 68, 68, 0.15);
+        color: var(--danger);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
+
+      .api-badge.idle {
+        background: rgba(148, 163, 184, 0.12);
+        color: var(--text-3);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 11px;
+        padding: 11px 16px;
+        font-size: 13px;
+        color: var(--text-1);
+        z-index: 300;
+        display: none;
+        animation: slideUp 0.3s ease;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      }
+
+      .toast.show {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+
+      .toast-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="screen-login" class="no-image">
+      <div class="login-orb-fallback">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+      </div>
+      <div class="login-left">
+        <div class="login-brand-tag">
+          <div class="dot-pulse"></div>
+          <span id="login-brand-tag">CJ2Tech — Plataforma de Consulta</span>
+        </div>
+        <h1 class="login-headline" id="login-titulo">
+          Consulta e simulação<br />de contratos <span>consignados</span
+          ><br />em segundos.
+        </h1>
+        <p class="login-sub" id="login-subtitulo">
+          Acesse dados completos do beneficiário, visualize contratos ativos e
+          veja o valor de quitação calculado automaticamente pela metodologia do
+          Banco Central.
+        </p>
+        <div class="login-features">
+          <div class="feat-pill">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" /></svg
+            >CPF e benefício atualizados
+          </div>
+          <div class="feat-pill">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg
+            >Quitação automática pelo Banco Central
+          </div>
+          <div class="feat-pill">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <line x1="3" y1="9" x2="21" y2="9" />
+              <line x1="9" y1="21" x2="9" y2="9" /></svg
+            >Contratos detalhados
+          </div>
+        </div>
+      </div>
+      <div class="login-right">
+        <div class="login-card">
+          <div class="login-logo">
+            <div class="logo-svg-wrap" id="login-logo-wrap">
+              <span class="logo-dark" id="logo-dark-login"
+                ><svg viewBox="0 0 200 200" fill="none">
+                  <circle
+                    cx="100"
+                    cy="100"
+                    r="88"
+                    stroke="white"
+                    stroke-width="3.5"
+                    fill="none"
+                    stroke-dasharray="460 100"
+                    stroke-linecap="round"
+                  />
+                  <circle
+                    cx="100"
+                    cy="100"
+                    r="65"
+                    stroke="white"
+                    stroke-width="2.5"
+                    fill="none"
+                    stroke-dasharray="320 90"
+                    stroke-linecap="round"
+                    stroke-dashoffset="50"
+                  />
+                  <circle cx="100" cy="12" r="11" fill="white" />
+                  <circle cx="126" cy="38" r="7" fill="white" />
+                  <circle cx="24" cy="110" r="8" fill="white" />
+                  <circle cx="95" cy="165" r="13" fill="white" />
+                  <text
+                    x="55"
+                    y="120"
+                    font-family="'Exo 2',sans-serif"
+                    font-weight="800"
+                    font-size="48"
+                    fill="white"
+                  >
+                    CJ2
+                  </text>
+                  <text
+                    x="115"
+                    y="143"
+                    font-family="'Exo 2',sans-serif"
+                    font-weight="700"
+                    font-size="18"
+                    fill="white"
+                    font-style="italic"
+                  >
+                    TECH
+                  </text>
+                </svg></span
+              >
+              <span class="logo-light" id="logo-light-login"
+                ><svg viewBox="0 0 200 200" fill="none">
+                  <defs>
+                    <linearGradient id="lgL" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stop-color="#3b82f6" />
+                      <stop offset="100%" stop-color="#1e3a8a" />
+                    </linearGradient>
+                  </defs>
+                  <circle
+                    cx="100"
+                    cy="100"
+                    r="88"
+                    stroke="url(#lgL)"
+                    stroke-width="3.5"
+                    fill="none"
+                    stroke-dasharray="460 100"
+                    stroke-linecap="round"
+                  />
+                  <circle
+                    cx="100"
+                    cy="100"
+                    r="65"
+                    stroke="url(#lgL)"
+                    stroke-width="2.5"
+                    fill="none"
+                    stroke-dasharray="320 90"
+                    stroke-linecap="round"
+                    stroke-dashoffset="50"
+                  />
+                  <circle cx="100" cy="12" r="11" fill="#3b82f6" />
+                  <circle cx="126" cy="38" r="7" fill="#2563eb" />
+                  <circle cx="24" cy="110" r="8" fill="#1d4ed8" />
+                  <circle cx="95" cy="165" r="13" fill="#1e40af" />
+                  <text
+                    x="55"
+                    y="120"
+                    font-family="'Exo 2',sans-serif"
+                    font-weight="800"
+                    font-size="48"
+                    fill="url(#lgL)"
+                  >
+                    CJ2
+                  </text>
+                  <text
+                    x="115"
+                    y="143"
+                    font-family="'Exo 2',sans-serif"
+                    font-weight="700"
+                    font-size="18"
+                    fill="#0284c7"
+                    font-style="italic"
+                  >
+                    TECH
+                  </text>
+                </svg></span
+              >
+            </div>
+            <h2 id="login-card-title">Acesse sua conta</h2>
+          </div>
+          <div class="form-group">
+            <label>Usuário</label
+            ><input
+              type="text"
+              id="login-user"
+              placeholder="Digite seu usuário"
+              autocomplete="username"
+            />
+          </div>
+          <div class="form-group">
+            <label>Senha</label
+            ><input
+              type="password"
+              id="login-pass"
+              placeholder="••••••••"
+              autocomplete="current-password"
+            />
+          </div>
+          <button class="btn-primary" onclick="doLogin()">Entrar</button>
+          <div class="login-error" id="login-error">
+            Usuário ou senha inválidos.
+          </div>
+          <div style="text-align: center; margin-top: 14px">
+            <button
+              class="btn-theme"
+              onclick="toggleTheme()"
+              id="btn-theme-login"
+            >
+              🌙
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="screen-app">
+      <div class="topbar">
+        <div class="topbar-logo">
+          <div class="logo-svg-wrap" id="topbar-logo-wrap">
+            <span class="logo-dark" id="logo-dark-topbar"
+              ><svg viewBox="0 0 200 200" fill="none">
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="88"
+                  stroke="white"
+                  stroke-width="4"
+                  fill="none"
+                  stroke-dasharray="460 100"
+                  stroke-linecap="round"
+                />
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="65"
+                  stroke="white"
+                  stroke-width="3"
+                  fill="none"
+                  stroke-dasharray="320 90"
+                  stroke-linecap="round"
+                  stroke-dashoffset="50"
+                />
+                <circle cx="100" cy="12" r="11" fill="white" />
+                <circle cx="126" cy="38" r="7" fill="white" />
+                <circle cx="24" cy="110" r="8" fill="white" />
+                <circle cx="95" cy="165" r="13" fill="white" />
+                <text
+                  x="55"
+                  y="120"
+                  font-family="'Exo 2',sans-serif"
+                  font-weight="800"
+                  font-size="48"
+                  fill="white"
+                >
+                  CJ2
+                </text>
+                <text
+                  x="115"
+                  y="143"
+                  font-family="'Exo 2',sans-serif"
+                  font-weight="700"
+                  font-size="18"
+                  fill="white"
+                  font-style="italic"
+                >
+                  TECH
+                </text>
+              </svg></span
+            >
+            <span class="logo-light" id="logo-light-topbar"
+              ><svg viewBox="0 0 200 200" fill="none">
+                <defs>
+                  <linearGradient id="lgT" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#3b82f6" />
+                    <stop offset="100%" stop-color="#1e3a8a" />
+                  </linearGradient>
+                </defs>
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="88"
+                  stroke="url(#lgT)"
+                  stroke-width="4"
+                  fill="none"
+                  stroke-dasharray="460 100"
+                  stroke-linecap="round"
+                />
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="65"
+                  stroke="url(#lgT)"
+                  stroke-width="3"
+                  fill="none"
+                  stroke-dasharray="320 90"
+                  stroke-linecap="round"
+                  stroke-dashoffset="50"
+                />
+                <circle cx="100" cy="12" r="11" fill="#3b82f6" />
+                <circle cx="126" cy="38" r="7" fill="#2563eb" />
+                <circle cx="24" cy="110" r="8" fill="#1d4ed8" />
+                <circle cx="95" cy="165" r="13" fill="#1e40af" />
+                <text
+                  x="55"
+                  y="120"
+                  font-family="'Exo 2',sans-serif"
+                  font-weight="800"
+                  font-size="48"
+                  fill="url(#lgT)"
+                >
+                  CJ2
+                </text>
+                <text
+                  x="115"
+                  y="143"
+                  font-family="'Exo 2',sans-serif"
+                  font-weight="700"
+                  font-size="18"
+                  fill="#0284c7"
+                  font-style="italic"
+                >
+                  TECH
+                </text>
+              </svg></span
+            >
+          </div>
+          <span class="topbar-brand" id="topbar-nome-sistema"
+            >CJ2Tech <span>Sistema de Consulta</span></span
+          >
+        </div>
+        <div class="topbar-right">
+          <div id="api-badge" class="api-badge idle">API não configurada</div>
+          <button class="btn-theme" id="btn-theme" onclick="toggleTheme()">
+            🌙
+          </button>
+          <button
+            class="btn-admin"
+            id="btn-admin-topbar"
+            onclick="openAdmin()"
+            style="display: none"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
+              <path
+                d="M19 10.5c0 3.5-2 6.5-7 10.5-5-4-7-7-7-10.5a7 7 0 0 1 14 0Z"
+              /></svg
+            >Admin
+          </button>
+          <div class="topbar-user">
+            <div class="user-avatar" id="user-avatar">AD</div>
+            <span id="user-name">Admin</span>
+          </div>
+          <button class="btn-logout" onclick="doLogout()">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" /></svg
+            >Sair
+          </button>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div class="loading-bar" id="loading-bar"></div>
+
+        <div class="search-block">
+          <div class="section-header">
+            <div class="dot"></div>
+            <h3>Consulta</h3>
+          </div>
+          <div class="card">
+            <div class="search-row">
+              <div class="search-input-wrap">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input
+                  class="search-input"
+                  id="search-input"
+                  type="text"
+                  placeholder="Digite CPF ou número do benefício"
+                  maxlength="20"
+                  oninput="maskInput(this)"
+                  onkeydown="if (event.key === 'Enter') doConsulta();"
+                />
+              </div>
+              <button class="btn-search" id="btn-search" onclick="doConsulta()">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" /></svg
+                >Consultar
+              </button>
+            </div>
+            <div class="search-type-row">
+              <label class="radio-option"
+                ><input
+                  type="radio"
+                  name="tipo"
+                  value="cpf"
+                  checked
+                  onchange="setTipo(this.value)"
+                /><span class="radio-custom"></span>CPF</label
+              >
+              <label class="radio-option"
+                ><input
+                  type="radio"
+                  name="tipo"
+                  value="beneficio"
+                  onchange="setTipo(this.value)"
+                /><span class="radio-custom"></span>Benefício</label
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="client-block" id="client-block">
+          <div class="section-header">
+            <div class="dot"></div>
+            <h3>Dados do Cliente</h3>
+          </div>
+          <div class="card">
+            <div class="client-header">
+              <div class="client-avatar-big" id="client-initials">--</div>
+              <div class="client-name-wrap">
+                <h2 id="c-nome">—</h2>
+                <div class="status-badge status-ativo" id="c-status-badge">
+                  —
+                </div>
+              </div>
+            </div>
+            <div class="client-grid">
+              <div class="client-field">
+                <div class="label">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                  CPF
+                </div>
+                <div class="value" id="c-cpf">—</div>
+              </div>
+              <div class="client-field">
+                <div class="label">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                    />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
+                  Benefício
+                </div>
+                <div class="value" id="c-beneficio">—</div>
+              </div>
+              <div class="client-field">
+                <div class="label">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  Nascimento
+                </div>
+                <div class="value" id="c-nascimento">—</div>
+              </div>
+              <div class="client-field">
+                <div class="label">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  Espécie
+                </div>
+                <div class="value" id="c-especie">—</div>
+              </div>
+              <div class="client-field">
+                <div class="label">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  Nome da Mãe
+                </div>
+                <div class="value" id="c-mae">—</div>
+              </div>
+              <div class="client-field">
+                <div class="label">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  Nome do Pai
+                </div>
+                <div class="value" id="c-pai">—</div>
+              </div>
+              <div class="client-field">
+                <div class="label">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  Situação
+                </div>
+                <div class="value" id="c-situacao">—</div>
+              </div>
+              <div class="client-field">
+                <div class="label">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <line x1="12" y1="1" x2="12" y2="23" />
+                    <path
+                      d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+                    />
+                  </svg>
+                  Total Comprometido
+                </div>
+                <div class="value" id="c-total-comprometido">—</div>
+              </div>
+              <div class="client-field" style="border-color: var(--cyan-dim)">
+                <div class="label" style="color: var(--cyan-dim)">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                    <polyline points="2 17 12 22 22 17" />
+                    <polyline points="2 12 12 17 22 12" />
+                  </svg>
+                  Margem Disponível
+                </div>
+                <div
+                  class="value"
+                  id="c-margem-calculada"
+                  style="color: var(--cyan)"
+                >
+                  —
+                </div>
+              </div>
+              <div class="client-field">
+                <div class="label">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                    <polyline points="2 17 12 22 22 17" />
+                    <polyline points="2 12 12 17 22 12" />
+                  </svg>
+                  Margem Bruta (API)
+                </div>
+                <div
+                  class="value"
+                  id="c-margem"
+                  style="font-size: 11px; color: var(--text-3)"
+                >
+                  —
+                </div>
+              </div>
+              <div class="client-field">
+                <div class="label">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                    <line x1="12" y1="18" x2="12.01" y2="18" />
+                  </svg>
+                  Telefone
+                </div>
+                <div class="value" id="c-tel1">—</div>
+              </div>
+              <div
+                class="client-field"
+                style="
+                  grid-column: span 2;
+                  background: rgba(16, 185, 129, 0.08);
+                  border-color: rgba(16, 185, 129, 0.3);
+                "
+              >
+                <div class="label" style="color: var(--success)">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Total de Parcelas Pagas
+                </div>
+                <div
+                  class="value"
+                  id="c-total-parcelas-pagas"
+                  style="
+                    font-size: 15px;
+                    font-weight: 700;
+                    color: var(--success);
+                  "
+                >
+                  —
+                </div>
+              </div>
+              <div class="client-field" style="grid-column: span 2">
+                <div class="label">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  Endereço
+                </div>
+                <div
+                  class="value"
+                  id="c-endereco-completo"
+                  style="font-size: 12px"
+                >
+                  —
+                </div>
+              </div>
+              <span id="c-tel2" style="display: none">—</span>
+              <span id="c-end-rua" style="display: none">—</span>
+              <span id="c-end-bairro" style="display: none">—</span>
+              <span id="c-end-cidade" style="display: none">—</span>
+              <span id="c-end-uf" style="display: none">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="contracts-block" id="contracts-block">
+          <div class="section-header">
+            <div class="dot"></div>
+            <h3>Contratos</h3>
+          </div>
+          <div class="card">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Banco</th>
+                    <th>Contrato</th>
+                    <th>Início</th>
+                    <th>Fim</th>
+                    <th>Valor Contrato</th>
+                    <th>Taxa</th>
+                    <th>Parcela</th>
+                    <th>Restantes</th>
+                    <th>Pagas</th>
+                    <th>Quitação (Banco Central)</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="contracts-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="simulation-block" id="simulation-block">
+          <div class="section-header">
+            <div class="dot"></div>
+            <h3>Simulação Detalhada</h3>
+          </div>
+          <div class="card">
+            <div class="sim-header">
+              <div>
+                <h3 id="sim-titulo">Simulação</h3>
+                <div class="sub" id="sim-banco">—</div>
+              </div>
+              <button class="btn-close-sim" onclick="closeSim()">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" /></svg
+                >Fechar
+              </button>
+            </div>
+            <div class="sim-grid">
+              <div class="sim-inputs">
+                <h4>Parâmetros</h4>
+                <div class="sim-field">
+                  <label>Parcela (R$)</label
+                  ><input type="number" id="sim-parcela" step="0.01" />
+                </div>
+                <div class="sim-field">
+                  <label>Taxa Mensal (%)</label
+                  ><input type="number" id="sim-taxa" step="0.01" />
+                </div>
+                <div class="sim-field">
+                  <label>Início Desconto</label
+                  ><input type="date" id="sim-inicio" />
+                </div>
+                <div class="sim-field">
+                  <label>Final Desconto</label
+                  ><input type="date" id="sim-fim" />
+                </div>
+                <div class="sim-field">
+                  <label>Data Base</label
+                  ><input type="date" id="sim-data-base" />
+                </div>
+                <button class="btn-calcular" onclick="calcularQuitacao()">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" /></svg
+                  >Recalcular
+                </button>
+              </div>
+              <div class="sim-results">
+                <h4>Resultado — Metodologia Banco Central</h4>
+                <div class="result-cards">
+                  <div class="result-card">
+                    <div class="rc-label">Parcelas Totais</div>
+                    <div class="rc-value" id="r-total">—</div>
+                  </div>
+                  <div class="result-card">
+                    <div class="rc-label">Parcelas Restantes</div>
+                    <div class="rc-value" id="r-restantes">—</div>
+                  </div>
+                  <div class="result-card">
+                    <div class="rc-label">Total Restante</div>
+                    <div class="rc-value" id="r-total-restante">—</div>
+                  </div>
+                  <div class="result-card">
+                    <div class="rc-label">Juros Restantes</div>
+                    <div class="rc-value" id="r-juros">—</div>
+                  </div>
+                  <div class="result-card highlight" style="grid-column: 1/-1">
+                    <div class="rc-label">Valor de Quitação (q₀)</div>
+                    <div class="rc-value" id="r-quitacao">—</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal-overlay"
+      id="admin-overlay"
+      onclick="if (event.target === this) closeAdmin();"
+    >
+      <div class="modal-box wide">
+        <div class="modal-header">
+          <h3>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
+              <path
+                d="M19 10.5c0 3.5-2 6.5-7 10.5-5-4-7-7-7-10.5a7 7 0 0 1 14 0Z"
+              />
+            </svg>
+            Painel Administrativo
+          </h3>
+          <button class="btn-close-modal" onclick="closeAdmin()">×</button>
+        </div>
+        <div class="admin-tabs">
+          <button
+            class="admin-tab-btn active"
+            onclick="switchAdminTab('users')"
+            id="atab-users"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            Usuários
+          </button>
+          <button
+            class="admin-tab-btn"
+            onclick="switchAdminTab('mypass')"
+            id="atab-mypass"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            Minha Senha
+          </button>
+          <button
+            class="admin-tab-btn"
+            onclick="switchAdminTab('identidade')"
+            id="atab-identidade"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M12 2a10 10 0 0 0-10 10c0 4.5 3.5 8 8 8h4a8 8 0 0 0 8-8 10 10 0 0 0-10-10z"
+              />
+              <path d="M12 8v4" />
+              <path d="M12 16h.01" />
+            </svg>
+            Identidade
+          </button>
+          <button
+            class="admin-tab-btn"
+            onclick="switchAdminTab('api')"
+            id="atab-api"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M4 4v16h16" />
+              <path d="m9 10 3-3 3 3" />
+              <path d="m9 14 3 3 3-3" />
+            </svg>
+            API
+          </button>
+          <button
+            class="admin-tab-btn"
+            onclick="switchAdminTab('imagem')"
+            id="atab-imagem"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <polyline points="21 15 16 10 5 21" />
+            </svg>
+            Imagem
+          </button>
+          <button
+            class="admin-tab-btn"
+            onclick="switchAdminTab('financeiro')"
+            id="atab-financeiro"
+            style="display: none"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="12" y1="1" x2="12" y2="23" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+            Financeiro
+          </button>
+        </div>
+
+        <div id="admin-tab-users">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 12px;
+            "
+          >
+            <span style="font-size: 13px; color: var(--text-2)"
+              >Usuários do sistema</span
+            >
+            <button class="btn-sm btn-simulate" onclick="showNewUserForm()">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Novo
+            </button>
+          </div>
+          <div
+            id="user-form-wrap"
+            style="
+              display: none;
+              background: var(--bg-card2);
+              border: 1px solid var(--border);
+              border-radius: 10px;
+              padding: 16px;
+              margin-bottom: 12px;
+            "
+          >
+            <div
+              style="
+                font-size: 11px;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                color: var(--text-3);
+                margin-bottom: 10px;
+              "
+              id="user-form-title"
+            >
+              Novo Usuário
+            </div>
+            <div
+              style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px"
+            >
+              <div class="sim-field">
+                <label>Nome</label
+                ><input type="text" id="uf-nome" placeholder="Nome completo" />
+              </div>
+              <div class="sim-field">
+                <label>Login</label
+                ><input type="text" id="uf-user" placeholder="usuario.login" />
+              </div>
+              <div class="sim-field">
+                <label>Senha</label
+                ><input
+                  type="password"
+                  id="uf-pass"
+                  placeholder="Mín. 4 caracteres"
+                />
+              </div>
+              <div class="sim-field">
+                <label>Perfil</label
+                ><select id="uf-role">
+                  <option value="consultor">Consultor</option>
+                  <option value="administrador">Administrador</option>
+                </select>
+              </div>
+            </div>
+            <input type="hidden" id="uf-editing-id" />
+            <div style="display: flex; gap: 8px; margin-top: 10px">
+              <button class="btn-sm btn-simulate" onclick="saveUser()">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Salvar
+              </button>
+              <button class="btn-sm btn-detail" onclick="cancelUserForm()">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+                Cancelar
+              </button>
+            </div>
+          </div>
+          <table style="width: 100%; border-collapse: collapse">
+            <thead>
+              <tr>
+                <th
+                  style="
+                    text-align: left;
+                    padding: 8px 11px;
+                    font-size: 10px;
+                    letter-spacing: 1.5px;
+                    text-transform: uppercase;
+                    color: var(--text-3);
+                    border-bottom: 1px solid var(--border);
+                  "
+                >
+                  Nome
+                </th>
+                <th
+                  style="
+                    text-align: left;
+                    padding: 8px 11px;
+                    font-size: 10px;
+                    letter-spacing: 1.5px;
+                    text-transform: uppercase;
+                    color: var(--text-3);
+                    border-bottom: 1px solid var(--border);
+                  "
+                >
+                  Login
+                </th>
+                <th
+                  style="
+                    text-align: left;
+                    padding: 8px 11px;
+                    font-size: 10px;
+                    letter-spacing: 1.5px;
+                    text-transform: uppercase;
+                    color: var(--text-3);
+                    border-bottom: 1px solid var(--border);
+                  "
+                >
+                  Perfil
+                </th>
+                <th style="border-bottom: 1px solid var(--border)"></th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody"></tbody>
+          </table>
+        </div>
+
+        <div id="admin-tab-mypass" style="display: none">
+          <p style="font-size: 13px; color: var(--text-2); margin-bottom: 16px">
+            Altere a senha da sua conta.
+          </p>
+          <div class="sim-field">
+            <label>Senha Atual</label
+            ><input type="password" id="mp-atual" placeholder="••••••••" />
+          </div>
+          <div class="sim-field">
+            <label>Nova Senha</label
+            ><input
+              type="password"
+              id="mp-nova"
+              placeholder="Mín. 4 caracteres"
+            />
+          </div>
+          <div class="sim-field">
+            <label>Confirmar</label
+            ><input
+              type="password"
+              id="mp-confirma"
+              placeholder="Repita a nova senha"
+            />
+          </div>
+          <button
+            class="btn-calcular"
+            onclick="alterarSenha()"
+            style="margin-top: 6px"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            Alterar Senha
+          </button>
+          <div
+            id="mp-msg"
+            style="margin-top: 10px; font-size: 13px; display: none"
+          ></div>
+        </div>
+
+        <div id="admin-tab-identidade" style="display: none">
+          <p style="font-size: 13px; color: var(--text-2); margin-bottom: 16px">
+            Configure a identidade visual. Reflete automaticamente no login e no
+            painel.
+          </p>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 12px;
+              margin-bottom: 4px;
+            "
+          >
+            <div class="sim-field">
+              <label>Nome do Sistema</label
+              ><input
+                type="text"
+                id="id-nome"
+                placeholder="Ex: CJ2Tech Sistema de Consulta"
+              />
+            </div>
+            <div class="sim-field">
+              <label>Título do Login</label
+              ><input
+                type="text"
+                id="id-titulo"
+                placeholder="Ex: Consulta e simulação..."
+              />
+            </div>
+          </div>
+          <div class="sim-field">
+            <label>Subtítulo do Login</label
+            ><input
+              type="text"
+              id="id-subtitulo"
+              placeholder="Descrição exibida no login"
+            />
+          </div>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 12px;
+              margin-top: 4px;
+            "
+          >
+            <div>
+              <div
+                style="
+                  font-size: 11px;
+                  letter-spacing: 1px;
+                  text-transform: uppercase;
+                  color: var(--text-3);
+                  margin-bottom: 8px;
+                "
+              >
+                Logo Escuro (para tema dark)
+              </div>
+              <div
+                id="preview-logo-dark"
+                style="
+                  width: 100%;
+                  height: 70px;
+                  background: #05070f;
+                  border: 1px solid var(--border);
+                  border-radius: 8px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-bottom: 8px;
+                  color: var(--text-3);
+                  font-size: 11px;
+                "
+              >
+                SVG padrão
+              </div>
+              <div
+                style="
+                  background: var(--bg-card2);
+                  border: 2px dashed var(--border);
+                  border-radius: 8px;
+                  padding: 12px;
+                  text-align: center;
+                  cursor: pointer;
+                  font-size: 12px;
+                  color: var(--text-3);
+                "
+                onclick="document.getElementById('logo-dark-input').click()"
+              >
+                📁 Selecionar (PNG/SVG)
+                <input
+                  type="file"
+                  id="logo-dark-input"
+                  accept="image/*,.svg"
+                  style="display: none"
+                  onchange="previewLogo(this, 'dark')"
+                />
+              </div>
+            </div>
+            <div>
+              <div
+                style="
+                  font-size: 11px;
+                  letter-spacing: 1px;
+                  text-transform: uppercase;
+                  color: var(--text-3);
+                  margin-bottom: 8px;
+                "
+              >
+                Logo Claro (para tema light)
+              </div>
+              <div
+                id="preview-logo-light"
+                style="
+                  width: 100%;
+                  height: 70px;
+                  background: #f0f4ff;
+                  border: 1px solid var(--border);
+                  border-radius: 8px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-bottom: 8px;
+                  color: var(--text-3);
+                  font-size: 11px;
+                "
+              >
+                SVG padrão
+              </div>
+              <div
+                style="
+                  background: var(--bg-card2);
+                  border: 2px dashed var(--border);
+                  border-radius: 8px;
+                  padding: 12px;
+                  text-align: center;
+                  cursor: pointer;
+                  font-size: 12px;
+                  color: var(--text-3);
+                "
+                onclick="document.getElementById('logo-light-input').click()"
+              >
+                📁 Selecionar (PNG/SVG)
+                <input
+                  type="file"
+                  id="logo-light-input"
+                  accept="image/*,.svg"
+                  style="display: none"
+                  onchange="previewLogo(this, 'light')"
+                />
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; margin-top: 14px">
+            <button
+              class="btn-calcular"
+              onclick="salvarIdentidade()"
+              style="flex: 1"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Salvar
+            </button>
+            <button
+              class="btn-sm btn-detail"
+              onclick="resetIdentidade()"
+              style="padding: 10px 16px"
+            >
+              Restaurar Padrão
+            </button>
+          </div>
+        </div>
+
+        <div id="admin-tab-api" style="display: none">
+          <p style="font-size: 13px; color: var(--text-2); margin-bottom: 16px">
+            Credenciais salvas localmente no navegador.
+          </p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+            <div class="sim-field">
+              <label>Tag Empresa</label
+              ><input type="text" id="api-tag" placeholder="Ex: MINHAEMPRESA" />
+            </div>
+            <div class="sim-field">
+              <label>Usuário Promosys</label
+              ><input type="text" id="api-usuario" placeholder="usuário" />
+            </div>
+            <div class="sim-field">
+              <label>Senha Promosys</label
+              ><input type="password" id="api-senha" placeholder="senha" />
+            </div>
+            <div class="sim-field">
+              <label>Modo padrão</label>
+              <select id="api-modo">
+                <option value="offline">Offline (recomendado)</option>
+                <option value="online">Online</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-calcular" onclick="salvarConfigApi()">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            Salvar
+          </button>
+          <button
+            class="btn-sm btn-detail"
+            onclick="testarApi()"
+            style="margin-top: 8px; width: 100%; padding: 10px"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 16v-4" />
+              <path d="M12 8h.01" />
+            </svg>
+            Testar Conexão
+          </button>
+          <div
+            id="api-test-result"
+            style="
+              margin-top: 10px;
+              font-size: 13px;
+              display: none;
+              padding: 11px;
+              border-radius: 8px;
+              background: var(--bg-card2);
+              border: 1px solid var(--border);
+            "
+          ></div>
+          <div
+            style="
+              background: var(--bg-card2);
+              border: 1px solid var(--border);
+              border-radius: 9px;
+              padding: 13px;
+              margin-top: 14px;
+            "
+          >
+            <div
+              style="
+                font-size: 10px;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                color: var(--text-3);
+                margin-bottom: 8px;
+              "
+            >
+              Endpoints utilizados
+            </div>
+            <div
+              style="
+                font-family: var(--mono);
+                font-size: 11px;
+                color: var(--blue-4);
+                line-height: 2;
+              "
+            >
+              Token → /services/token.php<br />CPF (offline) →
+              /services/consultaCpfOffline.php<br />Benefício (offline) →
+              /services/consultaOffline.php<br />Benefício (online) →
+              /services/consulta.php
+            </div>
+          </div>
+        </div>
+
+        <div id="admin-tab-imagem" style="display: none">
+          <p style="font-size: 13px; color: var(--text-2); margin-bottom: 14px">
+            Imagem de fundo da tela de login.
+          </p>
+          <div
+            style="
+              background: var(--bg-card2);
+              border: 1px solid var(--border);
+              border-radius: 9px;
+              padding: 13px;
+              margin-bottom: 13px;
+            "
+          >
+            <div
+              style="
+                font-size: 10px;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                color: var(--text-3);
+                margin-bottom: 8px;
+              "
+            >
+              Preview
+            </div>
+            <div
+              id="bg-preview"
+              style="
+                width: 100%;
+                height: 130px;
+                border-radius: 7px;
+                background: var(--bg-deep);
+                border: 1px solid var(--border);
+                background-size: cover;
+                background-position: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: var(--text-3);
+                font-size: 13px;
+              "
+            >
+              Sem imagem
+            </div>
+          </div>
+          <div
+            style="
+              background: var(--bg-card2);
+              border: 2px dashed var(--border);
+              border-radius: 9px;
+              padding: 22px;
+              text-align: center;
+              cursor: pointer;
+            "
+            onclick="document.getElementById('bg-file-input').click()"
+          >
+            <div style="font-size: 24px; margin-bottom: 6px">🖼️</div>
+            <div
+              style="
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text-1);
+                margin-bottom: 3px;
+              "
+            >
+              Clique para selecionar
+            </div>
+            <div style="font-size: 12px; color: var(--text-3)">
+              JPG, PNG, WEBP — 1920×1080 recomendado
+            </div>
+            <input
+              type="file"
+              id="bg-file-input"
+              accept="image/*"
+              style="display: none"
+              onchange="previewBgImage(this)"
+            />
+          </div>
+          <div
+            id="bg-file-name"
+            style="
+              font-size: 12px;
+              color: var(--text-3);
+              margin-top: 7px;
+              display: none;
+            "
+          ></div>
+          <button
+            class="btn-calcular"
+            onclick="aplicarBgImagem()"
+            style="margin-top: 11px"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            Aplicar
+          </button>
+          <button
+            class="btn-sm btn-detail"
+            onclick="removerBgImagem()"
+            style="margin-top: 8px; width: 100%; padding: 9px"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+            Remover imagem
+          </button>
+        </div>
+        <div id="admin-tab-financeiro" style="display: none">
+          <p style="font-size: 13px; color: var(--text-2); margin-bottom: 16px">
+            Dados financeiros das empresas. Visível apenas para Master Total.
+          </p>
+          <div
+            id="financeiro-lista"
+            style="font-size: 13px; color: var(--text-3)"
+          >
+            Carregando...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal-overlay"
+      id="beneficio-select-overlay"
+      onclick="if (event.target === this) this.classList.remove('open');"
+    >
+      <div class="modal-box" style="width: 500px">
+        <div class="modal-header">
+          <div>
+            <h3>Selecione o Benefício</h3>
+            <div style="font-size: 12px; color: var(--text-3); margin-top: 3px">
+              Este CPF possui múltiplos benefícios. Escolha um para consultar.
+            </div>
+          </div>
+          <button
+            class="btn-close-modal"
+            onclick="
+              document
+                .getElementById('beneficio-select-overlay')
+                .classList.remove('open')
+            "
+          >
+            ×
+          </button>
+        </div>
+        <div
+          id="beneficio-select-list"
+          style="display: flex; flex-direction: column; gap: 10px"
+        ></div>
+      </div>
+    </div>
+
+    <div
+      class="modal-overlay"
+      id="modal-overlay"
+      onclick="if (event.target === this) closeModal();"
+    >
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>Detalhes do Contrato</h3>
+          <button class="btn-close-modal" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-grid" id="modal-content"></div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">
+      <div class="toast-dot" id="toast-dot"></div>
+      <span id="toast-msg"></span>
+    </div>
+
+    <script>
+      "use strict";
+
+      const IDENTITY_DEFAULT = {
+        nomeSistema: "CJ2Tech Sistema de Consulta",
+        titulo: "Consulta e simulação de contratos consignados em segundos.",
+        subtitulo:
+          "Acesse dados completos do beneficiário, visualize contratos ativos e veja o valor de quitação calculado automaticamente pela metodologia do Banco Central.",
+        logoDark: null,
+        logoLight: null,
+      };
+
+      let IDENTITY = { ...IDENTITY_DEFAULT };
+
+      function loadIdentity() {
+        const s = localStorage.getItem("cj2-identity");
+        if (s) IDENTITY = Object.assign({ ...IDENTITY_DEFAULT }, JSON.parse(s));
+        applyIdentity();
+      }
+
+      function applyIdentity() {
+        document.title = IDENTITY.nomeSistema;
+        const topNome = document.getElementById("topbar-nome-sistema");
+        if (topNome) {
+          const parts = IDENTITY.nomeSistema.split(" ");
+          const first = parts[0];
+          const rest = parts.slice(1).join(" ");
+          topNome.innerHTML = first + (rest ? ` <span>${rest}</span>` : "");
+        }
+        const elTit = document.getElementById("login-titulo");
+        if (elTit) elTit.textContent = IDENTITY.titulo;
+        const elSub = document.getElementById("login-subtitulo");
+        if (elSub) elSub.textContent = IDENTITY.subtitulo;
+        const elTag = document.getElementById("login-brand-tag");
+        if (elTag) elTag.textContent = IDENTITY.nomeSistema;
+        applyLogo("dark", IDENTITY.logoDark);
+        applyLogo("light", IDENTITY.logoLight);
+      }
+
+      function applyLogo(mode, dataUrl) {
+        const ids =
+          mode === "dark"
+            ? ["logo-dark-login", "logo-dark-topbar"]
+            : ["logo-light-login", "logo-light-topbar"];
+        ids.forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          if (dataUrl) {
+            el.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:contain">`;
+          }
+        });
+      }
+
+      function fillIdentityForm() {
+        document.getElementById("id-nome").value = IDENTITY.nomeSistema || "";
+        document.getElementById("id-titulo").value = IDENTITY.titulo || "";
+        document.getElementById("id-subtitulo").value =
+          IDENTITY.subtitulo || "";
+        if (IDENTITY.logoDark) {
+          const p = document.getElementById("preview-logo-dark");
+          p.innerHTML = `<img src="${IDENTITY.logoDark}" style="max-height:60px;max-width:100%;object-fit:contain">`;
+        }
+        if (IDENTITY.logoLight) {
+          const p = document.getElementById("preview-logo-light");
+          p.innerHTML = `<img src="${IDENTITY.logoLight}" style="max-height:60px;max-width:100%;object-fit:contain">`;
+        }
+      }
+
+      let _logoTempDark = null,
+        _logoTempLight = null;
+
+      function previewLogo(input, mode) {
+        if (!input.files || !input.files[0]) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const dataUrl = e.target.result;
+          if (mode === "dark") {
+            _logoTempDark = dataUrl;
+            document.getElementById("preview-logo-dark").innerHTML =
+              `<img src="${dataUrl}" style="max-height:60px;max-width:100%;object-fit:contain">`;
+          } else {
+            _logoTempLight = dataUrl;
+            document.getElementById("preview-logo-light").innerHTML =
+              `<img src="${dataUrl}" style="max-height:60px;max-width:100%;object-fit:contain">`;
+          }
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+
+      async function salvarIdentidade() {
+        IDENTITY.nomeSistema =
+          document.getElementById("id-nome").value.trim() ||
+          IDENTITY_DEFAULT.nomeSistema;
+        IDENTITY.titulo =
+          document.getElementById("id-titulo").value.trim() ||
+          IDENTITY_DEFAULT.titulo;
+        IDENTITY.subtitulo =
+          document.getElementById("id-subtitulo").value.trim() ||
+          IDENTITY_DEFAULT.subtitulo;
+        if (_logoTempDark) IDENTITY.logoDark = _logoTempDark;
+        if (_logoTempLight) IDENTITY.logoLight = _logoTempLight;
+        _logoTempDark = null;
+        _logoTempLight = null;
+        localStorage.setItem("cj2-identity", JSON.stringify(IDENTITY));
+        applyIdentity();
+        if (sessionToken && currentUser?.empresa_id) {
+          try {
+            const body = {
+              empresa_id: currentUser.empresa_id,
+              nome_sistema: IDENTITY.nomeSistema,
+              titulo_login: IDENTITY.titulo,
+              subtitulo_login: IDENTITY.subtitulo,
+              logo_dark: IDENTITY.logoDark || null,
+              logo_light: IDENTITY.logoLight || null,
+            };
+            const res = await fetch("api/config.php", {
+              method: "PUT",
+              headers: authHeaders(),
+              body: JSON.stringify(body),
+            });
+            const data = await res.json();
+            if (!res.ok)
+              throw new Error(data.erro || "Erro ao salvar no banco.");
+            showToast("Identidade salva no banco!", "success");
+          } catch (e) {
+            showToast("Salvo localmente. Erro no banco: " + e.message, "info");
+          }
+        } else {
+          showToast("Identidade salva localmente!", "success");
+        }
+      }
+
+      function resetIdentidade() {
+        IDENTITY = { ...IDENTITY_DEFAULT };
+        localStorage.removeItem("cj2-identity");
+        applyIdentity();
+        fillIdentityForm();
+        ["logo-dark-login", "logo-dark-topbar"].forEach((id) => {
+          const el = document.getElementById(id);
+          if (el)
+            el.innerHTML = `<svg viewBox="0 0 200 200" fill="none"><circle cx="100" cy="100" r="88" stroke="white" stroke-width="4" fill="none" stroke-dasharray="460 100" stroke-linecap="round"/><circle cx="100" cy="100" r="65" stroke="white" stroke-width="3" fill="none" stroke-dasharray="320 90" stroke-linecap="round" stroke-dashoffset="50"/><circle cx="100" cy="12" r="11" fill="white"/><circle cx="126" cy="38" r="7" fill="white"/><circle cx="24" cy="110" r="8" fill="white"/><circle cx="95" cy="165" r="13" fill="white"/><text x="55" y="120" font-family="'Exo 2',sans-serif" font-weight="800" font-size="48" fill="white">CJ2</text><text x="115" y="143" font-family="'Exo 2',sans-serif" font-weight="700" font-size="18" fill="white" font-style="italic">TECH</text></svg>`;
+        });
+        showToast("Identidade restaurada!", "info");
+      }
+
+      const fmt = (v) =>
+        "R$ " +
+        parseFloat(v || 0).toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      const fmtDate = (d) => {
+        if (!d || d === "—") return "—";
+        const s = String(d);
+        if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+          const p = s.split("T")[0].split("-");
+          return p[2] + "/" + p[1] + "/" + p[0];
+        }
+        if (/^\d{2}\/\d{2}\/\d{4}/.test(s)) return s;
+        return d;
+      };
+      const diffMonths = (a, b) =>
+        Math.max(
+          0,
+          (b.getFullYear() - a.getFullYear()) * 12 +
+            b.getMonth() -
+            a.getMonth(),
+        );
+      const getInitials = (n) => {
+        const p = (n || "").trim().split(" ");
+        return (
+          (p[0]?.[0] || "?") + (p.length > 1 ? p[p.length - 1][0] || "" : "")
+        );
+      };
+
+      function showToast(msg, type = "info") {
+        const colors = {
+          success: "#10b981",
+          error: "#ef4444",
+          info: "#3b82f6",
+        };
+        document.getElementById("toast-msg").textContent = msg;
+        document.getElementById("toast-dot").style.background =
+          colors[type] || colors.info;
+        const t = document.getElementById("toast");
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 3200);
+      }
+      function loadingStart() {
+        document.getElementById("loading-bar").style.display = "block";
+        document.getElementById("btn-search").disabled = true;
+      }
+      function loadingEnd() {
+        document.getElementById("loading-bar").style.display = "none";
+        document.getElementById("btn-search").disabled = false;
+      }
+
+      (function () {
+        if (localStorage.getItem("cj2-theme") === "light")
+          document.documentElement.classList.add("light");
+      })();
+      function toggleTheme() {
+        const light = document.documentElement.classList.toggle("light");
+        const icon = light ? "☀️" : "🌙";
+        ["btn-theme", "btn-theme-login"].forEach((id) => {
+          const b = document.getElementById(id);
+          if (b) b.textContent = icon;
+        });
+        localStorage.setItem("cj2-theme", light ? "light" : "dark");
+      }
+      let sessionToken = sessionStorage.getItem("cj2-token") || null;
+      let currentUser = null;
+      let apiConfig = {
+        usuario: "",
+        senha: "",
+        modo: "offline",
+        token: null,
+        tokenDate: null,
+      };
+      let tipoConsulta = "cpf";
+      let currentContracts = [];
+
+      window.addEventListener("DOMContentLoaded", () => {
+        const savedTheme = localStorage.getItem("cj2-theme") || "dark";
+        if (savedTheme === "light")
+          document.documentElement.classList.add("light");
+        const icon = savedTheme === "light" ? "☀️" : "🌙";
+        ["btn-theme", "btn-theme-login"].forEach((id) => {
+          const b = document.getElementById(id);
+          if (b) b.textContent = icon;
+        });
+        const slugParam = new URLSearchParams(window.location.search).get(
+          "empresa",
+        );
+        carregarConfigPublica(slugParam);
+        document
+          .getElementById("login-pass")
+          .addEventListener("keydown", (e) => {
+            if (e.key === "Enter") doLogin();
+          });
+      });
+
+      function loadLoginBgFile() {
+        const cands = [
+          "bg-login/bg.jpg",
+          "bg-login/bg.jpeg",
+          "bg-login/bg.png",
+          "bg-login/bg.webp",
+          "bg-login.jpg",
+          "bg-login.png",
+        ];
+        const l = document.getElementById("screen-login");
+        let i = 0;
+        function tryNext() {
+          if (i >= cands.length) return;
+          const img = new Image();
+          img.onload = () => {
+            l.style.backgroundImage = `url('${cands[i]}')`;
+            l.classList.remove("no-image");
+          };
+          img.onerror = () => {
+            i++;
+            tryNext();
+          };
+          img.src = cands[i];
+        }
+        tryNext();
+      }
+
+      async function carregarConfigPublica(slug) {
+        try {
+          const url = slug
+            ? `api/config.php?empresa=${encodeURIComponent(slug)}`
+            : "api/config.php";
+          const res = await fetch(url);
+          if (!res.ok) {
+            const err = await res
+              .json()
+              .catch(() => ({ erro: "Erro desconhecido" }));
+            if (res.status === 404) {
+              document.getElementById("login-brand-tag").textContent =
+                err.erro || "Empresa não identificada";
+              console.warn("[CJ2] Config:", err.erro);
+            }
+            throw new Error(err.erro || "Config não encontrada");
+          }
+          const data = await res.json();
+          const cfg = data.config || {};
+          if (cfg.nome_sistema) IDENTITY.nomeSistema = cfg.nome_sistema;
+          if (cfg.titulo_login) IDENTITY.titulo = cfg.titulo_login;
+          if (cfg.subtitulo_login) IDENTITY.subtitulo = cfg.subtitulo_login;
+          if (cfg.logo_dark) IDENTITY.logoDark = cfg.logo_dark;
+          if (cfg.logo_light) IDENTITY.logoLight = cfg.logo_light;
+          if (cfg.imagem_fundo) {
+            const l = document.getElementById("screen-login");
+            l.style.backgroundImage = `url('${cfg.imagem_fundo}')`;
+            l.classList.remove("no-image");
+          } else {
+            loadLoginBgFile();
+          }
+          applyIdentity();
+        } catch (e) {
+          loadIdentity();
+          loadLoginBgFile();
+        }
+      }
+
+      function authHeaders() {
+        return {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + sessionToken,
+        };
+      }
+
+      async function doLogin() {
+        const u = document.getElementById("login-user").value.trim();
+        const p = document.getElementById("login-pass").value;
+        const errEl = document.getElementById("login-error");
+        errEl.style.display = "none";
+        if (!u || !p) {
+          errEl.style.display = "block";
+          errEl.textContent = "Preencha usuário e senha.";
+          return;
+        }
+        try {
+          const res = await fetch("api/login.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ login: u, senha: p }),
+          });
+          const data = await res.json();
+          if (!res.ok || data.erro)
+            throw new Error(data.erro || "Credenciais inválidas.");
+          sessionToken = data.token;
+          sessionStorage.setItem("cj2-token", sessionToken);
+          currentUser = data.usuario;
+          if (data.api_config) {
+            apiConfig.usuario = data.api_config.api_usuario || "";
+            apiConfig.senha = data.api_config.api_senha || "";
+            apiConfig.modo = data.api_config.api_modo || "offline";
+          }
+          if (data.config) {
+            const c = data.config;
+            if (c.nome_sistema) IDENTITY.nomeSistema = c.nome_sistema;
+            if (c.titulo_login) IDENTITY.titulo = c.titulo_login;
+            if (c.subtitulo_login) IDENTITY.subtitulo = c.subtitulo_login;
+            if (c.logo_dark) IDENTITY.logoDark = c.logo_dark;
+            if (c.logo_light) IDENTITY.logoLight = c.logo_light;
+            applyIdentity();
+          }
+          document.getElementById("screen-login").style.display = "none";
+          document.getElementById("screen-app").style.display = "block";
+          document.getElementById("user-name").textContent = currentUser.nome;
+          document.getElementById("user-avatar").textContent = getInitials(
+            currentUser.nome,
+          ).toUpperCase();
+          const adminBtn = document.getElementById("btn-admin-topbar");
+          if (adminBtn)
+            adminBtn.style.display =
+              currentUser.perfil !== "consultor" ? "flex" : "none";
+          updateApiBadge();
+          showToast("Bem-vindo, " + currentUser.nome + "!", "success");
+        } catch (e) {
+          errEl.style.display = "block";
+          errEl.textContent = e.message;
+        }
+      }
+
+      async function doLogout() {
+        try {
+          await fetch("api/logout.php", {
+            method: "POST",
+            headers: authHeaders(),
+          });
+        } catch (e) {}
+        sessionToken = null;
+        currentUser = null;
+        sessionStorage.removeItem("cj2-token");
+        document.getElementById("screen-app").style.display = "none";
+        document.getElementById("screen-login").style.display = "flex";
+        document.getElementById("login-user").value = "";
+        document.getElementById("login-pass").value = "";
+        document.getElementById("login-error").style.display = "none";
+        resetView();
+      }
+
+      function updateApiBadge() {
+        const b = document.getElementById("api-badge");
+        if (!b) return;
+        if (!apiConfig.usuario || !apiConfig.senha) {
+          b.className = "api-badge idle";
+          b.textContent = "API não configurada";
+        } else {
+          b.className = "api-badge ok";
+          b.textContent = "API configurada";
+        }
+      }
+      function fillApiForm() {
+        document.getElementById("api-tag").value =
+          currentUser?.empresa_id || "";
+        document.getElementById("api-usuario").value = apiConfig.usuario || "";
+        document.getElementById("api-senha").value = apiConfig.senha || "";
+        document.getElementById("api-modo").value = apiConfig.modo || "offline";
+      }
+      async function salvarConfigApi() {
+        const empId = currentUser?.empresa_id;
+        if (!empId) {
+          showToast("Empresa não identificada.", "error");
+          return;
+        }
+        apiConfig.usuario = document.getElementById("api-usuario").value.trim();
+        apiConfig.senha = document.getElementById("api-senha").value;
+        apiConfig.modo = document.getElementById("api-modo").value;
+        apiConfig.token = null;
+        try {
+          const res = await fetch("api/empresas.php?id=" + empId, {
+            method: "PUT",
+            headers: authHeaders(),
+            body: JSON.stringify({
+              api_usuario: apiConfig.usuario,
+              api_senha: apiConfig.senha,
+              api_modo: apiConfig.modo,
+            }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.erro || "Erro ao salvar.");
+          updateApiBadge();
+          showToast("Configurações salvas!", "success");
+        } catch (e) {
+          showToast("Erro: " + e.message, "error");
+        }
+      }
+
+      async function getToken() {
+        const today = new Date().toDateString();
+        if (apiConfig.token && apiConfig.tokenDate === today)
+          return apiConfig.token;
+        const res = await fetch("api/proxy.php", {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({
+            endpoint: "token",
+            usuario: apiConfig.usuario,
+            senha: apiConfig.senha,
+          }),
+        });
+        const data = await res.json();
+        if (data.Code !== "000")
+          throw new Error(data.Msg || "Erro ao obter token");
+        apiConfig.token = data.Token;
+        apiConfig.tokenDate = today;
+        return data.Token;
+      }
+      async function testarApi() {
+        const resEl = document.getElementById("api-test-result");
+        resEl.style.display = "block";
+        resEl.style.color = "var(--text-2)";
+        resEl.textContent = "🔄 Testando...";
+        try {
+          if (!apiConfig.usuario || !apiConfig.senha)
+            throw new Error("Configure usuário e senha primeiro.");
+          apiConfig.token = null;
+          await getToken();
+          resEl.style.color = "var(--success)";
+          resEl.textContent = "✅ Conexão OK! Token obtido.";
+          updateApiBadge();
+          showToast("API conectada!", "success");
+        } catch (e) {
+          resEl.style.color = "var(--danger)";
+          resEl.textContent = "❌ " + e.message;
+          showToast("Falha", "error");
+        }
+      }
+
+      function setTipo(v) {
+        tipoConsulta = v;
+      }
+      function maskInput(el) {
+        let v = el.value.replace(/\D/g, "");
+        if (tipoConsulta === "cpf" && v.length <= 11)
+          v = v
+            .replace(/(\d{3})(\d)/, "$1.$2")
+            .replace(/(\d{3})(\d)/, "$1.$2")
+            .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+        el.value = v;
+      }
+
+      async function doConsulta() {
+        const raw = document
+          .getElementById("search-input")
+          .value.replace(/\D/g, "");
+        if (raw.length < 8) {
+          showToast("Informe CPF ou benefício válido.", "error");
+          return;
+        }
+        if (!apiConfig.usuario || !apiConfig.senha) {
+          showToast("Configure as credenciais da API no Admin.", "error");
+          return;
+        }
+        loadingStart();
+        try {
+          const token = await getToken();
+          if (tipoConsulta === "cpf") {
+            const resBen = await fetch("api/proxy.php", {
+              method: "POST",
+              headers: authHeaders(),
+              body: JSON.stringify({
+                endpoint: "beneficios",
+                token_promosys: token,
+                cpf: raw,
+              }),
+            });
+            const dataBen = await resBen.json();
+            if (dataBen.Code !== "000")
+              throw new Error(dataBen.Msg || "CPF não encontrado");
+            const lista = dataBen.Beneficios || [];
+            if (lista.length === 0)
+              throw new Error("Nenhum benefício encontrado para este CPF");
+            if (lista.length === 1) {
+              await consultarBeneficio(token, lista[0]);
+            } else {
+              loadingEnd();
+              mostrarSelecaoBeneficios(lista, token);
+              return;
+            }
+          } else {
+            await consultarBeneficio(token, raw);
+          }
+          showToast("Consulta realizada com sucesso!", "success");
+        } catch (e) {
+          showToast("Erro: " + e.message, "error");
+          ["client-block", "contracts-block", "simulation-block"].forEach(
+            (id) => (document.getElementById(id).style.display = "none"),
+          );
+        }
+        loadingEnd();
+      }
+
+      async function consultarBeneficio(token, beneficio) {
+        const res = await fetch("api/proxy.php", {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({
+            endpoint: "beneficio",
+            token_promosys: token,
+            beneficio: String(beneficio),
+            modo: apiConfig.modo,
+          }),
+        });
+        const data = await res.json();
+        if (data.Code !== "000")
+          throw new Error(data.Msg || "Erro na consulta do benefício");
+        document
+          .getElementById("beneficio-select-overlay")
+          .classList.remove("open");
+        renderCliente(data);
+        renderContratos(data);
+      }
+
+      function mostrarSelecaoBeneficios(lista, token) {
+        const overlay = document.getElementById("beneficio-select-overlay");
+        const container = document.getElementById("beneficio-select-list");
+        container.innerHTML = lista
+          .map(
+            (b) => `
+        <div onclick="selecionarBeneficio('${b}','${token}')" style="padding:16px 18px;background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px;" onmouseover="this.style.borderColor='var(--blue-3)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="width:38px;height:38px;background:linear-gradient(135deg,var(--blue-2),var(--cyan-dim));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+          <div><div style="font-weight:600;font-size:14px;margin-bottom:3px">${b}</div><div style="font-size:12px;color:var(--text-3)">Clique para consultar este benefício</div></div>
+          <div style="margin-left:auto;color:var(--blue-4);font-size:18px">→</div>
+        </div>
+      `,
+          )
+          .join("");
+        overlay.classList.add("open");
+      }
+
+      async function selecionarBeneficio(beneficio, token) {
+        loadingStart();
+        try {
+          await consultarBeneficio(token, beneficio);
+          showToast("Consulta realizada com sucesso!", "success");
+        } catch (e) {
+          showToast("Erro: " + e.message, "error");
+        }
+        loadingEnd();
+      }
+
+      function g(obj, ...keys) {
+        for (const k of keys) {
+          if (obj[k] != null && obj[k] !== "") return obj[k];
+        }
+        return "—";
+      }
+
+      function renderCliente(data) {
+        const c = data.Consulta || data;
+        const ben = c.BENEFICIO || {};
+
+        const nome = c.NOME || "—";
+        const cpf = c.FULL_CPF || g(c, "Cpf", "cpf", "CPF") || "—";
+        const nb = ben.nb || g(c, "Beneficio", "beneficio") || "—";
+        const nasc = c.NASCTO
+          ? formatNascto(c.NASCTO)
+          : g(c, "DataNascimento", "dataNascimento", "DtNascimento") || "—";
+        const mae = g(c, "NomeMae", "nomeMae", "Mae", "mae") || "—";
+        const pai = g(c, "NomePai", "nomePai", "Pai", "pai") || "—";
+        const sit =
+          ben.situacao ||
+          g(c, "SituacaoBeneficio", "situacao", "Situacao") ||
+          "—";
+        const esp =
+          c.ESP || g(c, "EspecieBeneficio", "especie", "Especie") || "—";
+        const marg =
+          ben.MargemCalculadaBen ||
+          ben.MargemCalculada ||
+          g(c, "MargemDisponivel", "margem") ||
+          "—";
+
+        const ini = nome !== "—" ? getInitials(nome).toUpperCase() : "??";
+        document.getElementById("client-initials").textContent = ini;
+        document.getElementById("c-nome").textContent = nome;
+        document.getElementById("c-cpf").textContent = cpf;
+        document.getElementById("c-beneficio").textContent = nb;
+        document.getElementById("c-nascimento").textContent = nasc;
+        document.getElementById("c-mae").textContent = mae;
+        document.getElementById("c-pai").textContent = pai;
+        document.getElementById("c-situacao").textContent = sit;
+        document.getElementById("c-especie").textContent = esp;
+        document.getElementById("c-margem").textContent =
+          marg !== "—" ? fmt(marg) : "—";
+
+        const contratos = normalizeContratos(data);
+        if (contratos.length) {
+          // REMOVIDO: Seção "Parcelas Pagas (por contrato)"
+          // Mantém apenas o total de parcelas pagas
+          let totalParcelasPagas = 0;
+          contratos.forEach((ct) => {
+            const pagas = parseInt(ct.ParcPagas || 0);
+            if (!isNaN(pagas) && pagas > 0) totalParcelasPagas += pagas;
+          });
+          const totalPagasEl = document.getElementById(
+            "c-total-parcelas-pagas",
+          );
+          if (totalPagasEl)
+            totalPagasEl.textContent =
+              totalParcelasPagas > 0 ? totalParcelasPagas : "—";
+        } else {
+          const totalPagasEl = document.getElementById(
+            "c-total-parcelas-pagas",
+          );
+          if (totalPagasEl) totalPagasEl.textContent = "—";
+        }
+
+        const benObj = (data.Consulta || data).BENEFICIO || {};
+        const totalComp =
+          benObj.TotalComprometido ?? benObj.ValorConsignado ?? null;
+        const compEl = document.getElementById("c-total-comprometido");
+        if (compEl)
+          compEl.textContent = totalComp !== null ? fmt(totalComp) : "—";
+
+        const margCalcEl = document.getElementById("c-margem-calculada");
+        if (margCalcEl) margCalcEl.textContent = "—";
+
+        const cons = data.Consulta || data;
+        const tel1Val = cons.TEL_1 || cons.TEL_2 || "—";
+        const tel1El = document.getElementById("c-tel1");
+        if (tel1El) tel1El.textContent = tel1Val;
+
+        const tel2El = document.getElementById("c-tel2");
+        const ruaEl = document.getElementById("c-end-rua");
+        const bairEl = document.getElementById("c-end-bairro");
+        const cidEl = document.getElementById("c-end-cidade");
+        const ufEl = document.getElementById("c-end-uf");
+        if (tel2El) tel2El.textContent = cons.TEL_2 || "—";
+        if (ruaEl) ruaEl.textContent = cons.ENDERECO || "—";
+        if (bairEl) bairEl.textContent = cons.BAIRRO || "—";
+        if (cidEl) cidEl.textContent = cons.CIDADE || "—";
+        if (ufEl) ufEl.textContent = cons.UF || "—";
+
+        const endParts = [
+          cons.ENDERECO,
+          cons.BAIRRO,
+          cons.CIDADE,
+          cons.UF,
+        ].filter((v) => v && v !== "—");
+        const endEl = document.getElementById("c-endereco-completo");
+        if (endEl)
+          endEl.textContent = endParts.length ? endParts.join(" - ") : "—";
+
+        const badge = document.getElementById("c-status-badge");
+        const ativo = String(sit).toLowerCase().includes("ativ");
+        badge.textContent = sit;
+        badge.className =
+          "status-badge " + (ativo ? "status-ativo" : "status-inativo");
+        document.getElementById("client-block").style.display = "block";
+        document.getElementById("simulation-block").style.display = "none";
+      }
+
+      function formatNascto(ts) {
+        if (!ts) return "—";
+        try {
+          const d = new Date(ts * 1000);
+          return d.toLocaleDateString("pt-BR");
+        } catch (e) {
+          return "—";
+        }
+      }
+
+      function calcQuitacaoBC(pmt, taxaMensal, inicioStr, fimStr, baseStr) {
+        const j = taxaMensal / 100;
+        const parseD = (s) => {
+          if (!s) return null;
+          const v = String(s).split("T")[0];
+          return new Date(v + "T12:00:00");
+        };
+        const ini = parseD(inicioStr),
+          fim = parseD(fimStr),
+          bas = parseD(baseStr || new Date().toISOString().split("T")[0]);
+        if (!ini || !fim || !bas) return null;
+        const nTotal = diffMonths(ini, fim);
+        const nRest = Math.max(0, diffMonths(bas, fim));
+        if (j === 0 || nRest === 0)
+          return { nTotal, nRest, pv: 0, totalRest: pmt * nRest, juros: 0 };
+        const pv = (pmt * (1 - Math.pow(1 + j, -nRest))) / j;
+        const totalRest = pmt * nRest;
+        return {
+          nTotal,
+          nRest,
+          pv: Math.round(pv * 100) / 100,
+          totalRest: Math.round(totalRest * 100) / 100,
+          juros: Math.round((totalRest - pv) * 100) / 100,
+        };
+      }
+
+      function normalizeContratos(data) {
+        const c = data.Consulta || data;
+        if (Array.isArray(c.CONTRATO)) return c.CONTRATO;
+        if (Array.isArray(c.Emprestimos)) return c.Emprestimos;
+        if (Array.isArray(c.Contratos)) return c.Contratos;
+        if (Array.isArray(data)) return data;
+        return [];
+      }
+      function gc(c, ...keys) {
+        for (const k of keys) {
+          if (c[k] != null && c[k] !== "") return c[k];
+        }
+        return "";
+      }
+
+      function converterDataPromosys(d) {
+        if (!d || d === "000000") return "";
+        const s = String(d);
+        if (s.length === 6)
+          return s.substring(0, 4) + "-" + s.substring(4, 6) + "-01";
+        return s;
+      }
+
+      function renderContratos(data) {
+        const contratos = normalizeContratos(data);
+        currentContracts = contratos;
+        const today = new Date().toISOString().split("T")[0];
+        const tbody = document.getElementById("contracts-tbody");
+
+        if (!contratos.length) {
+          tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:28px;color:var(--text-3)">Nenhum contrato encontrado</td></tr>`;
+          document.getElementById("contracts-block").style.display = "block";
+          return;
+        }
+
+        tbody.innerHTML = contratos
+          .map((c, i) => {
+            const banco =
+              c.Banco_Nome || gc(c, "Banco", "banco", "NomeBanco") || "—";
+            const contrato =
+              c.Contrato || gc(c, "NrContrato", "NumeroContrato") || "—";
+            const inicio =
+              converterDataPromosys(c.InicioDesconto) ||
+              gc(c, "DataInicio", "dataInicio");
+            const fim =
+              converterDataPromosys(c.FinalDesconto) ||
+              gc(c, "DataFim", "dataFim");
+            const valor = parseFloat(
+              c.Vl_Emprestimo || gc(c, "ValorContrato", "valor") || 0,
+            );
+            const taxa = parseFloat(
+              c.TaxaJuros || gc(c, "Taxa", "taxaJuros") || 0,
+            );
+            const parcela = parseFloat(
+              c.Vl_Parcela || gc(c, "Parcela", "valorParcela") || 0,
+            );
+            const prazo = parseInt(c.Prazo || 0);
+            const pagas = parseInt(c.ParcPagas || 0);
+            const quitProm = parseFloat(c.QUITACAOATUAL || 0);
+
+            let quitFinal = "—",
+              restStr = prazo > 0 ? `${prazo - pagas}/${prazo}` : "—";
+            if (parcela > 0 && taxa > 0 && inicio && fim) {
+              const calc = calcQuitacaoBC(parcela, taxa, inicio, fim, today);
+              if (calc) {
+                quitFinal = fmt(calc.pv);
+                restStr = calc.nRest + "/" + calc.nTotal;
+              }
+            } else if (quitProm > 0) {
+              quitFinal = fmt(quitProm);
+            }
+
+            return `<tr>
+          <td class="td-banco">${banco}</td>
+          <td class="td-contrato">${contrato}</td>
+          <td>${fmtDate(inicio) || "—"}</td>
+          <td>${fmtDate(fim) || "—"}</td>
+          <td>${valor ? fmt(valor) : "—"}</td>
+          <td class="td-taxa">${taxa ? taxa.toFixed(2) + "%" : "—"}</td>
+          <td class="td-parcela">${parcela ? fmt(parcela) : "—"}</td>
+          <td><span class="badge-restantes">${restStr}</span></td>
+          <td class="td-parcelas-pagas">${pagas > 0 ? pagas : "—"}</td>
+          <td class="td-quitacao">${quitFinal}</td>
+          <td>
+            <button class="btn-sm btn-simulate" onclick="openSim(${i})"> Simular</button>
+            <button class="btn-sm btn-detail" onclick="openDetail(${i})" style="margin-left:4px">Detalhar</button>
+          </td>
+        </tr>`;
+          })
+          .join("");
+
+        document.getElementById("contracts-block").style.display = "block";
+        atualizarMargemCalculada();
+      }
+
+      function atualizarMargemCalculada() {
+        const el = document.getElementById("c-margem-calculada");
+        if (!el) return;
+        if (!currentContracts.length) {
+          el.textContent = "—";
+          return;
+        }
+
+        const today = new Date().toISOString().split("T")[0];
+        let somaQuitacao = 0;
+        let temCalculo = false;
+
+        currentContracts.forEach((c) => {
+          const parcela = parseFloat(c.Vl_Parcela || 0);
+          const taxa = parseFloat(c.TaxaJuros || 0);
+          const inicio = converterDataPromosys(c.InicioDesconto);
+          const fim = converterDataPromosys(c.FinalDesconto);
+
+          if (parcela > 0 && taxa > 0 && inicio && fim) {
+            const calc = calcQuitacaoBC(parcela, taxa, inicio, fim, today);
+            if (calc && calc.pv > 0) {
+              somaQuitacao += calc.pv;
+              temCalculo = true;
+            }
+          }
+        });
+
+        if (temCalculo) {
+          el.textContent = fmt(somaQuitacao);
+          el.title =
+            "Soma dos valores de quitação calculados pelo Banco Central para todos os contratos ativos";
+        } else {
+          el.textContent = "—";
+        }
+      }
+
+      function openSim(idx) {
+        const c = currentContracts[idx];
+        const today = new Date().toISOString().split("T")[0];
+        const parcela = parseFloat(
+          c.Vl_Parcela || gc(c, "Parcela", "valorParcela") || 0,
+        );
+        const taxa = parseFloat(c.TaxaJuros || gc(c, "Taxa", "taxaJuros") || 0);
+        const inicio =
+          converterDataPromosys(c.InicioDesconto) ||
+          gc(c, "DataInicio", "dataInicio");
+        const fim =
+          converterDataPromosys(c.FinalDesconto) || gc(c, "DataFim", "dataFim");
+        const banco = c.Banco_Nome || gc(c, "Banco", "NomeBanco") || "—";
+        const contrato = c.Contrato || gc(c, "NrContrato") || "";
+
+        document.getElementById("sim-titulo").textContent =
+          "Contrato " + (contrato || idx + 1);
+        document.getElementById("sim-banco").textContent = banco;
+        document.getElementById("sim-parcela").value = parcela || "";
+        document.getElementById("sim-taxa").value = taxa || "";
+        document.getElementById("sim-inicio").value = inicio || "";
+        document.getElementById("sim-fim").value = fim || "";
+        document.getElementById("sim-data-base").value = today;
+        [
+          "r-total",
+          "r-restantes",
+          "r-total-restante",
+          "r-juros",
+          "r-quitacao",
+        ].forEach((id) => (document.getElementById(id).textContent = "—"));
+        document.getElementById("simulation-block").style.display = "block";
+        document
+          .getElementById("simulation-block")
+          .scrollIntoView({ behavior: "smooth", block: "start" });
+        if (parcela > 0 && taxa > 0 && inicio && fim) calcularQuitacao();
+      }
+      function closeSim() {
+        document.getElementById("simulation-block").style.display = "none";
+      }
+
+      function calcularQuitacao() {
+        const pmt = parseFloat(document.getElementById("sim-parcela").value);
+        const taxa = parseFloat(document.getElementById("sim-taxa").value);
+        const ini = document.getElementById("sim-inicio").value;
+        const fim = document.getElementById("sim-fim").value;
+        const base = document.getElementById("sim-data-base").value;
+        if (!pmt || !taxa || !ini || !fim || !base) {
+          showToast("Preencha todos os campos.", "error");
+          return;
+        }
+        const calc = calcQuitacaoBC(pmt, taxa, ini, fim, base);
+        if (!calc) {
+          showToast("Datas inválidas.", "error");
+          return;
+        }
+        document.getElementById("r-total").textContent = calc.nTotal;
+        document.getElementById("r-restantes").textContent = calc.nRest;
+        document.getElementById("r-total-restante").textContent = fmt(
+          calc.totalRest,
+        );
+        document.getElementById("r-juros").textContent = fmt(calc.juros);
+        document.getElementById("r-quitacao").textContent = fmt(calc.pv);
+        showToast("Simulação calculada!", "success");
+      }
+
+      function openDetail(idx) {
+        const c = currentContracts[idx];
+        const today = new Date().toISOString().split("T")[0];
+
+        const nomeCliente =
+          document.getElementById("c-nome")?.textContent || "—";
+        const cpfCliente = document.getElementById("c-cpf")?.textContent || "—";
+        const tel1 = document.getElementById("c-tel1")?.textContent || "—";
+        const tel2 = document.getElementById("c-tel2")?.textContent || "—";
+        const rua = document.getElementById("c-end-rua")?.textContent || "";
+        const bairro =
+          document.getElementById("c-end-bairro")?.textContent || "";
+        const cidade =
+          document.getElementById("c-end-cidade")?.textContent || "";
+        const uf = document.getElementById("c-end-uf")?.textContent || "";
+        const endereco =
+          [rua, bairro, cidade, uf].filter((v) => v && v !== "—").join(" - ") ||
+          "—";
+        const telExibir = tel1 !== "—" ? tel1 : tel2;
+
+        const banco = c.Banco_Nome || gc(c, "Banco", "NomeBanco") || "—";
+        const contrato = c.Contrato || gc(c, "NrContrato") || "—";
+        const valor = parseFloat(c.Vl_Emprestimo || 0);
+        const parcela = parseFloat(c.Vl_Parcela || 0);
+        const taxa = parseFloat(c.TaxaJuros || 0);
+        const prazo = parseInt(c.Prazo || 0);
+        const pagas = parseInt(c.ParcPagas || 0);
+        const situacao = c.Situacao || "Ativo";
+        const inicio = converterDataPromosys(c.InicioDesconto);
+        const fim = converterDataPromosys(c.FinalDesconto);
+        const averbacao = c.dt_averbacao || "—";
+
+        let quitacao = "—",
+          juros = "—",
+          saldoRest = "—",
+          nRest = "—",
+          nTotal = "—";
+        let temCalculo = false;
+
+        if (parcela > 0 && taxa > 0 && inicio && fim) {
+          const calc = calcQuitacaoBC(parcela, taxa, inicio, fim, today);
+          if (calc) {
+            quitacao = fmt(calc.pv);
+            juros = fmt(calc.juros);
+            saldoRest = fmt(calc.totalRest);
+            nRest = calc.nRest;
+            nTotal = calc.nTotal;
+            temCalculo = true;
+          }
+        }
+
+        const quitPromosys = parseFloat(c.QUITACAOATUAL || 0);
+        const quitPromosysStr = quitPromosys > 0 ? fmt(quitPromosys) : "—";
+
+        if (!temCalculo && quitPromosys > 0) quitacao = fmt(quitPromosys);
+
+        const parcelasExib =
+          nRest !== "—" && nTotal !== "—"
+            ? `${nRest}/${nTotal}`
+            : `${pagas}/${prazo}`;
+
+        document.getElementById("modal-content").innerHTML = `
+        <div style="grid-column:1/-1;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);margin-bottom:6px;padding-bottom:8px;border-bottom:1px solid var(--border)"><svg width="14" height="14" style="display:inline;margin-right:6px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Dados do Cliente</div>
+        <div class="modal-field"><div class="label">Nome</div><div class="value">${nomeCliente}</div></div>
+        <div class="modal-field"><div class="label">CPF</div><div class="value">${cpfCliente}</div></div>
+        <div class="modal-field"><div class="label">Telefone</div><div class="value">${telExibir}</div></div>
+        <div class="modal-field"><div class="label">Telefone 2</div><div class="value">${tel2 !== tel1 ? tel2 : "—"}</div></div>
+        <div class="modal-field" style="grid-column:1/-1"><div class="label">Endereço</div><div class="value">${endereco}</div></div>
+
+        <div style="grid-column:1/-1;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);margin:12px 0 6px;padding-bottom:8px;border-bottom:1px solid var(--border)"><svg width="14" height="14" style="display:inline;margin-right:6px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg> Dados do Contrato</div>
+        <div class="modal-field"><div class="label">Banco</div><div class="value">${banco}</div></div>
+        <div class="modal-field"><div class="label">Contrato</div><div class="value">${contrato}</div></div>
+        <div class="modal-field"><div class="label">Valor Financiado</div><div class="value">${valor ? fmt(valor) : "—"}</div></div>
+        <div class="modal-field"><div class="label">Parcela Mensal</div><div class="value">${parcela ? fmt(parcela) : "—"}</div></div>
+        <div class="modal-field"><div class="label">Taxa Mensal</div><div class="value">${taxa ? taxa.toFixed(2) + "%" : "—"}</div></div>
+        <div class="modal-field"><div class="label">Parcelas (Rest./Total)</div><div class="value">${parcelasExib}</div></div>
+        <div class="modal-field"><div class="label">Início</div><div class="value">${fmtDate(inicio) || "—"}</div></div>
+        <div class="modal-field"><div class="label">Fim</div><div class="value">${fmtDate(fim) || "—"}</div></div>
+        <div class="modal-field"><div class="label">Averbação</div><div class="value">${fmtDate(averbacao)}</div></div>
+        <div class="modal-field"><div class="label">Situação</div><div class="value">${situacao}</div></div>
+
+        <div style="grid-column:1/-1;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);margin:12px 0 6px;padding-bottom:8px;border-bottom:1px solid var(--border)"><svg width="14" height="14" style="display:inline;margin-right:6px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Simulação / Quitação (Banco Central)</div>
+        <div class="modal-field"><div class="label">Total Restante</div><div class="value">${saldoRest}</div></div>
+        <div class="modal-field"><div class="label">Juros Restantes</div><div class="value">${juros}</div></div>
+        <div class="modal-field" style="grid-column:1/-1;background:rgba(8,145,178,.08);border:1px solid rgba(8,145,178,.3);border-radius:10px;padding:14px;text-align:center">
+          <div class="label" style="color:var(--cyan);margin-bottom:6px">Valor de Quitação (q₀ — Banco Central)</div>
+          <div class="value" style="font-size:22px;color:var(--cyan)">${quitacao}</div>
+          ${temCalculo && quitPromosysStr !== "—" ? `<div style="font-size:11px;color:var(--text-3);margin-top:6px">Promosys informa: ${quitPromosysStr}</div>` : ""}
+        </div>
+      `;
+        document.getElementById("modal-overlay").classList.add("open");
+      }
+      function closeModal() {
+        document.getElementById("modal-overlay").classList.remove("open");
+      }
+
+      function resetView() {
+        ["client-block", "contracts-block", "simulation-block"].forEach(
+          (id) => (document.getElementById(id).style.display = "none"),
+        );
+        document.getElementById("search-input").value = "";
+        currentContracts = [];
+      }
+
+      function openAdmin() {
+        renderUsersList();
+        const podeApi =
+          currentUser &&
+          ["master_total", "master_operacional"].includes(currentUser.perfil);
+        const tabApi = document.getElementById("atab-api");
+        const tabApiContent = document.getElementById("admin-tab-api");
+        if (tabApi) tabApi.style.display = podeApi ? "" : "none";
+        if (tabApiContent) tabApiContent.style.display = podeApi ? "" : "none";
+
+        const podeIdent =
+          currentUser &&
+          ["master_total", "administrador"].includes(currentUser.perfil);
+        const tabIdent = document.getElementById("atab-identidade");
+        if (tabIdent) tabIdent.style.display = podeIdent ? "" : "none";
+
+        const podeFin = currentUser && currentUser.perfil === "master_total";
+        const tabFin = document.getElementById("atab-financeiro");
+        if (tabFin) tabFin.style.display = podeFin ? "" : "none";
+
+        fillApiForm();
+        fillIdentityForm();
+        updateBgPreview();
+        switchAdminTab("users");
+        document.getElementById("admin-overlay").classList.add("open");
+      }
+      function closeAdmin() {
+        document.getElementById("admin-overlay").classList.remove("open");
+      }
+
+      async function carregarFinanceiro() {
+        const el = document.getElementById("financeiro-lista");
+        if (!el) return;
+        el.textContent = "Carregando...";
+        try {
+          const res = await fetch("api/financeiro.php", {
+            headers: authHeaders(),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.erro || "Erro.");
+          const items = data.financeiro || [];
+          if (!items.length) {
+            el.textContent = "Nenhuma empresa encontrada.";
+            return;
+          }
+          el.innerHTML = items
+            .map(
+              (e) => `
+          <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <div style="font-weight:600;font-size:14px">${e.nome_empresa}</div>
+              <span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${e.status_cobranca === "em_dia" ? "rgba(16,185,129,.15)" : "rgba(239,68,68,.15)"};color:${e.status_cobranca === "em_dia" ? "var(--success)" : "var(--danger)"};border:1px solid ${e.status_cobranca === "em_dia" ? "rgba(16,185,129,.3)" : "rgba(239,68,68,.3)"}">${e.status_cobranca?.replace("_", " ") || "—"}</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:12px">
+              <div><div style="color:var(--text-3);margin-bottom:2px">Licenças</div><div style="font-family:var(--mono)">${e.licencas_em_uso}/${e.limite_licencas}${e.licencas_excedentes > 0 ? " <span style=color:var(--danger)>(+" + e.licencas_excedentes + " exc.)</span>" : ""}</div></div>
+              <div><div style="color:var(--text-3);margin-bottom:2px">Valor Mensal</div><div style="font-family:var(--mono)">${e.valor_mensal ? "R$ " + parseFloat(e.valor_mensal).toFixed(2) : "—"}</div></div>
+              <div><div style="color:var(--text-3);margin-bottom:2px">Total Mês</div><div style="font-family:var(--mono);color:var(--cyan)">${e.total_mes_calculado ? "R$ " + parseFloat(e.total_mes_calculado).toFixed(2) : "—"}</div></div>
+              <div><div style="color:var(--text-3);margin-bottom:2px">Valor/Licença</div><div style="font-family:var(--mono)">${e.valor_por_licenca ? "R$ " + parseFloat(e.valor_por_licenca).toFixed(2) : "—"}</div></div>
+              <div><div style="color:var(--text-3);margin-bottom:2px">Saldo Créditos</div><div style="font-family:var(--mono)">${e.saldo_creditos ? "R$ " + parseFloat(e.saldo_creditos).toFixed(2) : "R$ 0,00"}</div></div>
+              <div><div style="color:var(--text-3);margin-bottom:2px">Vencimento</div><div style="font-family:var(--mono)">Dia ${e.vencimento_dia || "—"}</div></div>
+            </div>
+          </div>`,
+            )
+            .join("");
+        } catch (e) {
+          el.textContent = "Erro: " + e.message;
+        }
+      }
+      function switchAdminTab(tab) {
+        [
+          "users",
+          "mypass",
+          "identidade",
+          "api",
+          "imagem",
+          "financeiro",
+        ].forEach((t) => {
+          const el = document.getElementById("admin-tab-" + t);
+          const btn = document.getElementById("atab-" + t);
+          if (el) el.style.display = t === tab ? "block" : "none";
+          if (btn) btn.classList.toggle("active", t === tab);
+        });
+        if (tab === "financeiro") carregarFinanceiro();
+      }
+
+      let _cachedUsers = [];
+
+      async function renderUsersList() {
+        try {
+          const empId = currentUser?.empresa_id;
+          const url =
+            "api/usuarios.php" + (empId ? "?empresa_id=" + empId : "");
+          const res = await fetch(url, { headers: authHeaders() });
+          const data = await res.json();
+          _cachedUsers = data.usuarios || [];
+          const perfilLabel = (p) =>
+            ({
+              master_total: "Master Total",
+              master_operacional: "Master Operacional",
+              administrador: "Administrador",
+              consultor: "Consultor",
+            })[p] || p;
+          const perfilColor = (p) =>
+            p === "administrador" || p.startsWith("master")
+              ? "rgba(59,130,246,.15)"
+              : "rgba(16,185,129,.12)";
+          const perfilText = (p) =>
+            p === "administrador" || p.startsWith("master")
+              ? "var(--blue-4)"
+              : "var(--success)";
+          document.getElementById("users-tbody").innerHTML = _cachedUsers
+            .map(
+              (u) => `
+          <tr style="border-bottom:1px solid rgba(30,90,200,.1)">
+            <td style="padding:10px 11px;font-size:13px">${u.nome}</td>
+            <td style="padding:10px 11px;font-size:13px;color:var(--text-2);font-family:var(--mono)">${u.login}</td>
+            <td style="padding:10px 11px"><span style="padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;background:${perfilColor(u.perfil)};color:${perfilText(u.perfil)};border:1px solid ${perfilColor(u.perfil).replace(".15)", ".3)").replace(".12)", ".25)")}">${perfilLabel(u.perfil)}</span></td>
+            <td style="padding:10px 11px;text-align:right">
+              <button class="btn-sm btn-simulate" onclick="editUser(${u.id})" style="margin-right:4px">Editar</button>
+              ${u.id !== currentUser?.id ? `<button class="btn-sm" onclick="deleteUser(${u.id})" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--danger)">Desativar</button>` : ""}
+            </td>
+          </tr>`,
+            )
+            .join("");
+        } catch (e) {
+          showToast("Erro ao carregar usuários.", "error");
+        }
+      }
+      function showNewUserForm() {
+        ["uf-nome", "uf-user", "uf-pass"].forEach(
+          (id) => (document.getElementById(id).value = ""),
+        );
+        document.getElementById("uf-role").value = "consultor";
+        document.getElementById("uf-editing-id").value = "";
+        document.getElementById("user-form-title").textContent = "Novo Usuário";
+        document.getElementById("user-form-wrap").style.display = "block";
+      }
+      function cancelUserForm() {
+        document.getElementById("user-form-wrap").style.display = "none";
+      }
+      function editUser(id) {
+        const u = _cachedUsers.find((x) => x.id === id);
+        if (!u) return;
+        document.getElementById("user-form-title").textContent =
+          "Editar Usuário";
+        document.getElementById("uf-nome").value = u.nome;
+        document.getElementById("uf-user").value = u.login;
+        document.getElementById("uf-pass").value = "";
+        document.getElementById("uf-role").value = u.perfil;
+        document.getElementById("uf-editing-id").value = u.id;
+        document.getElementById("user-form-wrap").style.display = "block";
+      }
+      async function saveUser() {
+        const nome = document.getElementById("uf-nome").value.trim();
+        const login = document.getElementById("uf-user").value.trim();
+        const pass = document.getElementById("uf-pass").value;
+        const perfil = document.getElementById("uf-role").value;
+        const editId = document.getElementById("uf-editing-id").value;
+        if (!nome || !login) {
+          showToast("Preencha nome e login.", "error");
+          return;
+        }
+        try {
+          let res;
+          if (editId) {
+            const body = { nome, login, perfil };
+            if (pass.length >= 6) body.senha = pass;
+            res = await fetch("api/usuarios.php?id=" + editId, {
+              method: "PUT",
+              headers: authHeaders(),
+              body: JSON.stringify(body),
+            });
+          } else {
+            if (!pass || pass.length < 6) {
+              showToast("Senha precisa ter ≥6 caracteres.", "error");
+              return;
+            }
+            res = await fetch("api/usuarios.php", {
+              method: "POST",
+              headers: authHeaders(),
+              body: JSON.stringify({
+                nome,
+                login,
+                senha: pass,
+                perfil,
+                empresa_id: currentUser?.empresa_id,
+              }),
+            });
+          }
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.erro || "Erro ao salvar.");
+          showToast(
+            editId ? "Usuário atualizado!" : "Usuário criado!",
+            "success",
+          );
+          cancelUserForm();
+          renderUsersList();
+        } catch (e) {
+          showToast("Erro: " + e.message, "error");
+        }
+      }
+      async function deleteUser(id) {
+        if (id === currentUser?.id) {
+          showToast("Você não pode desativar sua própria conta.", "error");
+          return;
+        }
+        try {
+          const res = await fetch("api/usuarios.php?id=" + id, {
+            method: "DELETE",
+            headers: authHeaders(),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.erro || "Erro.");
+          renderUsersList();
+          showToast("Usuário desativado.", "info");
+        } catch (e) {
+          showToast("Erro: " + e.message, "error");
+        }
+      }
+      async function alterarSenha() {
+        const atual = document.getElementById("mp-atual").value;
+        const nova = document.getElementById("mp-nova").value;
+        const confirma = document.getElementById("mp-confirma").value;
+        const msg = document.getElementById("mp-msg");
+        if (nova.length < 6) {
+          msg.textContent = "❌ Senha precisa ter ≥6 caracteres.";
+          msg.style.color = "var(--danger)";
+          msg.style.display = "block";
+          return;
+        }
+        if (nova !== confirma) {
+          msg.textContent = "❌ As senhas não coincidem.";
+          msg.style.color = "var(--danger)";
+          msg.style.display = "block";
+          return;
+        }
+        try {
+          const checkRes = await fetch("api/login.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ login: currentUser.login, senha: atual }),
+          });
+          if (!checkRes.ok) {
+            msg.textContent = "❌ Senha atual incorreta.";
+            msg.style.color = "var(--danger)";
+            msg.style.display = "block";
+            return;
+          }
+          const res = await fetch("api/usuarios.php?id=" + currentUser.id, {
+            method: "PUT",
+            headers: authHeaders(),
+            body: JSON.stringify({ senha: nova }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.erro || "Erro.");
+          msg.textContent = "✅ Senha alterada!";
+          msg.style.color = "var(--success)";
+          msg.style.display = "block";
+          ["mp-atual", "mp-nova", "mp-confirma"].forEach(
+            (id) => (document.getElementById(id).value = ""),
+          );
+        } catch (e) {
+          msg.textContent = "❌ " + e.message;
+          msg.style.color = "var(--danger)";
+          msg.style.display = "block";
+        }
+      }
+
+      let bgDataUrl = null;
+      function updateBgPreview() {
+        const p = document.getElementById("bg-preview");
+        if (!p) return;
+        const s = localStorage.getItem("cj2-bg-image");
+        if (s) {
+          p.style.backgroundImage = `url('${s}')`;
+          p.textContent = "";
+        } else {
+          p.style.backgroundImage = "";
+          p.textContent = "Sem imagem";
+        }
+      }
+      function previewBgImage(input) {
+        if (!input.files || !input.files[0]) return;
+        document.getElementById("bg-file-name").textContent =
+          "📎 " + input.files[0].name;
+        document.getElementById("bg-file-name").style.display = "block";
+        const r = new FileReader();
+        r.onload = (e) => {
+          bgDataUrl = e.target.result;
+          const p = document.getElementById("bg-preview");
+          p.style.backgroundImage = `url('${bgDataUrl}')`;
+          p.textContent = "";
+        };
+        r.readAsDataURL(input.files[0]);
+      }
+      async function aplicarBgImagem() {
+        if (!bgDataUrl) {
+          showToast("Selecione uma imagem.", "error");
+          return;
+        }
+        const l = document.getElementById("screen-login");
+        l.style.backgroundImage = `url('${bgDataUrl}')`;
+        l.classList.remove("no-image");
+        localStorage.setItem("cj2-bg-image", bgDataUrl);
+        if (sessionToken && currentUser?.empresa_id) {
+          try {
+            const res = await fetch("api/config.php", {
+              method: "PUT",
+              headers: authHeaders(),
+              body: JSON.stringify({
+                empresa_id: currentUser.empresa_id,
+                imagem_fundo: bgDataUrl,
+              }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.erro || "Erro.");
+            showToast("Imagem salva no banco!", "success");
+          } catch (e) {
+            showToast("Salva localmente. Erro no banco: " + e.message, "info");
+          }
+        } else {
+          showToast("Imagem aplicada!", "success");
+        }
+      }
+      async function removerBgImagem() {
+        localStorage.removeItem("cj2-bg-image");
+        bgDataUrl = null;
+        const l = document.getElementById("screen-login");
+        l.style.backgroundImage = "";
+        l.classList.add("no-image");
+        updateBgPreview();
+        document.getElementById("bg-file-name").style.display = "none";
+        document.getElementById("bg-file-input").value = "";
+        if (sessionToken && currentUser?.empresa_id) {
+          try {
+            await fetch("api/config.php", {
+              method: "PUT",
+              headers: authHeaders(),
+              body: JSON.stringify({
+                empresa_id: currentUser.empresa_id,
+                imagem_fundo: null,
+              }),
+            });
+          } catch (e) {}
+        }
+        showToast("Imagem removida.", "info");
+      }
+    </script>
+  </body>
+</html>
