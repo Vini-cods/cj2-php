@@ -4102,29 +4102,52 @@
         if (secResumo) {
           const margNovoValue = margemNovo;
 
-          // Margem RMC (cartão de crédito consignado) - Usando ValorRMC
+          // Margem RMC (cartão de crédito consignado)
+          // margemdispcartao = margem disponível para RMC
+          // ValorRMC = valor total da margem RMC (inclui já comprometido)
           const margRMC =
-            ben.ValorRMC ?? ben.MargemRMC ?? ben.margemRMC ?? null;
+            ben.margemdispcartao != null
+              ? ben.margemdispcartao
+              : (ben.ValorRMC ?? ben.MargemRMC ?? ben.margemRMC ?? null);
 
-          // Margem RCC (cartão de débito consignado) - Usando ValorRCC
+          // Margem RCC (cartão de débito consignado)
+          // margemdispcartaoBen = margem disponível para RCC
+          // ValorRCC = valor total da margem RCC (inclui já comprometido)
           const margRCC =
-            ben.ValorRCC ?? ben.MargemRCC ?? ben.margemRCC ?? null;
+            ben.margemdispcartaoBen != null
+              ? ben.margemdispcartaoBen
+              : (ben.ValorRCC ?? ben.MargemRCC ?? ben.margemRCC ?? null);
 
-          // Possui Cartão RMC - campo correto da API
+          // Possui Cartão RMC - detectado pelos contratos (Tipo_Emprestimo 76)
+          // ou campo direto da API caso exista
+          const contratosAll = c.CONTRATO || [];
           const posCartaoRMC =
             ben.PossuiCartaoRMC ??
             ben.possuiCartaoRMC ??
             ben.possuicartaormc ??
             ben.possui_cartao_rmc ??
-            null;
+            (contratosAll.some(
+              (ct) =>
+                Number(ct.Tipo_Emprestimo) === 76 ||
+                Number(ct.tipo_emprestimo) === 76,
+            )
+              ? "S"
+              : null);
 
-          // Possui Cartão RCC - campo correto da API
+          // Possui Cartão RCC - detectado pelos contratos (Tipo_Emprestimo 44)
+          // ou campo direto da API caso exista
           const posCartaoRCC =
             ben.PossuiCartaoRCC ??
             ben.possuiCartaoRCC ??
             ben.possuicartaorcc ??
             ben.possui_cartao_rcc ??
-            null;
+            (contratosAll.some(
+              (ct) =>
+                Number(ct.Tipo_Emprestimo) === 44 ||
+                Number(ct.tipo_emprestimo) === 44,
+            )
+              ? "S"
+              : null);
 
           const elMargNovo = document.getElementById("r-margem-novo");
           if (elMargNovo)
