@@ -1989,30 +1989,7 @@
                 </div>
                 <div class="value" id="c-total-comprometido">—</div>
               </div>
-              <div class="client-field" style="border-color: var(--cyan-dim)">
-                <div class="label" style="color: var(--cyan-dim)">
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                    <polyline points="2 17 12 22 22 17" />
-                    <polyline points="2 12 12 17 22 12" />
-                  </svg>
-                  Margem Disponível
-                </div>
-                <div
-                  class="value"
-                  id="c-margem-calculada"
-                  style="color: var(--cyan)"
-                >
-                  —
-                </div>
-              </div>
+
               <div class="client-field">
                 <div class="label">
                   <svg
@@ -2032,7 +2009,11 @@
                 <div
                   class="value"
                   id="c-margem"
-                  style="font-size: 11px; color: var(--text-3)"
+                  style="
+                    font-size: 13px;
+                    color: var(--success);
+                    font-weight: 700;
+                  "
                 >
                   —
                 </div>
@@ -2054,35 +2035,24 @@
                 </div>
                 <div class="value" id="c-tel1">—</div>
               </div>
-              <div
-                class="client-field"
-                style="
-                  grid-column: span 2;
-                  background: rgba(16, 185, 129, 0.08);
-                  border-color: rgba(16, 185, 129, 0.3);
-                "
-              >
-                <div class="label" style="color: var(--success)">
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Total de Parcelas Pagas
+              <div class="client-field">
+                <div class="label">Bloqueado p/ Empréstimos</div>
+                <div class="value" id="c-bloqueado" style="font-weight: 700">
+                  —
                 </div>
+              </div>
+              <div class="client-field">
+                <div class="label">Pensão Alimentícia</div>
+                <div class="value" id="c-pensao" style="font-weight: 700">
+                  —
+                </div>
+              </div>
+              <div class="client-field">
+                <div class="label">Representante Legal</div>
                 <div
                   class="value"
-                  id="c-total-parcelas-pagas"
-                  style="
-                    font-size: 15px;
-                    font-weight: 700;
-                    color: var(--success);
-                  "
+                  id="c-representante"
+                  style="font-weight: 700"
                 >
                   —
                 </div>
@@ -2115,6 +2085,55 @@
               <span id="c-end-bairro" style="display: none">—</span>
               <span id="c-end-cidade" style="display: none">—</span>
               <span id="c-end-uf" style="display: none">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEÇÃO BANCÁRIA -->
+        <div id="section-bancario" style="display: none; margin-bottom: 20px">
+          <div class="section-header">
+            <div class="dot" style="background: var(--cyan)"></div>
+            <h3>Dados Bancários</h3>
+          </div>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+              gap: 10px;
+              margin-top: 12px;
+            "
+          >
+            <div class="client-field" style="grid-column: span 2">
+              <div class="label">Banco</div>
+              <div
+                class="value"
+                id="c-banco-pagamento"
+                style="font-size: 13px; font-weight: 600"
+              >
+                —
+              </div>
+            </div>
+            <div class="client-field">
+              <div class="label">Meio de Pagamento</div>
+              <div class="value" id="c-meio-pagamento">—</div>
+            </div>
+            <div class="client-field">
+              <div class="label">Agência</div>
+              <div class="value" id="c-agencia">—</div>
+            </div>
+            <div class="client-field">
+              <div class="label">Número da Conta</div>
+              <div class="value" id="c-numero-conta">—</div>
+            </div>
+            <div class="client-field">
+              <div class="label">DDB</div>
+              <div class="value" id="c-ddb">—</div>
+            </div>
+            <div class="client-field">
+              <div class="label">Situação</div>
+              <div class="value" id="c-situacao-banco" style="font-weight: 700">
+                —
+              </div>
             </div>
           </div>
         </div>
@@ -3690,8 +3709,10 @@
         document.getElementById("c-pai").textContent = pai;
         document.getElementById("c-situacao").textContent = sit;
         document.getElementById("c-especie").textContent = esp;
+        // Margem Bruta: usar MargemCalculadaBen (valor real do benefício)
+        const margBruta = ben.MargemCalculadaBen ?? ben.MargemCalculada ?? null;
         document.getElementById("c-margem").textContent =
-          marg !== "—" ? fmt(marg) : "—";
+          margBruta !== null ? fmt(margBruta) : marg !== "—" ? fmt(marg) : "—";
 
         const contratos = normalizeContratos(data);
         if (contratos.length) {
@@ -3750,6 +3771,85 @@
         const endEl = document.getElementById("c-endereco-completo");
         if (endEl)
           endEl.textContent = endParts.length ? endParts.join(" - ") : "—";
+
+        // ── Campos adicionais do benefício ──────────────────
+        const bloqEl = document.getElementById("c-bloqueado");
+        const pensaoEl = document.getElementById("c-pensao");
+        const repEl = document.getElementById("c-representante");
+
+        const bloq = ben.bloqemp ?? ben.Bloqueado ?? "—";
+        const pensao = ben.pa ?? "—";
+        const rep = ben.possuirepresentantelegal ?? "—";
+
+        const simNao = (v) => {
+          if (
+            v === true ||
+            v === "S" ||
+            v === "Sim" ||
+            v === "sim" ||
+            v === 1 ||
+            v === "1"
+          )
+            return "Sim";
+          if (
+            v === false ||
+            v === "N" ||
+            v === "Não" ||
+            v === "nao" ||
+            v === 0 ||
+            v === "0"
+          )
+            return "Não";
+          return v || "—";
+        };
+        const colorSimNao = (el, val) => {
+          el.textContent = simNao(val);
+          el.style.color =
+            val === true ||
+            val === "S" ||
+            val === "Sim" ||
+            val === 1 ||
+            val === "1"
+              ? "var(--danger, #ef4444)"
+              : "var(--success)";
+        };
+
+        if (bloqEl) colorSimNao(bloqEl, bloq);
+        if (pensaoEl) colorSimNao(pensaoEl, pensao);
+        if (repEl) colorSimNao(repEl, rep);
+
+        // ── Dados bancários ─────────────────────────────────
+        const db = c.DADOS_BANCARIOS || {};
+        const banco = db.NOME_BANCO_PAGTO || db.NOME_BANCO || null;
+        const meio = db.NOME_TIPO_PAGTO || null;
+        const agenc = db.AGENCIA_COMPLETO || db.AGENCIA || null;
+        const conta = db.CONTA_PAGTO || db.CONTA || null;
+        const ddb = db.DIB_FORMATADO || null;
+        const sitBanco = ben.situacao || null;
+
+        const secBancario = document.getElementById("section-bancario");
+        if (banco || meio || agenc || conta || ddb) {
+          if (secBancario) secBancario.style.display = "";
+          const setBanco = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = val || "—";
+          };
+          setBanco("c-banco-pagamento", banco);
+          setBanco("c-meio-pagamento", meio);
+          setBanco("c-agencia", agenc);
+          setBanco("c-numero-conta", conta);
+          setBanco("c-ddb", ddb);
+          const sitBancoEl = document.getElementById("c-situacao-banco");
+          if (sitBancoEl) {
+            sitBancoEl.textContent = sitBanco || "—";
+            sitBancoEl.style.color =
+              sitBanco && sitBanco.toUpperCase().includes("ATIVO")
+                ? "var(--success)"
+                : "var(--text-2)";
+          }
+        } else {
+          if (secBancario) secBancario.style.display = "none";
+        }
 
         const badge = document.getElementById("c-status-badge");
         const ativo = String(sit).toLowerCase().includes("ativ");
