@@ -15,7 +15,7 @@ function requireAuth(): array {
 
     $stmt = $db->prepare("
         SELECT s.usuario_id, s.expira_em,
-               u.nome, u.login, u.perfil, u.status, u.empresa_id
+               u.id, u.nome, u.login, u.perfil, u.status, u.empresa_id
         FROM sessoes s
         INNER JOIN usuarios u ON u.id = s.usuario_id
         WHERE s.token = ? AND s.expira_em > ?
@@ -26,6 +26,9 @@ function requireAuth(): array {
     if (!$row)              jsonError('Sessão inválida ou expirada.', 401);
     if ($row['status'] !== 'ativo') jsonError('Usuário inativo.', 403);
 
+    // Adiciona usuario_id ao array retornado
+    $row['usuario_id'] = $row['id'];
+    
     return $row;
 }
 
@@ -44,11 +47,11 @@ function requireEmpresa(array $user, int $empresaId): void {
     }
 }
 
-// ── Regras de criação de perfis (FASE 1) ─────────────────────
-// master_total    → pode criar qualquer perfil
-// master_operacional → pode criar: administrador, consultor
-// administrador   → pode criar: administrador (interno), consultor
-// consultor       → não pode criar nenhum
+// ── Regras de criação de perfis (HIERARQUIA COMPLETA) ────────
+// master_total        → pode criar qualquer perfil
+// master_operacional  → pode criar: administrador, consultor (e empresas)
+// administrador       → pode criar: administrador (interno), consultor
+// consultor           → não pode criar nenhum
 function getPerfisPermitidosCriacao(string $perfilCriador): array {
     return match($perfilCriador) {
         'master_total'       => ['master_total', 'master_operacional', 'administrador', 'consultor'],
@@ -56,6 +59,15 @@ function getPerfisPermitidosCriacao(string $perfilCriador): array {
         'administrador'      => ['administrador', 'consultor'],
         default              => [],
     };
+}
+
+// ── Regras de criação de empresas ────────────────────────────
+// master_total        → pode criar empresas
+// master_operacional  → pode criar empresas
+// administrador       → NÃO pode criar empresas
+// consultor           → NÃO pode criar empresas
+function podeCriarEmpresa(string $perfilCriador): bool {
+    return in_array($perfilCriador, ['master_total', 'master_operacional']);
 }
 
 // ── Financeiro: apenas master_total ─────────────────────────
@@ -70,12 +82,11 @@ function filtrarFinanceiro(array $empresa, array $user): array {
 }
 
 // ── API visível apenas para master_total e master_operacional ─
-// (FASE 4)
 function podeVerApi(array $user): bool {
     return in_array($user['perfil'], ['master_total', 'master_operacional']);
 }
 
-// ── Identidade: administrador e master_total (FASE 3) ────────
+// ── Identidade: administrador e master_total ────────────────
 function podeEditarIdentidade(array $user): bool {
     return in_array($user['perfil'], ['master_total', 'administrador']);
 }

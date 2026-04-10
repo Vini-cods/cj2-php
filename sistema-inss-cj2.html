@@ -412,7 +412,8 @@
 
       .form-group input,
       .sim-field input,
-      .sim-field select {
+      .sim-field select,
+      .sim-field textarea {
         width: 100%;
         padding: 11px 13px;
         background: rgba(255, 255, 255, 0.04);
@@ -429,14 +430,16 @@
 
       .form-group input:focus,
       .sim-field input:focus,
-      .sim-field select:focus {
+      .sim-field select:focus,
+      .sim-field textarea:focus {
         border-color: var(--blue-3);
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
       }
 
       html.light .form-group input,
       html.light .sim-field input,
-      html.light .sim-field select {
+      html.light .sim-field select,
+      html.light .sim-field textarea {
         background: #f8faff;
       }
 
@@ -656,13 +659,6 @@
       .topbar-logo .logo-svg-wrap {
         width: 36px;
         height: 36px;
-      }
-
-      .topbar-logo-img {
-        width: 36px;
-        height: 36px;
-        object-fit: contain;
-        border-radius: 6px;
       }
 
       .topbar-brand {
@@ -1387,6 +1383,30 @@
         border-radius: 50%;
         flex-shrink: 0;
       }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .status-badge-small {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 600;
+      }
+
+      .status-ativo-small {
+        background: rgba(16, 185, 129, 0.15);
+        color: var(--success);
+      }
+
+      .status-inativo-small {
+        background: rgba(239, 68, 68, 0.15);
+        color: var(--danger);
+      }
     </style>
   </head>
 
@@ -1989,7 +2009,6 @@
                 </div>
                 <div class="value" id="c-total-comprometido">—</div>
               </div>
-
               <div class="client-field">
                 <div class="label">
                   <svg
@@ -2004,7 +2023,7 @@
                     <polyline points="2 17 12 22 22 17" />
                     <polyline points="2 12 12 17 22 12" />
                   </svg>
-                  Margem Bruta (API)
+                  Margem Novo (disponível)
                 </div>
                 <div
                   class="value"
@@ -2080,11 +2099,177 @@
                   —
                 </div>
               </div>
+              <div class="client-field">
+                <div class="label">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path d="M12 2a15 15 0 0 0 0 20 15 15 0 0 0 0-20z" />
+                  </svg>
+                  CEP
+                </div>
+                <div class="value" id="c-cep">—</div>
+              </div>
               <span id="c-tel2" style="display: none">—</span>
               <span id="c-end-rua" style="display: none">—</span>
               <span id="c-end-bairro" style="display: none">—</span>
               <span id="c-end-cidade" style="display: none">—</span>
               <span id="c-end-uf" style="display: none">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD RESUMO -->
+        <div id="section-resumo" style="display: none; margin-bottom: 20px">
+          <div class="section-header">
+            <div class="dot" style="background: var(--blue-3)"></div>
+            <h3>Resumo</h3>
+          </div>
+          <div class="card" style="padding: 16px 18px">
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 14px 20px;
+              "
+            >
+              <div>
+                <div
+                  style="
+                    font-size: 11px;
+                    color: var(--text-2);
+                    margin-bottom: 4px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                  "
+                >
+                  Margem Novo
+                </div>
+                <div
+                  id="r-margem-novo"
+                  style="
+                    font-size: 17px;
+                    font-weight: 700;
+                    color: var(--success);
+                  "
+                >
+                  —
+                </div>
+              </div>
+              <div>
+                <div
+                  style="
+                    font-size: 11px;
+                    color: var(--text-2);
+                    margin-bottom: 4px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                  "
+                >
+                  Qtd. Contratos
+                </div>
+                <div
+                  id="r-qtd-contratos"
+                  style="
+                    font-size: 17px;
+                    font-weight: 700;
+                    color: var(--text-1);
+                  "
+                >
+                  —
+                </div>
+              </div>
+              <div>
+                <div
+                  style="
+                    font-size: 11px;
+                    color: var(--text-2);
+                    margin-bottom: 4px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                  "
+                >
+                  Margem RMC (Crédito)
+                </div>
+                <div
+                  id="r-margem-rmc"
+                  style="
+                    font-size: 17px;
+                    font-weight: 700;
+                    color: var(--success);
+                  "
+                >
+                  —
+                </div>
+              </div>
+              <div>
+                <div
+                  style="
+                    font-size: 11px;
+                    color: var(--text-2);
+                    margin-bottom: 4px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                  "
+                >
+                  Possui Cartão RMC?
+                </div>
+                <div
+                  id="r-possui-cartao-rmc"
+                  style="font-size: 15px; font-weight: 700"
+                >
+                  —
+                </div>
+              </div>
+              <div>
+                <div
+                  style="
+                    font-size: 11px;
+                    color: var(--text-2);
+                    margin-bottom: 4px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                  "
+                >
+                  Margem RCC (Débito)
+                </div>
+                <div
+                  id="r-margem-rcc"
+                  style="
+                    font-size: 17px;
+                    font-weight: 700;
+                    color: var(--success);
+                  "
+                >
+                  —
+                </div>
+              </div>
+              <div>
+                <div
+                  style="
+                    font-size: 11px;
+                    color: var(--text-2);
+                    margin-bottom: 4px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                  "
+                >
+                  Possui Cartão RCC?
+                </div>
+                <div
+                  id="r-possui-cartao-rcc"
+                  style="font-size: 15px; font-weight: 700"
+                >
+                  —
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2349,6 +2534,7 @@
             class="admin-tab-btn"
             onclick="switchAdminTab('api')"
             id="atab-api"
+            style="display: none"
           >
             <svg
               width="14"
@@ -2402,6 +2588,25 @@
             </svg>
             Financeiro
           </button>
+          <button
+            class="admin-tab-btn"
+            onclick="switchAdminTab('empresas')"
+            id="atab-empresas"
+            style="display: none"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+            </svg>
+            Empresas
+          </button>
         </div>
 
         <div id="admin-tab-users">
@@ -2416,7 +2621,11 @@
             <span style="font-size: 13px; color: var(--text-2)"
               >Usuários do sistema</span
             >
-            <button class="btn-sm btn-simulate" onclick="showNewUserForm()">
+            <button
+              class="btn-sm btn-simulate"
+              id="btn-novo-usuario"
+              onclick="showNewUserForm()"
+            >
               <svg
                 width="12"
                 height="12"
@@ -2428,7 +2637,7 @@
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
-              Novo
+              Novo Usuário
             </button>
           </div>
           <div
@@ -2458,19 +2667,19 @@
               style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px"
             >
               <div class="sim-field">
-                <label>Nome</label
+                <label>Nome *</label
                 ><input type="text" id="uf-nome" placeholder="Nome completo" />
               </div>
               <div class="sim-field">
-                <label>Login</label
+                <label>Login *</label
                 ><input type="text" id="uf-user" placeholder="usuario.login" />
               </div>
               <div class="sim-field">
-                <label>Senha</label
+                <label>Senha *</label
                 ><input
                   type="password"
                   id="uf-pass"
-                  placeholder="Mín. 4 caracteres"
+                  placeholder="Mín. 6 caracteres"
                 />
               </div>
               <div class="sim-field">
@@ -2512,53 +2721,68 @@
               </button>
             </div>
           </div>
-          <table style="width: 100%; border-collapse: collapse">
-            <thead>
-              <tr>
-                <th
-                  style="
-                    text-align: left;
-                    padding: 8px 11px;
-                    font-size: 10px;
-                    letter-spacing: 1.5px;
-                    text-transform: uppercase;
-                    color: var(--text-3);
-                    border-bottom: 1px solid var(--border);
-                  "
-                >
-                  Nome
-                </th>
-                <th
-                  style="
-                    text-align: left;
-                    padding: 8px 11px;
-                    font-size: 10px;
-                    letter-spacing: 1.5px;
-                    text-transform: uppercase;
-                    color: var(--text-3);
-                    border-bottom: 1px solid var(--border);
-                  "
-                >
-                  Login
-                </th>
-                <th
-                  style="
-                    text-align: left;
-                    padding: 8px 11px;
-                    font-size: 10px;
-                    letter-spacing: 1.5px;
-                    text-transform: uppercase;
-                    color: var(--text-3);
-                    border-bottom: 1px solid var(--border);
-                  "
-                >
-                  Perfil
-                </th>
-                <th style="border-bottom: 1px solid var(--border)"></th>
-              </tr>
-            </thead>
-            <tbody id="users-tbody"></tbody>
-          </table>
+          <div class="table-wrap">
+            <table style="width: 100%; border-collapse: collapse">
+              <thead>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 8px 11px;
+                      font-size: 10px;
+                      letter-spacing: 1.5px;
+                      text-transform: uppercase;
+                      color: var(--text-3);
+                      border-bottom: 1px solid var(--border);
+                    "
+                  >
+                    Nome
+                  </th>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 8px 11px;
+                      font-size: 10px;
+                      letter-spacing: 1.5px;
+                      text-transform: uppercase;
+                      color: var(--text-3);
+                      border-bottom: 1px solid var(--border);
+                    "
+                  >
+                    Login
+                  </th>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 8px 11px;
+                      font-size: 10px;
+                      letter-spacing: 1.5px;
+                      text-transform: uppercase;
+                      color: var(--text-3);
+                      border-bottom: 1px solid var(--border);
+                    "
+                  >
+                    Perfil
+                  </th>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 8px 11px;
+                      font-size: 10px;
+                      letter-spacing: 1.5px;
+                      text-transform: uppercase;
+                      color: var(--text-3);
+                      border-bottom: 1px solid var(--border);
+                    "
+                  >
+                    Status
+                  </th>
+                  <th style="border-bottom: 1px solid var(--border)"></th>
+                </tr>
+              </thead>
+              <tbody id="users-tbody"></tbody>
+            </table>
+          </div>
         </div>
 
         <div id="admin-tab-mypass" style="display: none">
@@ -2574,7 +2798,7 @@
             ><input
               type="password"
               id="mp-nova"
-              placeholder="Mín. 4 caracteres"
+              placeholder="Mín. 6 caracteres"
             />
           </div>
           <div class="sim-field">
@@ -2792,13 +3016,9 @@
 
         <div id="admin-tab-api" style="display: none">
           <p style="font-size: 13px; color: var(--text-2); margin-bottom: 16px">
-            Credenciais salvas localmente no navegador.
+            Credenciais da API Promosys.
           </p>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
-            <div class="sim-field">
-              <label>Tag Empresa</label
-              ><input type="text" id="api-tag" placeholder="Ex: MINHAEMPRESA" />
-            </div>
             <div class="sim-field">
               <label>Usuário Promosys</label
               ><input type="text" id="api-usuario" placeholder="usuário" />
@@ -2859,40 +3079,6 @@
               border: 1px solid var(--border);
             "
           ></div>
-          <div
-            style="
-              background: var(--bg-card2);
-              border: 1px solid var(--border);
-              border-radius: 9px;
-              padding: 13px;
-              margin-top: 14px;
-            "
-          >
-            <div
-              style="
-                font-size: 10px;
-                letter-spacing: 1px;
-                text-transform: uppercase;
-                color: var(--text-3);
-                margin-bottom: 8px;
-              "
-            >
-              Endpoints utilizados
-            </div>
-            <div
-              style="
-                font-family: var(--mono);
-                font-size: 11px;
-                color: var(--blue-4);
-                line-height: 2;
-              "
-            >
-              Token → /services/token.php<br />CPF (offline) →
-              /services/consultaCpfOffline.php<br />Benefício (offline) →
-              /services/consultaOffline.php<br />Benefício (online) →
-              /services/consulta.php
-            </div>
-          </div>
         </div>
 
         <div id="admin-tab-imagem" style="display: none">
@@ -3017,6 +3203,7 @@
             Remover imagem
           </button>
         </div>
+
         <div id="admin-tab-financeiro" style="display: none">
           <p style="font-size: 13px; color: var(--text-2); margin-bottom: 16px">
             Dados financeiros das empresas. Visível apenas para Master Total.
@@ -3027,6 +3214,38 @@
           >
             Carregando...
           </div>
+        </div>
+
+        <div id="admin-tab-empresas" style="display: none">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 16px;
+              flex-wrap: wrap;
+              gap: 10px;
+            "
+          >
+            <p style="font-size: 13px; color: var(--text-2)">
+              Gerenciamento de empresas white-label.
+            </p>
+            <button class="btn-sm btn-simulate" onclick="showNewEmpresaForm()">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Nova Empresa
+            </button>
+          </div>
+          <div id="empresas-lista" style="font-size: 13px">Carregando...</div>
         </div>
       </div>
     </div>
@@ -3084,6 +3303,10 @@
     <script>
       "use strict";
 
+      // ============================================================
+      // CONFIGURAÇÕES INICIAIS
+      // ============================================================
+
       const IDENTITY_DEFAULT = {
         nomeSistema: "CJ2Tech Sistema de Consulta",
         titulo: "Consulta e simulação de contratos consignados em segundos.",
@@ -3094,6 +3317,101 @@
       };
 
       let IDENTITY = { ...IDENTITY_DEFAULT };
+      let sessionToken = sessionStorage.getItem("cj2-token") || null;
+      let currentUser = null;
+      let apiConfig = {
+        usuario: "",
+        senha: "",
+        modo: "offline",
+        token: null,
+        tokenDate: null,
+      };
+      let tipoConsulta = "cpf";
+      let currentContracts = [];
+      let _cachedUsers = [];
+      let _cachedEmpresas = [];
+
+      // ============================================================
+      // FUNÇÕES DE UTILIDADE
+      // ============================================================
+
+      function escapeHtml(str) {
+        if (!str) return "";
+        return str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      const fmt = (v) =>
+        "R$ " +
+        parseFloat(v || 0).toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+
+      const fmtDate = (d) => {
+        if (!d || d === "—") return "—";
+        const s = String(d);
+        if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+          const p = s.split("T")[0].split("-");
+          return p[2] + "/" + p[1] + "/" + p[0];
+        }
+        if (/^\d{2}\/\d{2}\/\d{4}/.test(s)) return s;
+        return d;
+      };
+
+      const diffMonths = (a, b) =>
+        Math.max(
+          0,
+          (b.getFullYear() - a.getFullYear()) * 12 +
+            b.getMonth() -
+            a.getMonth(),
+        );
+
+      const getInitials = (n) => {
+        const p = (n || "").trim().split(" ");
+        return (
+          (p[0]?.[0] || "?") + (p.length > 1 ? p[p.length - 1][0] || "" : "")
+        );
+      };
+
+      function showToast(msg, type = "info") {
+        const colors = {
+          success: "#10b981",
+          error: "#ef4444",
+          info: "#3b82f6",
+        };
+        document.getElementById("toast-msg").textContent = msg;
+        document.getElementById("toast-dot").style.background =
+          colors[type] || colors.info;
+        const t = document.getElementById("toast");
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 3200);
+      }
+
+      function loadingStart() {
+        document.getElementById("loading-bar").style.display = "block";
+        document.getElementById("btn-search").disabled = true;
+      }
+
+      function loadingEnd() {
+        document.getElementById("loading-bar").style.display = "none";
+        document.getElementById("btn-search").disabled = false;
+      }
+
+      function authHeaders() {
+        return {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + sessionToken,
+        };
+      }
+
+      // ============================================================
+      // IDENTIDADE E TEMA
+      // ============================================================
 
       function loadIdentity() {
         const s = localStorage.getItem("cj2-identity");
@@ -3130,6 +3448,13 @@
           if (!el) return;
           if (dataUrl) {
             el.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:contain">`;
+          } else {
+            // Restaura SVG padrão se não houver imagem
+            if (mode === "dark") {
+              el.innerHTML = `<svg viewBox="0 0 200 200" fill="none"><circle cx="100" cy="100" r="88" stroke="white" stroke-width="4" fill="none" stroke-dasharray="460 100" stroke-linecap="round"/><circle cx="100" cy="100" r="65" stroke="white" stroke-width="3" fill="none" stroke-dasharray="320 90" stroke-linecap="round" stroke-dashoffset="50"/><circle cx="100" cy="12" r="11" fill="white"/><circle cx="126" cy="38" r="7" fill="white"/><circle cx="24" cy="110" r="8" fill="white"/><circle cx="95" cy="165" r="13" fill="white"/><text x="55" y="120" font-family="'Exo 2',sans-serif" font-weight="800" font-size="48" fill="white">CJ2</text><text x="115" y="143" font-family="'Exo 2',sans-serif" font-weight="700" font-size="18" fill="white" font-style="italic">TECH</text></svg>`;
+            } else {
+              el.innerHTML = `<svg viewBox="0 0 200 200" fill="none"><defs><linearGradient id="lgT" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3b82f6" /><stop offset="100%" stop-color="#1e3a8a" /></linearGradient></defs><circle cx="100" cy="100" r="88" stroke="url(#lgT)" stroke-width="4" fill="none" stroke-dasharray="460 100" stroke-linecap="round"/><circle cx="100" cy="100" r="65" stroke="url(#lgT)" stroke-width="3" fill="none" stroke-dasharray="320 90" stroke-linecap="round" stroke-dashoffset="50"/><circle cx="100" cy="12" r="11" fill="#3b82f6"/><circle cx="126" cy="38" r="7" fill="#2563eb"/><circle cx="24" cy="110" r="8" fill="#1d4ed8"/><circle cx="95" cy="165" r="13" fill="#1e40af"/><text x="55" y="120" font-family="'Exo 2',sans-serif" font-weight="800" font-size="48" fill="url(#lgT)">CJ2</text><text x="115" y="143" font-family="'Exo 2',sans-serif" font-weight="700" font-size="18" fill="#0284c7" font-style="italic">TECH</text></svg>`;
+            }
           }
         });
       }
@@ -3142,10 +3467,15 @@
         if (IDENTITY.logoDark) {
           const p = document.getElementById("preview-logo-dark");
           p.innerHTML = `<img src="${IDENTITY.logoDark}" style="max-height:60px;max-width:100%;object-fit:contain">`;
+        } else {
+          document.getElementById("preview-logo-dark").innerHTML = "SVG padrão";
         }
         if (IDENTITY.logoLight) {
           const p = document.getElementById("preview-logo-light");
           p.innerHTML = `<img src="${IDENTITY.logoLight}" style="max-height:60px;max-width:100%;object-fit:contain">`;
+        } else {
+          document.getElementById("preview-logo-light").innerHTML =
+            "SVG padrão";
         }
       }
 
@@ -3218,70 +3548,14 @@
         localStorage.removeItem("cj2-identity");
         applyIdentity();
         fillIdentityForm();
-        ["logo-dark-login", "logo-dark-topbar"].forEach((id) => {
-          const el = document.getElementById(id);
-          if (el)
-            el.innerHTML = `<svg viewBox="0 0 200 200" fill="none"><circle cx="100" cy="100" r="88" stroke="white" stroke-width="4" fill="none" stroke-dasharray="460 100" stroke-linecap="round"/><circle cx="100" cy="100" r="65" stroke="white" stroke-width="3" fill="none" stroke-dasharray="320 90" stroke-linecap="round" stroke-dashoffset="50"/><circle cx="100" cy="12" r="11" fill="white"/><circle cx="126" cy="38" r="7" fill="white"/><circle cx="24" cy="110" r="8" fill="white"/><circle cx="95" cy="165" r="13" fill="white"/><text x="55" y="120" font-family="'Exo 2',sans-serif" font-weight="800" font-size="48" fill="white">CJ2</text><text x="115" y="143" font-family="'Exo 2',sans-serif" font-weight="700" font-size="18" fill="white" font-style="italic">TECH</text></svg>`;
-        });
         showToast("Identidade restaurada!", "info");
-      }
-
-      const fmt = (v) =>
-        "R$ " +
-        parseFloat(v || 0).toLocaleString("pt-BR", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        });
-      const fmtDate = (d) => {
-        if (!d || d === "—") return "—";
-        const s = String(d);
-        if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
-          const p = s.split("T")[0].split("-");
-          return p[2] + "/" + p[1] + "/" + p[0];
-        }
-        if (/^\d{2}\/\d{2}\/\d{4}/.test(s)) return s;
-        return d;
-      };
-      const diffMonths = (a, b) =>
-        Math.max(
-          0,
-          (b.getFullYear() - a.getFullYear()) * 12 +
-            b.getMonth() -
-            a.getMonth(),
-        );
-      const getInitials = (n) => {
-        const p = (n || "").trim().split(" ");
-        return (
-          (p[0]?.[0] || "?") + (p.length > 1 ? p[p.length - 1][0] || "" : "")
-        );
-      };
-
-      function showToast(msg, type = "info") {
-        const colors = {
-          success: "#10b981",
-          error: "#ef4444",
-          info: "#3b82f6",
-        };
-        document.getElementById("toast-msg").textContent = msg;
-        document.getElementById("toast-dot").style.background =
-          colors[type] || colors.info;
-        const t = document.getElementById("toast");
-        t.classList.add("show");
-        setTimeout(() => t.classList.remove("show"), 3200);
-      }
-      function loadingStart() {
-        document.getElementById("loading-bar").style.display = "block";
-        document.getElementById("btn-search").disabled = true;
-      }
-      function loadingEnd() {
-        document.getElementById("loading-bar").style.display = "none";
-        document.getElementById("btn-search").disabled = false;
       }
 
       (function () {
         if (localStorage.getItem("cj2-theme") === "light")
           document.documentElement.classList.add("light");
       })();
+
       function toggleTheme() {
         const light = document.documentElement.classList.toggle("light");
         const icon = light ? "☀️" : "🌙";
@@ -3291,64 +3565,10 @@
         });
         localStorage.setItem("cj2-theme", light ? "light" : "dark");
       }
-      let sessionToken = sessionStorage.getItem("cj2-token") || null;
-      let currentUser = null;
-      let apiConfig = {
-        usuario: "",
-        senha: "",
-        modo: "offline",
-        token: null,
-        tokenDate: null,
-      };
-      let tipoConsulta = "cpf";
-      let currentContracts = [];
 
-      window.addEventListener("DOMContentLoaded", () => {
-        const savedTheme = localStorage.getItem("cj2-theme") || "dark";
-        if (savedTheme === "light")
-          document.documentElement.classList.add("light");
-        const icon = savedTheme === "light" ? "☀️" : "🌙";
-        ["btn-theme", "btn-theme-login"].forEach((id) => {
-          const b = document.getElementById(id);
-          if (b) b.textContent = icon;
-        });
-        const slugParam = new URLSearchParams(window.location.search).get(
-          "empresa",
-        );
-        carregarConfigPublica(slugParam);
-        document
-          .getElementById("login-pass")
-          .addEventListener("keydown", (e) => {
-            if (e.key === "Enter") doLogin();
-          });
-      });
-
-      function loadLoginBgFile() {
-        const cands = [
-          "bg-login/bg.jpg",
-          "bg-login/bg.jpeg",
-          "bg-login/bg.png",
-          "bg-login/bg.webp",
-          "bg-login.jpg",
-          "bg-login.png",
-        ];
-        const l = document.getElementById("screen-login");
-        let i = 0;
-        function tryNext() {
-          if (i >= cands.length) return;
-          const img = new Image();
-          img.onload = () => {
-            l.style.backgroundImage = `url('${cands[i]}')`;
-            l.classList.remove("no-image");
-          };
-          img.onerror = () => {
-            i++;
-            tryNext();
-          };
-          img.src = cands[i];
-        }
-        tryNext();
-      }
+      // ============================================================
+      // LOGIN / LOGOUT
+      // ============================================================
 
       async function carregarConfigPublica(slug) {
         try {
@@ -3388,11 +3608,31 @@
         }
       }
 
-      function authHeaders() {
-        return {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + sessionToken,
-        };
+      function loadLoginBgFile() {
+        const cands = [
+          "bg-login/bg.jpg",
+          "bg-login/bg.jpeg",
+          "bg-login/bg.png",
+          "bg-login/bg.webp",
+          "bg-login.jpg",
+          "bg-login.png",
+        ];
+        const l = document.getElementById("screen-login");
+        let i = 0;
+        function tryNext() {
+          if (i >= cands.length) return;
+          const img = new Image();
+          img.onload = () => {
+            l.style.backgroundImage = `url('${cands[i]}')`;
+            l.classList.remove("no-image");
+          };
+          img.onerror = () => {
+            i++;
+            tryNext();
+          };
+          img.src = cands[i];
+        }
+        tryNext();
       }
 
       async function doLogin() {
@@ -3437,10 +3677,12 @@
           document.getElementById("user-avatar").textContent = getInitials(
             currentUser.nome,
           ).toUpperCase();
+
           const adminBtn = document.getElementById("btn-admin-topbar");
           if (adminBtn)
             adminBtn.style.display =
               currentUser.perfil !== "consultor" ? "flex" : "none";
+
           updateApiBadge();
           showToast("Bem-vindo, " + currentUser.nome + "!", "success");
         } catch (e) {
@@ -3467,6 +3709,18 @@
         resetView();
       }
 
+      function resetView() {
+        ["client-block", "contracts-block", "simulation-block"].forEach(
+          (id) => (document.getElementById(id).style.display = "none"),
+        );
+        document.getElementById("search-input").value = "";
+        currentContracts = [];
+      }
+
+      // ============================================================
+      // API CONFIG
+      // ============================================================
+
       function updateApiBadge() {
         const b = document.getElementById("api-badge");
         if (!b) return;
@@ -3478,13 +3732,13 @@
           b.textContent = "API configurada";
         }
       }
+
       function fillApiForm() {
-        document.getElementById("api-tag").value =
-          currentUser?.empresa_id || "";
         document.getElementById("api-usuario").value = apiConfig.usuario || "";
         document.getElementById("api-senha").value = apiConfig.senha || "";
         document.getElementById("api-modo").value = apiConfig.modo || "offline";
       }
+
       async function salvarConfigApi() {
         const empId = currentUser?.empresa_id;
         if (!empId) {
@@ -3534,6 +3788,7 @@
         apiConfig.tokenDate = today;
         return data.Token;
       }
+
       async function testarApi() {
         const resEl = document.getElementById("api-test-result");
         resEl.style.display = "block";
@@ -3555,9 +3810,14 @@
         }
       }
 
+      // ============================================================
+      // CONSULTA
+      // ============================================================
+
       function setTipo(v) {
         tipoConsulta = v;
       }
+
       function maskInput(el) {
         let v = el.value.replace(/\D/g, "");
         if (tipoConsulta === "cpf" && v.length <= 11)
@@ -3646,12 +3906,12 @@
         container.innerHTML = lista
           .map(
             (b) => `
-        <div onclick="selecionarBeneficio('${b}','${token}')" style="padding:16px 18px;background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px;" onmouseover="this.style.borderColor='var(--blue-3)'" onmouseout="this.style.borderColor='var(--border)'">
-          <div style="width:38px;height:38px;background:linear-gradient(135deg,var(--blue-2),var(--cyan-dim));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
-          <div><div style="font-weight:600;font-size:14px;margin-bottom:3px">${b}</div><div style="font-size:12px;color:var(--text-3)">Clique para consultar este benefício</div></div>
-          <div style="margin-left:auto;color:var(--blue-4);font-size:18px">→</div>
-        </div>
-      `,
+          <div onclick="selecionarBeneficio('${b}','${token}')" style="padding:16px 18px;background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px;" onmouseover="this.style.borderColor='var(--blue-3)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,var(--blue-2),var(--cyan-dim));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+            <div><div style="font-weight:600;font-size:14px;margin-bottom:3px">${b}</div><div style="font-size:12px;color:var(--text-3)">Clique para consultar este benefício</div></div>
+            <div style="margin-left:auto;color:var(--blue-4);font-size:18px">→</div>
+          </div>
+        `,
           )
           .join("");
         overlay.classList.add("open");
@@ -3693,11 +3953,17 @@
           "—";
         const esp =
           c.ESP || g(c, "EspecieBeneficio", "especie", "Especie") || "—";
-        const marg =
-          ben.MargemCalculadaBen ||
-          ben.MargemCalculada ||
-          g(c, "MargemDisponivel", "margem") ||
-          "—";
+
+        // Margem Novo = MaximoComprometimentoPermitido - TotalComprometido
+        const maxComp = ben.MaximoComprometimentoPermitido ?? null;
+        const totalComp = ben.TotalComprometido ?? null;
+        let margemNovo = null;
+
+        if (maxComp !== null && totalComp !== null) {
+          margemNovo = maxComp - totalComp;
+        } else {
+          margemNovo = ben.MargemCalculada ?? null;
+        }
 
         const ini = nome !== "—" ? getInitials(nome).toUpperCase() : "??";
         document.getElementById("client-initials").textContent = ini;
@@ -3709,42 +3975,12 @@
         document.getElementById("c-pai").textContent = pai;
         document.getElementById("c-situacao").textContent = sit;
         document.getElementById("c-especie").textContent = esp;
-        // Margem Bruta: usar MargemCalculadaBen (valor real do benefício)
-        const margBruta = ben.MargemCalculadaBen ?? ben.MargemCalculada ?? null;
         document.getElementById("c-margem").textContent =
-          margBruta !== null ? fmt(margBruta) : marg !== "—" ? fmt(marg) : "—";
+          margemNovo !== null ? fmt(margemNovo) : "—";
 
-        const contratos = normalizeContratos(data);
-        if (contratos.length) {
-          // REMOVIDO: Seção "Parcelas Pagas (por contrato)"
-          // Mantém apenas o total de parcelas pagas
-          let totalParcelasPagas = 0;
-          contratos.forEach((ct) => {
-            const pagas = parseInt(ct.ParcPagas || 0);
-            if (!isNaN(pagas) && pagas > 0) totalParcelasPagas += pagas;
-          });
-          const totalPagasEl = document.getElementById(
-            "c-total-parcelas-pagas",
-          );
-          if (totalPagasEl)
-            totalPagasEl.textContent =
-              totalParcelasPagas > 0 ? totalParcelasPagas : "—";
-        } else {
-          const totalPagasEl = document.getElementById(
-            "c-total-parcelas-pagas",
-          );
-          if (totalPagasEl) totalPagasEl.textContent = "—";
-        }
-
-        const benObj = (data.Consulta || data).BENEFICIO || {};
-        const totalComp =
-          benObj.TotalComprometido ?? benObj.ValorConsignado ?? null;
-        const compEl = document.getElementById("c-total-comprometido");
-        if (compEl)
-          compEl.textContent = totalComp !== null ? fmt(totalComp) : "—";
-
-        const margCalcEl = document.getElementById("c-margem-calculada");
-        if (margCalcEl) margCalcEl.textContent = "—";
+        const totalCompEl = document.getElementById("c-total-comprometido");
+        if (totalCompEl)
+          totalCompEl.textContent = totalComp !== null ? fmt(totalComp) : "—";
 
         const cons = data.Consulta || data;
         const tel1Val = cons.TEL_1 || cons.TEL_2 || "—";
@@ -3756,27 +3992,30 @@
         const bairEl = document.getElementById("c-end-bairro");
         const cidEl = document.getElementById("c-end-cidade");
         const ufEl = document.getElementById("c-end-uf");
+        const cepEl = document.getElementById("c-cep");
+
         if (tel2El) tel2El.textContent = cons.TEL_2 || "—";
         if (ruaEl) ruaEl.textContent = cons.ENDERECO || "—";
         if (bairEl) bairEl.textContent = cons.BAIRRO || "—";
         if (cidEl) cidEl.textContent = cons.CIDADE || "—";
         if (ufEl) ufEl.textContent = cons.UF || "—";
+        if (cepEl) cepEl.textContent = cons.CEP || "—";
 
         const endParts = [
           cons.ENDERECO,
           cons.BAIRRO,
           cons.CIDADE,
           cons.UF,
+          cons.CEP,
         ].filter((v) => v && v !== "—");
         const endEl = document.getElementById("c-endereco-completo");
         if (endEl)
           endEl.textContent = endParts.length ? endParts.join(" - ") : "—";
 
-        // ── Campos adicionais do benefício ──────────────────
+        // Campos adicionais
         const bloqEl = document.getElementById("c-bloqueado");
         const pensaoEl = document.getElementById("c-pensao");
         const repEl = document.getElementById("c-representante");
-
         const bloq = ben.bloqemp ?? ben.Bloqueado ?? "—";
         const pensao = ben.pa ?? "—";
         const rep = ben.possuirepresentantelegal ?? "—";
@@ -3810,15 +4049,14 @@
             val === "Sim" ||
             val === 1 ||
             val === "1"
-              ? "var(--danger, #ef4444)"
+              ? "var(--danger)"
               : "var(--success)";
         };
-
         if (bloqEl) colorSimNao(bloqEl, bloq);
         if (pensaoEl) colorSimNao(pensaoEl, pensao);
         if (repEl) colorSimNao(repEl, rep);
 
-        // ── Dados bancários ─────────────────────────────────
+        // Dados bancários
         const db = c.DADOS_BANCARIOS || {};
         const banco = db.NOME_BANCO_PAGTO || db.NOME_BANCO || null;
         const meio = db.NOME_TIPO_PAGTO || null;
@@ -3858,6 +4096,75 @@
           "status-badge " + (ativo ? "status-ativo" : "status-inativo");
         document.getElementById("client-block").style.display = "block";
         document.getElementById("simulation-block").style.display = "none";
+
+        // Card RESUMO - CORRIGIDO COM OS CAMPOS CORRETOS
+        const secResumo = document.getElementById("section-resumo");
+        if (secResumo) {
+          const margNovoValue = margemNovo;
+
+          // Margem RMC (cartão de crédito consignado) - Usando ValorRMC
+          const margRMC =
+            ben.ValorRMC ?? ben.MargemRMC ?? ben.margemRMC ?? null;
+
+          // Margem RCC (cartão de débito consignado) - Usando ValorRCC
+          const margRCC =
+            ben.ValorRCC ?? ben.MargemRCC ?? ben.margemRCC ?? null;
+
+          // Possui Cartão RMC - campo correto da API
+          const posCartaoRMC =
+            ben.PossuiCartaoRMC ??
+            ben.possuiCartaoRMC ??
+            ben.possuicartaormc ??
+            ben.possui_cartao_rmc ??
+            null;
+
+          // Possui Cartão RCC - campo correto da API
+          const posCartaoRCC =
+            ben.PossuiCartaoRCC ??
+            ben.possuiCartaoRCC ??
+            ben.possuicartaorcc ??
+            ben.possui_cartao_rcc ??
+            null;
+
+          const elMargNovo = document.getElementById("r-margem-novo");
+          if (elMargNovo)
+            elMargNovo.textContent =
+              margNovoValue != null ? fmt(margNovoValue) : "—";
+
+          const elMargRMC = document.getElementById("r-margem-rmc");
+          if (elMargRMC)
+            elMargRMC.textContent = margRMC != null ? fmt(margRMC) : "—";
+
+          const elMargRCC = document.getElementById("r-margem-rcc");
+          if (elMargRCC)
+            elMargRCC.textContent = margRCC != null ? fmt(margRCC) : "—";
+
+          const elCartaoRMC = document.getElementById("r-possui-cartao-rmc");
+          if (elCartaoRMC) {
+            const val = simNao(posCartaoRMC);
+            elCartaoRMC.textContent = val;
+            elCartaoRMC.style.color =
+              val === "Sim"
+                ? "var(--danger)"
+                : val === "Não"
+                  ? "var(--success)"
+                  : "var(--text-2)";
+          }
+
+          const elCartaoRCC = document.getElementById("r-possui-cartao-rcc");
+          if (elCartaoRCC) {
+            const val = simNao(posCartaoRCC);
+            elCartaoRCC.textContent = val;
+            elCartaoRCC.style.color =
+              val === "Sim"
+                ? "var(--danger)"
+                : val === "Não"
+                  ? "var(--success)"
+                  : "var(--text-2)";
+          }
+
+          secResumo.style.display = "";
+        }
       }
 
       function formatNascto(ts) {
@@ -3904,6 +4211,7 @@
         if (Array.isArray(data)) return data;
         return [];
       }
+
       function gc(c, ...keys) {
         for (const k of keys) {
           if (c[k] != null && c[k] !== "") return c[k];
@@ -3969,62 +4277,27 @@
             }
 
             return `<tr>
-          <td class="td-banco">${banco}</td>
-          <td class="td-contrato">${contrato}</td>
-          <td>${fmtDate(inicio) || "—"}</td>
-          <td>${fmtDate(fim) || "—"}</td>
-          <td>${valor ? fmt(valor) : "—"}</td>
-          <td class="td-taxa">${taxa ? taxa.toFixed(2) + "%" : "—"}</td>
-          <td class="td-parcela">${parcela ? fmt(parcela) : "—"}</td>
-          <td><span class="badge-restantes">${restStr}</span></td>
-          <td class="td-parcelas-pagas">${pagas > 0 ? pagas : "—"}</td>
-          <td class="td-quitacao">${quitFinal}</td>
-          <td>
-            <button class="btn-sm btn-simulate" onclick="openSim(${i})"> Simular</button>
-            <button class="btn-sm btn-detail" onclick="openDetail(${i})" style="margin-left:4px">Detalhar</button>
-          </td>
-        </tr>`;
+            <td class="td-banco">${escapeHtml(banco)}</td>
+            <td class="td-contrato">${escapeHtml(contrato)}</td>
+            <td>${fmtDate(inicio) || "—"}</td>
+            <td>${fmtDate(fim) || "—"}</td>
+            <td>${valor ? fmt(valor) : "—"}</td>
+            <td class="td-taxa">${taxa ? taxa.toFixed(2) + "%" : "—"}</td>
+            <td class="td-parcela">${parcela ? fmt(parcela) : "—"}</td>
+            <td><span class="badge-restantes">${restStr}</span></td>
+            <td class="td-parcelas-pagas">${pagas > 0 ? pagas : "—"}</td>
+            <td class="td-quitacao">${quitFinal}</td>
+            <td>
+              <button class="btn-sm btn-simulate" onclick="openSim(${i})"> Simular</button>
+              <button class="btn-sm btn-detail" onclick="openDetail(${i})" style="margin-left:4px">Detalhar</button>
+            </td>
+          </tr>`;
           })
           .join("");
 
         document.getElementById("contracts-block").style.display = "block";
-        atualizarMargemCalculada();
-      }
-
-      function atualizarMargemCalculada() {
-        const el = document.getElementById("c-margem-calculada");
-        if (!el) return;
-        if (!currentContracts.length) {
-          el.textContent = "—";
-          return;
-        }
-
-        const today = new Date().toISOString().split("T")[0];
-        let somaQuitacao = 0;
-        let temCalculo = false;
-
-        currentContracts.forEach((c) => {
-          const parcela = parseFloat(c.Vl_Parcela || 0);
-          const taxa = parseFloat(c.TaxaJuros || 0);
-          const inicio = converterDataPromosys(c.InicioDesconto);
-          const fim = converterDataPromosys(c.FinalDesconto);
-
-          if (parcela > 0 && taxa > 0 && inicio && fim) {
-            const calc = calcQuitacaoBC(parcela, taxa, inicio, fim, today);
-            if (calc && calc.pv > 0) {
-              somaQuitacao += calc.pv;
-              temCalculo = true;
-            }
-          }
-        });
-
-        if (temCalculo) {
-          el.textContent = fmt(somaQuitacao);
-          el.title =
-            "Soma dos valores de quitação calculados pelo Banco Central para todos os contratos ativos";
-        } else {
-          el.textContent = "—";
-        }
+        const qtdEl = document.getElementById("r-qtd-contratos");
+        if (qtdEl) qtdEl.textContent = contratos.length || "0";
       }
 
       function openSim(idx) {
@@ -4063,6 +4336,7 @@
           .scrollIntoView({ behavior: "smooth", block: "start" });
         if (parcela > 0 && taxa > 0 && inicio && fim) calcularQuitacao();
       }
+
       function closeSim() {
         document.getElementById("simulation-block").style.display = "none";
       }
@@ -4095,7 +4369,6 @@
       function openDetail(idx) {
         const c = currentContracts[idx];
         const today = new Date().toISOString().split("T")[0];
-
         const nomeCliente =
           document.getElementById("c-nome")?.textContent || "—";
         const cpfCliente = document.getElementById("c-cpf")?.textContent || "—";
@@ -4107,9 +4380,11 @@
         const cidade =
           document.getElementById("c-end-cidade")?.textContent || "";
         const uf = document.getElementById("c-end-uf")?.textContent || "";
+        const cep = document.getElementById("c-cep")?.textContent || "";
         const endereco =
-          [rua, bairro, cidade, uf].filter((v) => v && v !== "—").join(" - ") ||
-          "—";
+          [rua, bairro, cidade, uf, cep]
+            .filter((v) => v && v !== "—")
+            .join(" - ") || "—";
         const telExibir = tel1 !== "—" ? tel1 : tel2;
 
         const banco = c.Banco_Nome || gc(c, "Banco", "NomeBanco") || "—";
@@ -4128,9 +4403,8 @@
           juros = "—",
           saldoRest = "—",
           nRest = "—",
-          nTotal = "—";
-        let temCalculo = false;
-
+          nTotal = "—",
+          temCalculo = false;
         if (parcela > 0 && taxa > 0 && inicio && fim) {
           const calc = calcQuitacaoBC(parcela, taxa, inicio, fim, today);
           if (calc) {
@@ -4142,155 +4416,67 @@
             temCalculo = true;
           }
         }
-
         const quitPromosys = parseFloat(c.QUITACAOATUAL || 0);
         const quitPromosysStr = quitPromosys > 0 ? fmt(quitPromosys) : "—";
-
         if (!temCalculo && quitPromosys > 0) quitacao = fmt(quitPromosys);
-
         const parcelasExib =
           nRest !== "—" && nTotal !== "—"
             ? `${nRest}/${nTotal}`
             : `${pagas}/${prazo}`;
 
         document.getElementById("modal-content").innerHTML = `
-        <div style="grid-column:1/-1;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);margin-bottom:6px;padding-bottom:8px;border-bottom:1px solid var(--border)"><svg width="14" height="14" style="display:inline;margin-right:6px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Dados do Cliente</div>
-        <div class="modal-field"><div class="label">Nome</div><div class="value">${nomeCliente}</div></div>
-        <div class="modal-field"><div class="label">CPF</div><div class="value">${cpfCliente}</div></div>
-        <div class="modal-field"><div class="label">Telefone</div><div class="value">${telExibir}</div></div>
-        <div class="modal-field"><div class="label">Telefone 2</div><div class="value">${tel2 !== tel1 ? tel2 : "—"}</div></div>
-        <div class="modal-field" style="grid-column:1/-1"><div class="label">Endereço</div><div class="value">${endereco}</div></div>
-
-        <div style="grid-column:1/-1;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);margin:12px 0 6px;padding-bottom:8px;border-bottom:1px solid var(--border)"><svg width="14" height="14" style="display:inline;margin-right:6px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg> Dados do Contrato</div>
-        <div class="modal-field"><div class="label">Banco</div><div class="value">${banco}</div></div>
-        <div class="modal-field"><div class="label">Contrato</div><div class="value">${contrato}</div></div>
-        <div class="modal-field"><div class="label">Valor Financiado</div><div class="value">${valor ? fmt(valor) : "—"}</div></div>
-        <div class="modal-field"><div class="label">Parcela Mensal</div><div class="value">${parcela ? fmt(parcela) : "—"}</div></div>
-        <div class="modal-field"><div class="label">Taxa Mensal</div><div class="value">${taxa ? taxa.toFixed(2) + "%" : "—"}</div></div>
-        <div class="modal-field"><div class="label">Parcelas (Rest./Total)</div><div class="value">${parcelasExib}</div></div>
-        <div class="modal-field"><div class="label">Início</div><div class="value">${fmtDate(inicio) || "—"}</div></div>
-        <div class="modal-field"><div class="label">Fim</div><div class="value">${fmtDate(fim) || "—"}</div></div>
-        <div class="modal-field"><div class="label">Averbação</div><div class="value">${fmtDate(averbacao)}</div></div>
-        <div class="modal-field"><div class="label">Situação</div><div class="value">${situacao}</div></div>
-
-        <div style="grid-column:1/-1;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);margin:12px 0 6px;padding-bottom:8px;border-bottom:1px solid var(--border)"><svg width="14" height="14" style="display:inline;margin-right:6px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Simulação / Quitação (Banco Central)</div>
-        <div class="modal-field"><div class="label">Total Restante</div><div class="value">${saldoRest}</div></div>
-        <div class="modal-field"><div class="label">Juros Restantes</div><div class="value">${juros}</div></div>
-        <div class="modal-field" style="grid-column:1/-1;background:rgba(8,145,178,.08);border:1px solid rgba(8,145,178,.3);border-radius:10px;padding:14px;text-align:center">
-          <div class="label" style="color:var(--cyan);margin-bottom:6px">Valor de Quitação (q₀ — Banco Central)</div>
-          <div class="value" style="font-size:22px;color:var(--cyan)">${quitacao}</div>
-          ${temCalculo && quitPromosysStr !== "—" ? `<div style="font-size:11px;color:var(--text-3);margin-top:6px">Promosys informa: ${quitPromosysStr}</div>` : ""}
-        </div>
-      `;
+          <div style="grid-column:1/-1;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);margin-bottom:6px;padding-bottom:8px;border-bottom:1px solid var(--border)"><svg width="14" height="14" style="display:inline;margin-right:6px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Dados do Cliente</div>
+          <div class="modal-field"><div class="label">Nome</div><div class="value">${escapeHtml(nomeCliente)}</div></div>
+          <div class="modal-field"><div class="label">CPF</div><div class="value">${escapeHtml(cpfCliente)}</div></div>
+          <div class="modal-field"><div class="label">Telefone</div><div class="value">${escapeHtml(telExibir)}</div></div>
+          <div class="modal-field"><div class="label">Telefone 2</div><div class="value">${escapeHtml(tel2 !== tel1 ? tel2 : "—")}</div></div>
+          <div class="modal-field" style="grid-column:1/-1"><div class="label">Endereço</div><div class="value">${escapeHtml(endereco)}</div></div>
+          <div style="grid-column:1/-1;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);margin:12px 0 6px;padding-bottom:8px;border-bottom:1px solid var(--border)"><svg width="14" height="14" style="display:inline;margin-right:6px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg> Dados do Contrato</div>
+          <div class="modal-field"><div class="label">Banco</div><div class="value">${escapeHtml(banco)}</div></div>
+          <div class="modal-field"><div class="label">Contrato</div><div class="value">${escapeHtml(contrato)}</div></div>
+          <div class="modal-field"><div class="label">Valor Financiado</div><div class="value">${valor ? fmt(valor) : "—"}</div></div>
+          <div class="modal-field"><div class="label">Parcela Mensal</div><div class="value">${parcela ? fmt(parcela) : "—"}</div></div>
+          <div class="modal-field"><div class="label">Taxa Mensal</div><div class="value">${taxa ? taxa.toFixed(2) + "%" : "—"}</div></div>
+          <div class="modal-field"><div class="label">Parcelas (Rest./Total)</div><div class="value">${parcelasExib}</div></div>
+          <div class="modal-field"><div class="label">Início</div><div class="value">${fmtDate(inicio) || "—"}</div></div>
+          <div class="modal-field"><div class="label">Fim</div><div class="value">${fmtDate(fim) || "—"}</div></div>
+          <div class="modal-field"><div class="label">Averbação</div><div class="value">${fmtDate(averbacao)}</div></div>
+          <div class="modal-field"><div class="label">Situação</div><div class="value">${escapeHtml(situacao)}</div></div>
+          <div style="grid-column:1/-1;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);margin:12px 0 6px;padding-bottom:8px;border-bottom:1px solid var(--border)"><svg width="14" height="14" style="display:inline;margin-right:6px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Simulação / Quitação (Banco Central)</div>
+          <div class="modal-field"><div class="label">Total Restante</div><div class="value">${saldoRest}</div></div>
+          <div class="modal-field"><div class="label">Juros Restantes</div><div class="value">${juros}</div></div>
+          <div class="modal-field" style="grid-column:1/-1;background:rgba(8,145,178,.08);border:1px solid rgba(8,145,178,.3);border-radius:10px;padding:14px;text-align:center">
+            <div class="label" style="color:var(--cyan);margin-bottom:6px">Valor de Quitação (q₀ — Banco Central)</div>
+            <div class="value" style="font-size:22px;color:var(--cyan)">${quitacao}</div>
+            ${temCalculo && quitPromosysStr !== "—" ? `<div style="font-size:11px;color:var(--text-3);margin-top:6px">Promosys informa: ${quitPromosysStr}</div>` : ""}
+          </div>
+        `;
         document.getElementById("modal-overlay").classList.add("open");
       }
+
       function closeModal() {
         document.getElementById("modal-overlay").classList.remove("open");
       }
 
-      function resetView() {
-        ["client-block", "contracts-block", "simulation-block"].forEach(
-          (id) => (document.getElementById(id).style.display = "none"),
-        );
-        document.getElementById("search-input").value = "";
-        currentContracts = [];
-      }
-
-      function openAdmin() {
-        renderUsersList();
-        const podeApi =
-          currentUser &&
-          ["master_total", "master_operacional"].includes(currentUser.perfil);
-        const tabApi = document.getElementById("atab-api");
-        const tabApiContent = document.getElementById("admin-tab-api");
-        if (tabApi) tabApi.style.display = podeApi ? "" : "none";
-        if (tabApiContent) tabApiContent.style.display = podeApi ? "" : "none";
-
-        const podeIdent =
-          currentUser &&
-          ["master_total", "administrador"].includes(currentUser.perfil);
-        const tabIdent = document.getElementById("atab-identidade");
-        if (tabIdent) tabIdent.style.display = podeIdent ? "" : "none";
-
-        const podeFin = currentUser && currentUser.perfil === "master_total";
-        const tabFin = document.getElementById("atab-financeiro");
-        if (tabFin) tabFin.style.display = podeFin ? "" : "none";
-
-        fillApiForm();
-        fillIdentityForm();
-        updateBgPreview();
-        switchAdminTab("users");
-        document.getElementById("admin-overlay").classList.add("open");
-      }
-      function closeAdmin() {
-        document.getElementById("admin-overlay").classList.remove("open");
-      }
-
-      async function carregarFinanceiro() {
-        const el = document.getElementById("financeiro-lista");
-        if (!el) return;
-        el.textContent = "Carregando...";
-        try {
-          const res = await fetch("api/financeiro.php", {
-            headers: authHeaders(),
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.erro || "Erro.");
-          const items = data.financeiro || [];
-          if (!items.length) {
-            el.textContent = "Nenhuma empresa encontrada.";
-            return;
-          }
-          el.innerHTML = items
-            .map(
-              (e) => `
-          <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-              <div style="font-weight:600;font-size:14px">${e.nome_empresa}</div>
-              <span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${e.status_cobranca === "em_dia" ? "rgba(16,185,129,.15)" : "rgba(239,68,68,.15)"};color:${e.status_cobranca === "em_dia" ? "var(--success)" : "var(--danger)"};border:1px solid ${e.status_cobranca === "em_dia" ? "rgba(16,185,129,.3)" : "rgba(239,68,68,.3)"}">${e.status_cobranca?.replace("_", " ") || "—"}</span>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:12px">
-              <div><div style="color:var(--text-3);margin-bottom:2px">Licenças</div><div style="font-family:var(--mono)">${e.licencas_em_uso}/${e.limite_licencas}${e.licencas_excedentes > 0 ? " <span style=color:var(--danger)>(+" + e.licencas_excedentes + " exc.)</span>" : ""}</div></div>
-              <div><div style="color:var(--text-3);margin-bottom:2px">Valor Mensal</div><div style="font-family:var(--mono)">${e.valor_mensal ? "R$ " + parseFloat(e.valor_mensal).toFixed(2) : "—"}</div></div>
-              <div><div style="color:var(--text-3);margin-bottom:2px">Total Mês</div><div style="font-family:var(--mono);color:var(--cyan)">${e.total_mes_calculado ? "R$ " + parseFloat(e.total_mes_calculado).toFixed(2) : "—"}</div></div>
-              <div><div style="color:var(--text-3);margin-bottom:2px">Valor/Licença</div><div style="font-family:var(--mono)">${e.valor_por_licenca ? "R$ " + parseFloat(e.valor_por_licenca).toFixed(2) : "—"}</div></div>
-              <div><div style="color:var(--text-3);margin-bottom:2px">Saldo Créditos</div><div style="font-family:var(--mono)">${e.saldo_creditos ? "R$ " + parseFloat(e.saldo_creditos).toFixed(2) : "R$ 0,00"}</div></div>
-              <div><div style="color:var(--text-3);margin-bottom:2px">Vencimento</div><div style="font-family:var(--mono)">Dia ${e.vencimento_dia || "—"}</div></div>
-            </div>
-          </div>`,
-            )
-            .join("");
-        } catch (e) {
-          el.textContent = "Erro: " + e.message;
-        }
-      }
-      function switchAdminTab(tab) {
-        [
-          "users",
-          "mypass",
-          "identidade",
-          "api",
-          "imagem",
-          "financeiro",
-        ].forEach((t) => {
-          const el = document.getElementById("admin-tab-" + t);
-          const btn = document.getElementById("atab-" + t);
-          if (el) el.style.display = t === tab ? "block" : "none";
-          if (btn) btn.classList.toggle("active", t === tab);
-        });
-        if (tab === "financeiro") carregarFinanceiro();
-      }
-
-      let _cachedUsers = [];
+      // ============================================================
+      // ADMIN - USUÁRIOS
+      // ============================================================
 
       async function renderUsersList() {
         try {
           const empId = currentUser?.empresa_id;
-          const url =
-            "api/usuarios.php" + (empId ? "?empresa_id=" + empId : "");
+          let url = "api/usuarios.php";
+
+          if (currentUser?.perfil === "administrador" && empId) {
+            url += "?empresa_id=" + empId;
+          } else if (currentUser?.perfil === "master_operacional" && empId) {
+            url += "?empresa_id=" + empId;
+          }
+
           const res = await fetch(url, { headers: authHeaders() });
           const data = await res.json();
           _cachedUsers = data.usuarios || [];
+
           const perfilLabel = (p) =>
             ({
               master_total: "Master Total",
@@ -4298,44 +4484,98 @@
               administrador: "Administrador",
               consultor: "Consultor",
             })[p] || p;
-          const perfilColor = (p) =>
-            p === "administrador" || p.startsWith("master")
-              ? "rgba(59,130,246,.15)"
-              : "rgba(16,185,129,.12)";
-          const perfilText = (p) =>
-            p === "administrador" || p.startsWith("master")
-              ? "var(--blue-4)"
-              : "var(--success)";
+
+          const perfilColor = (p) => {
+            if (p === "master_total") return "rgba(139,92,246,.15)";
+            if (p === "master_operacional") return "rgba(59,130,246,.15)";
+            if (p === "administrador") return "rgba(16,185,129,.15)";
+            return "rgba(148,163,184,.12)";
+          };
+
+          const perfilText = (p) => {
+            if (p === "master_total") return "var(--purple)";
+            if (p === "master_operacional") return "var(--blue-4)";
+            if (p === "administrador") return "var(--success)";
+            return "var(--text-2)";
+          };
+
+          const podeCriar = currentUser?.perfil !== "consultor";
+          const btnNovo = document.getElementById("btn-novo-usuario");
+          if (btnNovo) btnNovo.style.display = podeCriar ? "flex" : "none";
+
           document.getElementById("users-tbody").innerHTML = _cachedUsers
-            .map(
-              (u) => `
-          <tr style="border-bottom:1px solid rgba(30,90,200,.1)">
-            <td style="padding:10px 11px;font-size:13px">${u.nome}</td>
-            <td style="padding:10px 11px;font-size:13px;color:var(--text-2);font-family:var(--mono)">${u.login}</td>
-            <td style="padding:10px 11px"><span style="padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;background:${perfilColor(u.perfil)};color:${perfilText(u.perfil)};border:1px solid ${perfilColor(u.perfil).replace(".15)", ".3)").replace(".12)", ".25)")}">${perfilLabel(u.perfil)}</span></td>
-            <td style="padding:10px 11px;text-align:right">
-              <button class="btn-sm btn-simulate" onclick="editUser(${u.id})" style="margin-right:4px">Editar</button>
-              ${u.id !== currentUser?.id ? `<button class="btn-sm" onclick="deleteUser(${u.id})" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--danger)">Desativar</button>` : ""}
-            </td>
-          </tr>`,
-            )
+            .map((u) => {
+              const podeEditar =
+                currentUser?.perfil === "master_total" ||
+                (currentUser?.perfil === "master_operacional" &&
+                  u.perfil !== "master_total") ||
+                (currentUser?.perfil === "administrador" &&
+                  u.perfil !== "master_total" &&
+                  u.perfil !== "master_operacional");
+              const podeDesativar = podeEditar && u.id !== currentUser?.id;
+              const podeExcluirPermanente =
+                currentUser?.perfil === "master_total" && podeDesativar;
+              const statusClass =
+                u.status === "ativo"
+                  ? "status-ativo-small"
+                  : "status-inativo-small";
+              const statusText = u.status === "ativo" ? "Ativo" : "Inativo";
+
+              return `
+              <tr style="border-bottom:1px solid rgba(30,90,200,.1)">
+                <td style="padding:10px 11px;font-size:13px">${escapeHtml(u.nome)}</td>
+                <td style="padding:10px 11px;font-size:13px;color:var(--text-2);font-family:var(--mono)">${escapeHtml(u.login)}</td>
+                <td style="padding:10px 11px"><span style="padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;background:${perfilColor(u.perfil)};color:${perfilText(u.perfil)};border:1px solid rgba(0,0,0,.05)">${perfilLabel(u.perfil)}</span></td>
+                <td style="padding:10px 11px"><span class="status-badge-small ${statusClass}">${statusText}</span></td>
+                <td style="padding:10px 11px;text-align:right">
+                  ${podeEditar ? `<button class="btn-sm btn-simulate" onclick="editUser(${u.id})" style="margin-right:4px">✏️ Editar</button>` : ""}
+                  ${podeDesativar ? `<button class="btn-sm" onclick="deleteUser(${u.id})" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--danger)">${podeExcluirPermanente ? "🗑️ Excluir" : u.status === "ativo" ? "🔴 Desativar" : "🟢 Ativar"}</button>` : ""}
+                </td>
+              </tr>`;
+            })
             .join("");
         } catch (e) {
           showToast("Erro ao carregar usuários.", "error");
         }
       }
+
       function showNewUserForm() {
         ["uf-nome", "uf-user", "uf-pass"].forEach(
           (id) => (document.getElementById(id).value = ""),
         );
-        document.getElementById("uf-role").value = "consultor";
+
+        const roleSelect = document.getElementById("uf-role");
+        if (roleSelect) {
+          roleSelect.innerHTML = "";
+          if (currentUser?.perfil === "master_total") {
+            roleSelect.innerHTML = `
+              <option value="master_total">Master Total</option>
+              <option value="master_operacional">Master Operacional</option>
+              <option value="administrador">Administrador</option>
+              <option value="consultor">Consultor</option>
+            `;
+          } else if (currentUser?.perfil === "master_operacional") {
+            roleSelect.innerHTML = `
+              <option value="administrador">Administrador</option>
+              <option value="consultor">Consultor</option>
+            `;
+          } else if (currentUser?.perfil === "administrador") {
+            roleSelect.innerHTML = `
+              <option value="administrador">Administrador</option>
+              <option value="consultor">Consultor</option>
+            `;
+          }
+        }
+
         document.getElementById("uf-editing-id").value = "";
         document.getElementById("user-form-title").textContent = "Novo Usuário";
         document.getElementById("user-form-wrap").style.display = "block";
       }
+
       function cancelUserForm() {
         document.getElementById("user-form-wrap").style.display = "none";
       }
+
       function editUser(id) {
         const u = _cachedUsers.find((x) => x.id === id);
         if (!u) return;
@@ -4344,16 +4584,28 @@
         document.getElementById("uf-nome").value = u.nome;
         document.getElementById("uf-user").value = u.login;
         document.getElementById("uf-pass").value = "";
-        document.getElementById("uf-role").value = u.perfil;
+
+        const roleSelect = document.getElementById("uf-role");
+        if (roleSelect && currentUser?.perfil === "master_total") {
+          roleSelect.innerHTML = `
+            <option value="master_total" ${u.perfil === "master_total" ? "selected" : ""}>Master Total</option>
+            <option value="master_operacional" ${u.perfil === "master_operacional" ? "selected" : ""}>Master Operacional</option>
+            <option value="administrador" ${u.perfil === "administrador" ? "selected" : ""}>Administrador</option>
+            <option value="consultor" ${u.perfil === "consultor" ? "selected" : ""}>Consultor</option>
+          `;
+        }
+
         document.getElementById("uf-editing-id").value = u.id;
         document.getElementById("user-form-wrap").style.display = "block";
       }
+
       async function saveUser() {
         const nome = document.getElementById("uf-nome").value.trim();
         const login = document.getElementById("uf-user").value.trim();
         const pass = document.getElementById("uf-pass").value;
         const perfil = document.getElementById("uf-role").value;
         const editId = document.getElementById("uf-editing-id").value;
+
         if (!nome || !login) {
           showToast("Preencha nome e login.", "error");
           return;
@@ -4397,11 +4649,21 @@
           showToast("Erro: " + e.message, "error");
         }
       }
+
       async function deleteUser(id) {
         if (id === currentUser?.id) {
-          showToast("Você não pode desativar sua própria conta.", "error");
+          showToast("Você não pode excluir sua própria conta.", "error");
           return;
         }
+
+        const userToDelete = _cachedUsers.find((u) => u.id === id);
+        const confirmMsg =
+          currentUser?.perfil === "master_total"
+            ? `Tem certeza que deseja EXCLUIR PERMANENTEMENTE o usuário "${userToDelete?.nome}"? Esta ação não pode ser desfeita.`
+            : `Tem certeza que deseja desativar o usuário "${userToDelete?.nome}"?`;
+
+        if (!confirm(confirmMsg)) return;
+
         try {
           const res = await fetch("api/usuarios.php?id=" + id, {
             method: "DELETE",
@@ -4410,11 +4672,17 @@
           const data = await res.json();
           if (!res.ok) throw new Error(data.erro || "Erro.");
           renderUsersList();
-          showToast("Usuário desativado.", "info");
+          showToast(
+            currentUser?.perfil === "master_total"
+              ? "Usuário excluído permanentemente!"
+              : "Usuário desativado!",
+            "info",
+          );
         } catch (e) {
           showToast("Erro: " + e.message, "error");
         }
       }
+
       async function alterarSenha() {
         const atual = document.getElementById("mp-atual").value;
         const nova = document.getElementById("mp-nova").value;
@@ -4464,7 +4732,415 @@
         }
       }
 
+      // ============================================================
+      // ADMIN - EMPRESAS
+      // ============================================================
+
+      async function carregarEmpresas() {
+        const el = document.getElementById("empresas-lista");
+        if (!el) return;
+        el.innerHTML =
+          '<div style="text-align:center;padding:20px">🔄 Carregando...</div>';
+        try {
+          const res = await fetch("api/empresas.php", {
+            headers: authHeaders(),
+          });
+          const data = await res.json();
+          if (!res.ok)
+            throw new Error(data.erro || "Erro ao carregar empresas.");
+          _cachedEmpresas = data.empresas || [];
+
+          if (!_cachedEmpresas.length) {
+            el.innerHTML =
+              '<div style="text-align:center;padding:20px;color:var(--text-3)">Nenhuma empresa encontrada.</div>';
+            return;
+          }
+
+          el.innerHTML = _cachedEmpresas
+            .map(
+              (e) => `
+            <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+                <div>
+                  <div style="font-weight:600;font-size:14px">${escapeHtml(e.nome_empresa)}</div>
+                  <div style="font-size:11px;color:var(--text-3)">Slug: ${escapeHtml(e.slug)}</div>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${e.status === "ativo" ? "rgba(16,185,129,.15)" : "rgba(239,68,68,.15)"};color:${e.status === "ativo" ? "var(--success)" : "var(--danger)"}">
+                    ${e.status === "ativo" ? "✅ Ativo" : "❌ Inativo"}
+                  </span>
+                  <button class="btn-sm btn-simulate" onclick="editarEmpresa(${e.id})" style="padding:4px 10px">✏️ Editar</button>
+                  ${e.status === "ativo" ? `<button class="btn-sm" onclick="desativarEmpresa(${e.id})" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--danger);padding:4px 10px">🔴 Desativar</button>` : ""}
+                  ${currentUser?.perfil === "master_total" && e.status === "inativo" ? `<button class="btn-sm" onclick="reativarEmpresa(${e.id})" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--success);padding:4px 10px">🟢 Reativar</button>` : ""}
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;font-size:12px;margin-top:8px">
+                <div><div style="color:var(--text-3)">📊 Licenças</div>${e.licencas_em_uso}/${e.limite_licencas}</div>
+                <div><div style="color:var(--text-3)">🌐 Domínio</div>${e.tipo_dominio === "cj2" ? (e.subdominio ? e.subdominio + ".cj2tech.com.br" : "CJ2") : e.dominio_personalizado || "—"}</div>
+                <div><div style="color:var(--text-3)">👥 Usuários</div>${e.total_usuarios || 0}</div>
+                ${currentUser?.perfil === "master_total" && e.valor_mensal ? `<div><div style="color:var(--text-3)">💰 Mensalidade</div>${fmt(e.valor_mensal)}</div>` : ""}
+                <div><div style="color:var(--text-3)">🔑 API</div>${e.api_usuario ? "✅ Configurada" : "❌ Não configurada"}</div>
+              </div>
+            </div>
+          `,
+            )
+            .join("");
+        } catch (e) {
+          el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--danger)">❌ Erro: ${e.message}</div>`;
+        }
+      }
+
+      function showNewEmpresaForm() {
+        const modal = document.createElement("div");
+        modal.className = "modal-overlay open";
+        modal.style.display = "flex";
+        modal.onclick = (e) => {
+          if (e.target === modal) modal.remove();
+        };
+
+        modal.innerHTML = `
+          <div class="modal-box wide" style="max-width:600px" onclick="event.stopPropagation()">
+            <div class="modal-header">
+              <h3>🏢 Nova Empresa</h3>
+              <button class="btn-close-modal" onclick="this.closest('.modal-overlay').remove()">×</button>
+            </div>
+            <form id="form-nova-empresa" onsubmit="event.preventDefault(); criarEmpresa();">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="sim-field">
+                  <label>Nome da Empresa *</label>
+                  <input type="text" id="emp-nome" required placeholder="Ex: Minha Empresa LTDA">
+                </div>
+                <div class="sim-field">
+                  <label>Slug *</label>
+                  <input type="text" id="emp-slug" required placeholder="ex: minha-empresa" pattern="[a-z0-9-]+">
+                </div>
+                <div class="sim-field">
+                  <label>Nome do Sistema</label>
+                  <input type="text" id="emp-nome-sistema" placeholder="CJ2Tech Sistema de Consulta">
+                </div>
+                <div class="sim-field">
+                  <label>Limite de Licenças</label>
+                  <input type="number" id="emp-limite" value="5" min="1">
+                </div>
+                <div class="sim-field">
+                  <label>Tipo de Domínio</label>
+                  <select id="emp-tipo-dominio" onchange="toggleDominioFields()">
+                    <option value="cj2">Domínio CJ2 (subdomínio)</option>
+                    <option value="proprio">Domínio Próprio</option>
+                  </select>
+                </div>
+                <div class="sim-field" id="div-subdominio">
+                  <label>Subdomínio</label>
+                  <input type="text" id="emp-subdominio" placeholder="empresa">
+                </div>
+                <div class="sim-field" id="div-dominio-proprio" style="display:none">
+                  <label>Domínio Personalizado</label>
+                  <input type="text" id="emp-dominio" placeholder="consulta.empresa.com.br">
+                </div>
+              </div>
+              <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
+                <div style="font-size:12px;font-weight:600;margin-bottom:12px">👤 Administrador Principal</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div class="sim-field">
+                    <label>Nome do Admin *</label>
+                    <input type="text" id="emp-admin-nome" required placeholder="Nome do administrador">
+                  </div>
+                  <div class="sim-field">
+                    <label>Login do Admin *</label>
+                    <input type="text" id="emp-admin-login" required placeholder="admin.login">
+                  </div>
+                  <div class="sim-field">
+                    <label>Senha do Admin *</label>
+                    <input type="password" id="emp-admin-senha" required placeholder="Mín. 6 caracteres">
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
+                <div style="font-size:12px;font-weight:600;margin-bottom:12px">🔌 Configuração da API (Opcional)</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div class="sim-field">
+                    <label>Usuário Promosys</label>
+                    <input type="text" id="emp-api-usuario" placeholder="Deixe em branco para herdar">
+                  </div>
+                  <div class="sim-field">
+                    <label>Senha Promosys</label>
+                    <input type="password" id="emp-api-senha" placeholder="Deixe em branco para herdar">
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:20px">
+                <button type="submit" class="btn-calcular" style="flex:1">✅ Criar Empresa</button>
+                <button type="button" class="btn-sm btn-detail" onclick="this.closest('.modal-overlay').remove()" style="padding:12px 20px">Cancelar</button>
+              </div>
+            </form>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      }
+
+      function toggleDominioFields() {
+        const tipo = document.getElementById("emp-tipo-dominio").value;
+        const divSub = document.getElementById("div-subdominio");
+        const divProprio = document.getElementById("div-dominio-proprio");
+        if (tipo === "cj2") {
+          divSub.style.display = "block";
+          divProprio.style.display = "none";
+        } else {
+          divSub.style.display = "none";
+          divProprio.style.display = "block";
+        }
+      }
+
+      async function criarEmpresa() {
+        const nome = document.getElementById("emp-nome").value.trim();
+        const slug = document.getElementById("emp-slug").value.trim();
+        const nomeSistema =
+          document.getElementById("emp-nome-sistema").value.trim() ||
+          "CJ2Tech Sistema de Consulta";
+        const limite =
+          parseInt(document.getElementById("emp-limite").value) || 5;
+        const tipoDominio = document.getElementById("emp-tipo-dominio").value;
+        const subdominio =
+          tipoDominio === "cj2"
+            ? document.getElementById("emp-subdominio").value.trim()
+            : null;
+        const dominioPersonalizado =
+          tipoDominio === "proprio"
+            ? document.getElementById("emp-dominio").value.trim()
+            : null;
+        const adminNome = document
+          .getElementById("emp-admin-nome")
+          .value.trim();
+        const adminLogin = document
+          .getElementById("emp-admin-login")
+          .value.trim();
+        const adminSenha = document.getElementById("emp-admin-senha").value;
+        const apiUsuario =
+          document.getElementById("emp-api-usuario").value.trim() || null;
+        const apiSenha = document.getElementById("emp-api-senha").value || null;
+
+        if (!nome || !slug || !adminNome || !adminLogin || !adminSenha) {
+          showToast("Preencha todos os campos obrigatórios.", "error");
+          return;
+        }
+        if (adminSenha.length < 6) {
+          showToast("Senha do admin deve ter no mínimo 6 caracteres.", "error");
+          return;
+        }
+        if (!/^[a-z0-9-]+$/.test(slug)) {
+          showToast(
+            "Slug deve conter apenas letras minúsculas, números e hífens.",
+            "error",
+          );
+          return;
+        }
+
+        try {
+          const res = await fetch("api/empresas.php", {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify({
+              nome_empresa: nome,
+              slug: slug,
+              nome_sistema: nomeSistema,
+              limite_licencas: limite,
+              tipo_dominio: tipoDominio,
+              subdominio: subdominio,
+              dominio_personalizado: dominioPersonalizado,
+              admin_nome: adminNome,
+              admin_login: adminLogin,
+              admin_senha: adminSenha,
+              api_usuario: apiUsuario,
+              api_senha: apiSenha,
+              status: "ativo",
+            }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.erro || "Erro ao criar empresa.");
+          showToast("Empresa criada com sucesso!", "success");
+          document.querySelector(".modal-overlay.open")?.remove();
+          carregarEmpresas();
+        } catch (e) {
+          showToast("Erro: " + e.message, "error");
+        }
+      }
+
+      async function editarEmpresa(id) {
+        const empresa = _cachedEmpresas.find((e) => e.id === id);
+        if (!empresa) return;
+
+        const modal = document.createElement("div");
+        modal.className = "modal-overlay open";
+        modal.style.display = "flex";
+        modal.onclick = (e) => {
+          if (e.target === modal) modal.remove();
+        };
+
+        modal.innerHTML = `
+          <div class="modal-box wide" style="max-width:500px" onclick="event.stopPropagation()">
+            <div class="modal-header">
+              <h3>✏️ Editar Empresa</h3>
+              <button class="btn-close-modal" onclick="this.closest('.modal-overlay').remove()">×</button>
+            </div>
+            <div class="sim-field">
+              <label>Nome da Empresa</label>
+              <input type="text" id="edit-nome" value="${escapeHtml(empresa.nome_empresa)}">
+            </div>
+            <div class="sim-field">
+              <label>Limite de Licenças</label>
+              <input type="number" id="edit-limite" value="${empresa.limite_licencas}">
+            </div>
+            ${
+              currentUser?.perfil === "master_total"
+                ? `
+              <div class="sim-field">
+                <label>Status</label>
+                <select id="edit-status">
+                  <option value="ativo" ${empresa.status === "ativo" ? "selected" : ""}>Ativo</option>
+                  <option value="inativo" ${empresa.status === "inativo" ? "selected" : ""}>Inativo</option>
+                </select>
+              </div>
+              <div class="sim-field">
+                <label>Usuário API</label>
+                <input type="text" id="edit-api-usuario" value="${empresa.api_usuario || ""}" placeholder="Usuário Promosys">
+              </div>
+              <div class="sim-field">
+                <label>Senha API</label>
+                <input type="password" id="edit-api-senha" placeholder="Nova senha (deixe em branco para manter)">
+              </div>
+            `
+                : ""
+            }
+            <div style="display:flex;gap:10px;margin-top:20px">
+              <button class="btn-calcular" onclick="salvarEdicaoEmpresa(${id})" style="flex:1">💾 Salvar</button>
+              <button class="btn-sm btn-detail" onclick="this.closest('.modal-overlay').remove()" style="padding:12px 20px">Cancelar</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      }
+
+      async function salvarEdicaoEmpresa(id) {
+        const nome = document.getElementById("edit-nome")?.value.trim();
+        const limite = parseInt(document.getElementById("edit-limite")?.value);
+        const status = document.getElementById("edit-status")?.value;
+        const apiUsuario = document
+          .getElementById("edit-api-usuario")
+          ?.value.trim();
+        const apiSenha = document.getElementById("edit-api-senha")?.value;
+
+        const body = {};
+        if (nome) body.nome_empresa = nome;
+        if (limite) body.limite_licencas = limite;
+        if (status) body.status = status;
+        if (apiUsuario !== undefined) body.api_usuario = apiUsuario || null;
+        if (apiSenha) body.api_senha = apiSenha;
+
+        try {
+          const res = await fetch("api/empresas.php?id=" + id, {
+            method: "PUT",
+            headers: authHeaders(),
+            body: JSON.stringify(body),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.erro || "Erro ao atualizar.");
+          showToast("Empresa atualizada!", "success");
+          document.querySelector(".modal-overlay.open")?.remove();
+          carregarEmpresas();
+
+          // Se a empresa editada for a do usuário atual, recarrega configurações
+          if (currentUser?.empresa_id === id) {
+            location.reload();
+          }
+        } catch (e) {
+          showToast("Erro: " + e.message, "error");
+        }
+      }
+
+      async function desativarEmpresa(id) {
+        if (
+          !confirm(
+            "Tem certeza que deseja desativar esta empresa? Todos os usuários também serão desativados.",
+          )
+        )
+          return;
+        try {
+          const res = await fetch("api/empresas.php?id=" + id, {
+            method: "DELETE",
+            headers: authHeaders(),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.erro || "Erro ao desativar.");
+          showToast("Empresa desativada!", "success");
+          carregarEmpresas();
+        } catch (e) {
+          showToast("Erro: " + e.message, "error");
+        }
+      }
+
+      async function reativarEmpresa(id) {
+        try {
+          const res = await fetch("api/empresas.php?id=" + id, {
+            method: "PUT",
+            headers: authHeaders(),
+            body: JSON.stringify({ status: "ativo" }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.erro || "Erro ao reativar.");
+          showToast("Empresa reativada!", "success");
+          carregarEmpresas();
+        } catch (e) {
+          showToast("Erro: " + e.message, "error");
+        }
+      }
+
+      async function carregarFinanceiro() {
+        if (currentUser?.perfil !== "master_total") return;
+        const el = document.getElementById("financeiro-lista");
+        if (!el) return;
+        el.textContent = "Carregando...";
+        try {
+          const res = await fetch("api/financeiro.php", {
+            headers: authHeaders(),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.erro || "Erro.");
+          const items = data.financeiro || [];
+          if (!items.length) {
+            el.textContent = "Nenhuma empresa encontrada.";
+            return;
+          }
+          el.innerHTML = items
+            .map(
+              (e) => `
+            <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                <div style="font-weight:600;font-size:14px">${escapeHtml(e.nome_empresa)}</div>
+                <span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${e.status_cobranca === "em_dia" ? "rgba(16,185,129,.15)" : "rgba(239,68,68,.15)"};color:${e.status_cobranca === "em_dia" ? "var(--success)" : "var(--danger)"}">${e.status_cobranca?.replace("_", " ") || "—"}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:12px">
+                <div><div style="color:var(--text-3)">Licenças</div>${e.licencas_em_uso}/${e.limite_licencas}${e.licencas_excedentes > 0 ? ` <span style="color:var(--danger)">(+${e.licencas_excedentes})</span>` : ""}</div>
+                <div><div style="color:var(--text-3)">Valor Mensal</div>${e.valor_mensal ? fmt(e.valor_mensal) : "—"}</div>
+                <div><div style="color:var(--text-3)">Total Mês</div><span style="color:var(--cyan);font-weight:600">${e.total_mes_calculado ? fmt(e.total_mes_calculado) : "—"}</span></div>
+                <div><div style="color:var(--text-3)">Valor/Licença</div>${e.valor_por_licenca ? fmt(e.valor_por_licenca) : "—"}</div>
+                <div><div style="color:var(--text-3)">Saldo Créditos</div>${e.saldo_creditos ? fmt(e.saldo_creditos) : "R$ 0,00"}</div>
+                <div><div style="color:var(--text-3)">Vencimento</div>Dia ${e.vencimento_dia || "—"}</div>
+              </div>
+            </div>
+          `,
+            )
+            .join("");
+        } catch (e) {
+          el.textContent = "Erro: " + e.message;
+        }
+      }
+
+      // ============================================================
+      // ADMIN - IMAGEM
+      // ============================================================
+
       let bgDataUrl = null;
+
       function updateBgPreview() {
         const p = document.getElementById("bg-preview");
         if (!p) return;
@@ -4477,6 +5153,7 @@
           p.textContent = "Sem imagem";
         }
       }
+
       function previewBgImage(input) {
         if (!input.files || !input.files[0]) return;
         document.getElementById("bg-file-name").textContent =
@@ -4491,6 +5168,7 @@
         };
         r.readAsDataURL(input.files[0]);
       }
+
       async function aplicarBgImagem() {
         if (!bgDataUrl) {
           showToast("Selecione uma imagem.", "error");
@@ -4520,6 +5198,7 @@
           showToast("Imagem aplicada!", "success");
         }
       }
+
       async function removerBgImagem() {
         localStorage.removeItem("cj2-bg-image");
         bgDataUrl = null;
@@ -4543,6 +5222,95 @@
         }
         showToast("Imagem removida.", "info");
       }
+
+      // ============================================================
+      // ADMIN - GERAL
+      // ============================================================
+
+      function openAdmin() {
+        renderUsersList();
+
+        const podeApi =
+          currentUser &&
+          ["master_total", "master_operacional"].includes(currentUser.perfil);
+        const tabApi = document.getElementById("atab-api");
+        const tabApiContent = document.getElementById("admin-tab-api");
+        if (tabApi) tabApi.style.display = podeApi ? "" : "none";
+        if (tabApiContent) tabApiContent.style.display = podeApi ? "" : "none";
+
+        const podeIdent =
+          currentUser &&
+          ["master_total", "administrador"].includes(currentUser.perfil);
+        const tabIdent = document.getElementById("atab-identidade");
+        if (tabIdent) tabIdent.style.display = podeIdent ? "" : "none";
+
+        const podeFin = currentUser && currentUser.perfil === "master_total";
+        const tabFin = document.getElementById("atab-financeiro");
+        if (tabFin) tabFin.style.display = podeFin ? "" : "none";
+
+        const podeEmpresas =
+          currentUser &&
+          ["master_total", "master_operacional"].includes(currentUser.perfil);
+        const tabEmpresas = document.getElementById("atab-empresas");
+        if (tabEmpresas) tabEmpresas.style.display = podeEmpresas ? "" : "none";
+
+        fillApiForm();
+        fillIdentityForm();
+        updateBgPreview();
+
+        if (podeEmpresas) carregarEmpresas();
+        if (podeFin) carregarFinanceiro();
+
+        switchAdminTab("users");
+        document.getElementById("admin-overlay").classList.add("open");
+      }
+
+      function closeAdmin() {
+        document.getElementById("admin-overlay").classList.remove("open");
+      }
+
+      function switchAdminTab(tab) {
+        [
+          "users",
+          "mypass",
+          "identidade",
+          "api",
+          "imagem",
+          "financeiro",
+          "empresas",
+        ].forEach((t) => {
+          const el = document.getElementById("admin-tab-" + t);
+          const btn = document.getElementById("atab-" + t);
+          if (el) el.style.display = t === tab ? "block" : "none";
+          if (btn) btn.classList.toggle("active", t === tab);
+        });
+        if (tab === "financeiro") carregarFinanceiro();
+        if (tab === "empresas") carregarEmpresas();
+      }
+
+      // ============================================================
+      // INICIALIZAÇÃO
+      // ============================================================
+
+      window.addEventListener("DOMContentLoaded", () => {
+        const savedTheme = localStorage.getItem("cj2-theme") || "dark";
+        if (savedTheme === "light")
+          document.documentElement.classList.add("light");
+        const icon = savedTheme === "light" ? "☀️" : "🌙";
+        ["btn-theme", "btn-theme-login"].forEach((id) => {
+          const b = document.getElementById(id);
+          if (b) b.textContent = icon;
+        });
+        const slugParam = new URLSearchParams(window.location.search).get(
+          "empresa",
+        );
+        carregarConfigPublica(slugParam);
+        document
+          .getElementById("login-pass")
+          .addEventListener("keydown", (e) => {
+            if (e.key === "Enter") doLogin();
+          });
+      });
     </script>
   </body>
 </html>
