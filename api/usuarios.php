@@ -184,15 +184,36 @@ if ($method === 'PUT') {
 
     $editaveis = ['nome', 'login', 'status'];
 
-    if ($user['perfil'] === 'master_total' && isset($body['perfil'])) {
-        $permitidos = getPerfisPermitidosCriacao($user['perfil']);
-        if (in_array($body['perfil'], $permitidos)) {
-            $editaveis[] = 'perfil';
+    if ($user['perfil'] === 'master_total') {
+        if (isset($body['perfil'])) {
+            $permitidos = getPerfisPermitidosCriacao($user['perfil']);
+            if (in_array($body['perfil'], $permitidos)) {
+                $editaveis[] = 'perfil';
+            }
+        }
+        // master_total pode mover usuário para outra empresa
+        if (array_key_exists('empresa_id', $body)) {
+            $novaEmpresaId = $body['empresa_id'] === null || $body['empresa_id'] === '' ? null : (int)$body['empresa_id'];
+            if ($novaEmpresaId !== null) {
+                $checkEmp = $db->prepare("SELECT id, limite_licencas, licencas_em_uso FROM empresas WHERE id = ? AND status = 'ativo'");
+                $checkEmp->execute([$novaEmpresaId]);
+                $novaEmpresa = $checkEmp->fetch();
+                if (!$novaEmpresa) jsonError('Empresa de destino não encontrada ou inativa.');
+                // Verifica limite de licenças se for consultor
+                $perfilFinal = isset($body['perfil']) ? $body['perfil'] : $alvo['perfil'];
+                if ($perfilFinal === 'consultor' && $novaEmpresa['licencas_em_uso'] >= $novaEmpresa['limite_licencas']) {
+                    jsonError('Empresa de destino atingiu o limite de licenças.');
+                }
+            }
+            $editaveis[] = 'empresa_id';
         }
     }
 
     foreach ($editaveis as $c) {
-        if (isset($body[$c])) {
+        if ($c === 'empresa_id' && array_key_exists('empresa_id', $body)) {
+            $campos[] = "empresa_id = ?";
+            $vals[] = ($body['empresa_id'] === null || $body['empresa_id'] === '') ? null : (int)$body['empresa_id'];
+        } elseif (isset($body[$c])) {
             $campos[] = "$c = ?";
             $vals[] = $body[$c];
         }
@@ -210,16 +231,37 @@ if ($method === 'PUT') {
         $db->prepare("UPDATE usuarios SET " . implode(', ', $campos) . " WHERE id = ?")
             ->execute($vals);
 
-        if (isset($body['status']) && $body['status'] === 'inativo' && $alvo['perfil'] === 'consultor' && $alvo['empresa_id']) {
-            $db->prepare("UPDATE empresas SET licencas_em_uso = GREATEST(0, licencas_em_uso - 1) WHERE id = ?")
-                ->execute([$alvo['empresa_id']]);
-        } elseif (isset($body['status']) && $body['status'] === 'ativo' && $alvo['perfil'] === 'consultor' && $alvo['empresa_id']) {
-            $checkLimite = $db->prepare("SELECT limite_licencas, licencas_em_uso FROM empresas WHERE id = ?");
-            $checkLimite->execute([$alvo['empresa_id']]);
-            $emp = $checkLimite->fetch();
-            if ($emp && $emp['licencas_em_uso'] < $emp['limite_licencas']) {
-                $db->prepare("UPDATE empresas SET licencas_em_uso = licencas_em_uso + 1 WHERE id = ?")
+        // ── Ajuste de licenças por mudança de empresa ──────────────
+        $novaEmpresaId = array_key_exists('empresa_id', $body)
+            ? (($body['empresa_id'] === null || $body['empresa_id'] === '') ? null : (int)$body['empresa_id'])
+            : (int)$alvo['empresa_id'];
+        $empresaMudou = array_key_exists('empresa_id', $body) && $novaEmpresaId !== (int)$alvo['empresa_id'];
+
+        if ($empresaMudou && $alvo['perfil'] === 'consultor') {
+            // Devolve licença para a empresa anterior
+            if ($alvo['empresa_id']) {
+                $db->prepare("UPDATE empresas SET licencas_em_uso = GREATEST(0, licencas_em_uso - 1) WHERE id = ?")
                     ->execute([$alvo['empresa_id']]);
+            }
+            // Adiciona licença na nova empresa (se ativo)
+            $statusFinal = isset($body['status']) ? $body['status'] : $alvo['status'];
+            if ($novaEmpresaId && $statusFinal === 'ativo') {
+                $db->prepare("UPDATE empresas SET licencas_em_uso = licencas_em_uso + 1 WHERE id = ?")
+                    ->execute([$novaEmpresaId]);
+            }
+        } elseif (!$empresaMudou) {
+            // Ajuste de licença por mudança de status (comportamento original)
+            if (isset($body['status']) && $body['status'] === 'inativo' && $alvo['perfil'] === 'consultor' && $alvo['empresa_id']) {
+                $db->prepare("UPDATE empresas SET licencas_em_uso = GREATEST(0, licencas_em_uso - 1) WHERE id = ?")
+                    ->execute([$alvo['empresa_id']]);
+            } elseif (isset($body['status']) && $body['status'] === 'ativo' && $alvo['perfil'] === 'consultor' && $alvo['empresa_id']) {
+                $checkLimite = $db->prepare("SELECT limite_licencas, licencas_em_uso FROM empresas WHERE id = ?");
+                $checkLimite->execute([$alvo['empresa_id']]);
+                $emp = $checkLimite->fetch();
+                if ($emp && $emp['licencas_em_uso'] < $emp['limite_licencas']) {
+                    $db->prepare("UPDATE empresas SET licencas_em_uso = licencas_em_uso + 1 WHERE id = ?")
+                        ->execute([$alvo['empresa_id']]);
+                }
             }
         }
     }

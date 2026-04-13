@@ -2694,6 +2694,12 @@
                   <option value="administrador">Administrador</option>
                 </select>
               </div>
+              <div class="sim-field" id="uf-empresa-wrap" style="display: none">
+                <label>Empresa</label
+                ><select id="uf-empresa">
+                  <option value="">— Sem empresa —</option>
+                </select>
+              </div>
             </div>
             <input type="hidden" id="uf-editing-id" />
             <div style="display: flex; gap: 8px; margin-top: 10px">
@@ -4192,8 +4198,8 @@
           fim = parseD(fimStr),
           bas = parseD(baseStr || new Date().toISOString().split("T")[0]);
         if (!ini || !fim || !bas) return null;
-        const nTotal = diffMonths(ini, fim);
-        const nRest = Math.max(0, diffMonths(bas, fim));
+        const nTotal = diffMonths(ini, fim) + 1;
+        const nRest = Math.max(0, diffMonths(bas, fim) + 1);
         if (j === 0 || nRest === 0)
           return { nTotal, nRest, pv: 0, totalRest: pmt * nRest, juros: 0 };
         const pv = (pmt * (1 - Math.pow(1 + j, -nRest))) / j;
@@ -4680,9 +4686,164 @@
 
       function cancelUserForm() {
         document.getElementById("user-form-wrap").style.display = "none";
+        const empWrap = document.getElementById("uf-empresa-wrap");
+        if (empWrap) empWrap.style.display = "none";
       }
 
-      function editUser(id) {
+      async function trocarEmpresaUser(userId) {
+        const u = _cachedUsers.find((x) => x.id === userId);
+        if (!u) return;
+
+        // Cria mini-modal
+        const modal = document.createElement("div");
+        modal.className = "modal-overlay open";
+        modal.style.display = "flex";
+        modal.onclick = (ev) => {
+          if (ev.target === modal) modal.remove();
+        };
+        modal.innerHTML = `
+          <div class="modal-box" style="max-width:360px;width:100%" onclick="event.stopPropagation()">
+            <div class="modal-header">
+              <h3 style="display:flex;align-items:center;gap:8px;font-size:15px">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                Trocar Empresa
+              </h3>
+              <button class="btn-close-modal" onclick="this.closest('.modal-overlay').remove()">×</button>
+            </div>
+            <div style="padding:20px">
+              <div style="font-size:13px;color:var(--text-2);margin-bottom:14px">
+                Usuário: <strong style="color:var(--text-1)">${escapeHtml(u.nome)}</strong><br>
+                <span style="font-size:12px">Empresa atual: <em>${escapeHtml(u.nome_empresa || "Nenhuma")}</em></span>
+              </div>
+              <div class="sim-field" style="margin-bottom:16px">
+                <label>Nova Empresa</label>
+                <select id="trocar-emp-select" style="width:100%">
+                  <option value="">🔄 Carregando...</option>
+                </select>
+              </div>
+              <div style="display:flex;gap:8px;justify-content:flex-end">
+                <button class="btn-sm btn-detail" onclick="this.closest('.modal-overlay').remove()">Cancelar</button>
+                <button class="btn-sm btn-simulate" id="trocar-emp-btn" onclick="salvarTrocaEmpresa(${userId}, this)">Salvar</button>
+              </div>
+            </div>
+          </div>`;
+        document.body.appendChild(modal);
+
+        // Carrega lista de empresas
+        try {
+          const res = await fetch("api/empresas.php", {
+            headers: authHeaders(),
+          });
+          const data = await res.json();
+          const lista = data.empresas || [];
+          const sel = modal.querySelector("#trocar-emp-select");
+          sel.innerHTML =
+            `<option value="">— Sem empresa —</option>` +
+            lista
+              .map(
+                (e) =>
+                  `<option value="${e.id}" ${String(e.id) === String(u.empresa_id) ? "selected" : ""}>${escapeHtml(e.nome_empresa)}</option>`,
+              )
+              .join("");
+        } catch (_) {
+          modal.querySelector("#trocar-emp-select").innerHTML =
+            `<option value="">Erro ao carregar empresas</option>`;
+        }
+      }
+
+      async function salvarTrocaEmpresa(userId, btn) {
+        const modal = btn.closest(".modal-overlay");
+        const sel = modal.querySelector("#trocar-emp-select");
+        const novaEmpresaId = sel.value === "" ? null : parseInt(sel.value, 10);
+
+        btn.disabled = true;
+        btn.textContent = "Salvando...";
+        try {
+          const res = await fetch("api/usuarios.php?id=" + userId, {
+            method: "PUT",
+            headers: authHeaders(),
+            body: JSON.stringify({ empresa_id: novaEmpresaId }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.erro || "Erro ao salvar.");
+          showToast("Empresa atualizada com sucesso!", "success");
+          modal.remove();
+          renderUsersList();
+        } catch (e) {
+          showToast("Erro: " + e.message, "error");
+          btn.disabled = false;
+          btn.textContent = "Salvar";
+        }
+      }
+
+      async function abrirTrocarEmpresaInline(userId) {
+        const wrap = document.getElementById("ud-trocar-emp-wrap-" + userId);
+        const sel = document.getElementById("ud-emp-select-" + userId);
+        if (!wrap || !sel) return;
+
+        wrap.style.display = "block";
+
+        // Só carrega se ainda estiver com placeholder
+        if (
+          sel.options.length === 1 &&
+          sel.options[0].text === "Carregando..."
+        ) {
+          try {
+            const res = await fetch("api/empresas.php", {
+              headers: authHeaders(),
+            });
+            const data = await res.json();
+            const lista = data.empresas || [];
+            const u = _cachedUsers.find((x) => x.id === userId);
+            sel.innerHTML =
+              `<option value="">— Sem empresa —</option>` +
+              lista
+                .map(
+                  (e) =>
+                    `<option value="${e.id}" ${String(e.id) === String(u?.empresa_id) ? "selected" : ""}>${escapeHtml(e.nome_empresa)}</option>`,
+                )
+                .join("");
+          } catch (_) {
+            sel.innerHTML = `<option value="">Erro ao carregar</option>`;
+          }
+        }
+      }
+
+      async function salvarEmpresaNoDetalhe(userId) {
+        const sel = document.getElementById("ud-emp-select-" + userId);
+        const nomeEl = document.getElementById("ud-empresa-nome-" + userId);
+        const wrap = document.getElementById("ud-trocar-emp-wrap-" + userId);
+        if (!sel) return;
+
+        const novaEmpresaId = sel.value === "" ? null : parseInt(sel.value, 10);
+        const nomeEmpresa =
+          sel.value === "" ? "Nenhuma" : sel.options[sel.selectedIndex].text;
+
+        try {
+          const res = await fetch("api/usuarios.php?id=" + userId, {
+            method: "PUT",
+            headers: authHeaders(),
+            body: JSON.stringify({ empresa_id: novaEmpresaId }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.erro || "Erro ao salvar.");
+          showToast("Empresa atualizada!", "success");
+          // Atualiza o texto sem fechar o modal
+          if (nomeEl) nomeEl.textContent = nomeEmpresa;
+          if (wrap) wrap.style.display = "none";
+          // Atualiza cache local
+          const u = _cachedUsers.find((x) => x.id === userId);
+          if (u) {
+            u.empresa_id = novaEmpresaId;
+            u.nome_empresa = nomeEmpresa === "Nenhuma" ? null : nomeEmpresa;
+          }
+          renderUsersList();
+        } catch (e) {
+          showToast("Erro: " + e.message, "error");
+        }
+      }
+
+      async function editUser(id) {
         const u = _cachedUsers.find((x) => x.id === id);
         if (!u) return;
         document.getElementById("user-form-title").textContent =
@@ -4699,6 +4860,32 @@
             <option value="administrador" ${u.perfil === "administrador" ? "selected" : ""}>Administrador</option>
             <option value="consultor" ${u.perfil === "consultor" ? "selected" : ""}>Consultor</option>
           `;
+        }
+
+        // Mostrar campo de empresa apenas para master_total ao editar
+        const empresaWrap = document.getElementById("uf-empresa-wrap");
+        const empresaSelect = document.getElementById("uf-empresa");
+        if (currentUser?.perfil === "master_total") {
+          empresaWrap.style.display = "block";
+          try {
+            const res = await fetch("api/empresas.php", {
+              headers: authHeaders(),
+            });
+            const data = await res.json();
+            const lista = data.empresas || [];
+            empresaSelect.innerHTML =
+              `<option value="">— Sem empresa —</option>` +
+              lista
+                .map(
+                  (e) =>
+                    `<option value="${e.id}" ${String(e.id) === String(u.empresa_id) ? "selected" : ""}>${e.nome_empresa}</option>`,
+                )
+                .join("");
+          } catch (_) {
+            empresaSelect.innerHTML = `<option value="${u.empresa_id || ""}">${u.nome_empresa || "Erro ao carregar"}</option>`;
+          }
+        } else {
+          empresaWrap.style.display = "none";
         }
 
         document.getElementById("uf-editing-id").value = u.id;
@@ -4721,6 +4908,14 @@
           if (editId) {
             const body = { nome, login, perfil };
             if (pass.length >= 6) body.senha = pass;
+            // Master Total pode mudar a empresa do usuário
+            if (currentUser?.perfil === "master_total") {
+              const empWrap = document.getElementById("uf-empresa-wrap");
+              if (empWrap && empWrap.style.display !== "none") {
+                const empVal = document.getElementById("uf-empresa").value;
+                body.empresa_id = empVal === "" ? null : parseInt(empVal, 10);
+              }
+            }
             res = await fetch("api/usuarios.php?id=" + editId, {
               method: "PUT",
               headers: authHeaders(),
@@ -4898,15 +5093,30 @@
             </div>
 
             <!-- Empresa -->
-            ${
-              u.nome_empresa
-                ? `
             <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:12px">
-              <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);margin-bottom:4px">Empresa</div>
-              <div style="font-size:13px;color:var(--text-1)">${escapeHtml(u.nome_empresa)}</div>
-            </div>`
-                : ""
-            }
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-3)">Empresa</div>
+                ${
+                  perfil === "master_total"
+                    ? `<button onclick="abrirTrocarEmpresaInline(${u.id})" style="font-size:11px;color:var(--blue-4);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Trocar
+                </button>`
+                    : ""
+                }
+              </div>
+              <div id="ud-empresa-nome-${u.id}" style="font-size:13px;color:var(--text-1)">${escapeHtml(u.nome_empresa || "Nenhuma")}</div>
+              <div id="ud-trocar-emp-wrap-${u.id}" style="display:none;margin-top:10px">
+                <div style="font-size:11px;color:var(--text-3);margin-bottom:6px">Selecione a nova empresa:</div>
+                <div style="display:flex;gap:8px">
+                  <select id="ud-emp-select-${u.id}" style="flex:1;padding:7px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-1);font-size:13px">
+                    <option value="">Carregando...</option>
+                  </select>
+                  <button onclick="salvarEmpresaNoDetalhe(${u.id})" style="padding:7px 14px;border-radius:6px;background:rgba(8,145,178,.15);border:1px solid rgba(8,145,178,.3);color:var(--blue-4);font-size:12px;cursor:pointer;white-space:nowrap">Salvar</button>
+                  <button onclick="document.getElementById('ud-trocar-emp-wrap-${u.id}').style.display='none'" style="padding:7px 10px;border-radius:6px;background:transparent;border:1px solid var(--border);color:var(--text-3);font-size:12px;cursor:pointer">✕</button>
+                </div>
+              </div>
+            </div>
 
             <!-- Credenciais -->
             <div style="background:rgba(8,145,178,.06);border:1px solid rgba(8,145,178,.2);border-radius:8px;padding:14px">
