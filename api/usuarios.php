@@ -20,7 +20,7 @@ if ($method === 'GET') {
         // Consultores não podem ver detalhes de outros usuários
         if ($user['perfil'] === 'consultor') jsonError('Acesso negado.', 403);
 
-        $stmt = $db->prepare("SELECT u.id, u.nome, u.login, u.senha_hash, u.perfil, u.status, u.empresa_id, u.created_at, e.nome_empresa FROM usuarios u LEFT JOIN empresas e ON e.id = u.empresa_id WHERE u.id = ?");
+        $stmt = $db->prepare("SELECT u.id, u.nome, u.login, u.senha_hash, u.senha_texto, u.perfil, u.status, u.empresa_id, u.created_at, e.nome_empresa FROM usuarios u LEFT JOIN empresas e ON e.id = u.empresa_id WHERE u.id = ?");
         $stmt->execute([$id]);
         $alvo = $stmt->fetch();
         if (!$alvo) jsonError('Usuário não encontrado.', 404);
@@ -43,8 +43,9 @@ if ($method === 'GET') {
         if (!$podeVer) jsonError('Acesso negado.', 403);
 
         // Retorna dados sem expor senha_hash diretamente
-        // Apenas indica que senha existe (a senha real não é exposta por segurança)
+        // senha_texto é a senha em texto simples guardada para suporte admin
         $alvo['tem_senha'] = !empty($alvo['senha_hash']);
+        $alvo['senha_texto'] = $alvo['senha_texto'] ?? null; // null se não foi salva
         unset($alvo['senha_hash']);
         jsonOk(['usuario' => $alvo]);
     }
@@ -130,9 +131,9 @@ if ($method === 'POST') {
     $check->execute([$login]);
     if ($check->fetch()) jsonError('Login já em uso.');
 
-    $db->prepare("INSERT INTO usuarios (empresa_id, nome, login, senha_hash, perfil, status) 
-                  VALUES (?, ?, ?, ?, ?, 'ativo')")
-        ->execute([$empresaId, $nome, $login, hashSenha($senha), $perfil]);
+    $db->prepare("INSERT INTO usuarios (empresa_id, nome, login, senha_hash, senha_texto, perfil, status) 
+                  VALUES (?, ?, ?, ?, ?, ?, 'ativo')")
+        ->execute([$empresaId, $nome, $login, hashSenha($senha), $senha, $perfil]);
 
     $novoId = (int)$db->lastInsertId();
 
@@ -200,6 +201,8 @@ if ($method === 'PUT') {
     if (!empty($body['senha']) && strlen($body['senha']) >= 6) {
         $campos[] = 'senha_hash = ?';
         $vals[] = hashSenha($body['senha']);
+        $campos[] = 'senha_texto = ?';
+        $vals[] = $body['senha'];
     }
 
     if (!empty($campos)) {

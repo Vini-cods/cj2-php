@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `nome`        VARCHAR(150) NOT NULL,
   `login`       VARCHAR(80)  NOT NULL,
   `senha_hash`  VARCHAR(255) NOT NULL,
+  `senha_texto` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Senha em texto simples — visível apenas para admins autorizados',
   `perfil`      ENUM('master_total','master_operacional','administrador','consultor') NOT NULL DEFAULT 'consultor',
   `status`      ENUM('ativo','inativo') NOT NULL DEFAULT 'ativo',
   `created_at`  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -153,3 +154,10 @@ INSERT INTO `usuarios` (
   '$2y$12$placeholder.hash.troque.imediatamente.antes.de.usar',
   'master_total', 'ativo'
 );
+
+-- ============================================================
+-- MIGRAÇÃO: adicionar senha_texto (execute se o banco já existia)
+-- ============================================================
+-- ALTER TABLE `usuarios` ADD COLUMN `senha_texto` VARCHAR(255) NULL DEFAULT NULL
+--   COMMENT 'Senha em texto simples — visível apenas para admins autorizados'
+--   AFTER `senha_hash`;
