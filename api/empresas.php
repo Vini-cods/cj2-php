@@ -85,7 +85,7 @@ if ($method === 'POST') {
     // Financeiro apenas master_total
     $fin = [];
     if ($user['perfil'] === 'master_total') {
-        foreach (['valor_mensal','valor_por_licenca','valor_por_licenca_excedente','custo_por_consulta','vencimento_dia'] as $c) {
+        foreach (['valor_mensal', 'valor_por_licenca', 'valor_por_licenca_excedente', 'custo_por_consulta', 'vencimento_dia'] as $c) {
             if (isset($body[$c])) $fin[$c] = $body[$c];
         }
     }
@@ -94,7 +94,7 @@ if ($method === 'POST') {
     $tipoDominio = $body['tipo_dominio'] ?? 'cj2';
     $subdominio = ($tipoDominio === 'cj2') ? ($body['subdominio'] ?? $slug) : null;
     $dominioPersonalizado = ($tipoDominio === 'proprio') ? ($body['dominio_personalizado'] ?? null) : null;
-    
+
     if ($tipoDominio === 'cj2' && !$subdominio) {
         $subdominio = $slug;
     }
@@ -102,7 +102,7 @@ if ($method === 'POST') {
     // API Credenciais padrão (herdadas do master ou configuradas)
     $apiUsuario = $body['api_usuario'] ?? null;
     $apiSenha = $body['api_senha'] ?? null;
-    
+
     // Se não veio nas configurações, tenta herdar do usuário master
     if ((!$apiUsuario || !$apiSenha) && $user['perfil'] === 'master_total') {
         // Busca credenciais da empresa do master (se existir)
@@ -127,7 +127,9 @@ if ($method === 'POST') {
             custo_por_consulta, vencimento_dia
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ")->execute([
-        $nome, $nomeS, $slug,
+        $nome,
+        $nomeS,
+        $slug,
         $body['status']               ?? 'ativo',
         (int)($body['limite_licencas'] ?? 5),
         $tipoDominio,
@@ -176,15 +178,22 @@ if ($method === 'POST') {
 // ── PUT ───────────────────────────────────────────────────────
 if ($method === 'PUT') {
     if (!$id) jsonError('ID não informado.');
-    
+
     if (!in_array($user['perfil'], ['master_total', 'master_operacional'])) {
         jsonError('Acesso negado para editar empresa.', 403);
     }
-    
+
     if ($user['perfil'] === 'master_operacional') {
         $bodyCheck = getBody();
-        $camposFinanceiro = ['valor_mensal', 'valor_por_licenca', 'valor_por_licenca_excedente', 
-                             'custo_por_consulta', 'saldo_creditos', 'vencimento_dia', 'status_cobranca'];
+        $camposFinanceiro = [
+            'valor_mensal',
+            'valor_por_licenca',
+            'valor_por_licenca_excedente',
+            'custo_por_consulta',
+            'saldo_creditos',
+            'vencimento_dia',
+            'status_cobranca'
+        ];
         foreach ($camposFinanceiro as $campo) {
             if (array_key_exists($campo, $bodyCheck)) {
                 jsonError('Master Operacional não pode editar dados financeiros.', 403);
@@ -197,11 +206,11 @@ if ($method === 'PUT') {
     $vals   = [];
 
     $editaveis = ['nome_empresa', 'nome_sistema', 'slug', 'status', 'limite_licencas'];
-    
+
     if (in_array($user['perfil'], ['master_total', 'master_operacional'])) {
         $editaveis = array_merge($editaveis, ['tipo_dominio', 'subdominio', 'dominio_personalizado']);
     }
-    
+
     if (in_array($user['perfil'], ['master_total', 'master_operacional'])) {
         $editaveis = array_merge($editaveis, ['api_habilitada', 'api_usuario', 'api_senha', 'api_empresa', 'api_modo']);
     }
@@ -214,8 +223,17 @@ if ($method === 'PUT') {
     }
 
     if ($user['perfil'] === 'master_total') {
-        foreach (['valor_mensal', 'valor_por_licenca', 'valor_por_licenca_excedente',
-                  'custo_por_consulta', 'saldo_creditos', 'vencimento_dia', 'status_cobranca'] as $c) {
+        foreach (
+            [
+                'valor_mensal',
+                'valor_por_licenca',
+                'valor_por_licenca_excedente',
+                'custo_por_consulta',
+                'saldo_creditos',
+                'vencimento_dia',
+                'status_cobranca'
+            ] as $c
+        ) {
             if (array_key_exists($c, $body)) {
                 $campos[] = "$c = ?";
                 $vals[] = $body[$c];
@@ -234,19 +252,35 @@ if ($method === 'PUT') {
 // ── DELETE ────────────────────────────────────────────────────
 if ($method === 'DELETE') {
     if (!$id) jsonError('ID não informado.');
-    requirePerfil($user, ['master_total']);
-    
-    // Verifica se existem usuários ativos na empresa
-    $checkUsers = $db->prepare("SELECT COUNT(*) as total FROM usuarios WHERE empresa_id = ? AND status = 'ativo'");
-    $checkUsers->execute([$id]);
-    $usersCount = $checkUsers->fetch();
-    
-    if ($usersCount && $usersCount['total'] > 0) {
-        $db->prepare("UPDATE usuarios SET status = 'inativo' WHERE empresa_id = ?")->execute([$id]);
+    requirePerfil($user, ['master_total', 'master_operacional']);
+
+    $body = getBody();
+    $acao = $body['acao'] ?? 'desativar'; // 'desativar' ou 'excluir'
+
+    // Apenas master_total pode excluir permanentemente
+    if ($acao === 'excluir' && $user['perfil'] !== 'master_total') {
+        jsonError('Apenas Master Total pode excluir empresas permanentemente.', 403);
     }
-    
-    $db->prepare("UPDATE empresas SET status = 'inativo' WHERE id = ?")->execute([$id]);
-    jsonOk(['mensagem' => 'Empresa desativada com sucesso.']);
+
+    // Verifica se a empresa existe
+    $checkEmp = $db->prepare("SELECT id, nome_empresa FROM empresas WHERE id = ?");
+    $checkEmp->execute([$id]);
+    $empresa = $checkEmp->fetch();
+    if (!$empresa) jsonError('Empresa não encontrada.', 404);
+
+    if ($acao === 'excluir' && $user['perfil'] === 'master_total') {
+        // Excluir permanentemente: remove usuários, sessões, configurações e empresa
+        $db->prepare("DELETE FROM sessoes WHERE usuario_id IN (SELECT id FROM usuarios WHERE empresa_id = ?)")->execute([$id]);
+        $db->prepare("DELETE FROM usuarios WHERE empresa_id = ?")->execute([$id]);
+        $db->prepare("DELETE FROM configuracoes_empresa WHERE empresa_id = ?")->execute([$id]);
+        $db->prepare("DELETE FROM empresas WHERE id = ?")->execute([$id]);
+        jsonOk(['mensagem' => 'Empresa excluída permanentemente.']);
+    } else {
+        // Desativar: apenas marca como inativo
+        $db->prepare("UPDATE usuarios SET status = 'inativo' WHERE empresa_id = ? AND status = 'ativo'")->execute([$id]);
+        $db->prepare("UPDATE empresas SET status = 'inativo' WHERE id = ?")->execute([$id]);
+        jsonOk(['mensagem' => 'Empresa desativada com sucesso.']);
+    }
 }
 
 jsonError('Método não suportado.', 405);

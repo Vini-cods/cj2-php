@@ -2726,68 +2726,7 @@
               </button>
             </div>
           </div>
-          <div class="table-wrap">
-            <table style="width: 100%; border-collapse: collapse">
-              <thead>
-                <tr>
-                  <th
-                    style="
-                      text-align: left;
-                      padding: 8px 11px;
-                      font-size: 10px;
-                      letter-spacing: 1.5px;
-                      text-transform: uppercase;
-                      color: var(--text-3);
-                      border-bottom: 1px solid var(--border);
-                    "
-                  >
-                    Nome
-                  </th>
-                  <th
-                    style="
-                      text-align: left;
-                      padding: 8px 11px;
-                      font-size: 10px;
-                      letter-spacing: 1.5px;
-                      text-transform: uppercase;
-                      color: var(--text-3);
-                      border-bottom: 1px solid var(--border);
-                    "
-                  >
-                    Login
-                  </th>
-                  <th
-                    style="
-                      text-align: left;
-                      padding: 8px 11px;
-                      font-size: 10px;
-                      letter-spacing: 1.5px;
-                      text-transform: uppercase;
-                      color: var(--text-3);
-                      border-bottom: 1px solid var(--border);
-                    "
-                  >
-                    Perfil
-                  </th>
-                  <th
-                    style="
-                      text-align: left;
-                      padding: 8px 11px;
-                      font-size: 10px;
-                      letter-spacing: 1.5px;
-                      text-transform: uppercase;
-                      color: var(--text-3);
-                      border-bottom: 1px solid var(--border);
-                    "
-                  >
-                    Status
-                  </th>
-                  <th style="border-bottom: 1px solid var(--border)"></th>
-                </tr>
-              </thead>
-              <tbody id="users-tbody"></tbody>
-            </table>
-          </div>
+          <div id="users-container"></div>
         </div>
 
         <div id="admin-tab-mypass" style="display: none">
@@ -2927,7 +2866,20 @@
                 "
                 onclick="document.getElementById('logo-dark-input').click()"
               >
-                📁 Selecionar (PNG/SVG)
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  style="display: inline; margin-right: 6px"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
+                </svg>
+                Selecionar (PNG/SVG)
                 <input
                   type="file"
                   id="logo-dark-input"
@@ -2980,7 +2932,20 @@
                 "
                 onclick="document.getElementById('logo-light-input').click()"
               >
-                📁 Selecionar (PNG/SVG)
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  style="display: inline; margin-right: 6px"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
+                </svg>
+                Selecionar (PNG/SVG)
                 <input
                   type="file"
                   id="logo-light-input"
@@ -3014,6 +2979,17 @@
               onclick="resetIdentidade()"
               style="padding: 10px 16px"
             >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+              </svg>
               Restaurar Padrão
             </button>
           </div>
@@ -4319,7 +4295,7 @@
               <button class="btn-sm btn-simulate" onclick="openSim(${i})"> Simular</button>
               <button class="btn-sm btn-detail" onclick="openDetail(${i})" style="margin-left:4px">Detalhar</button>
             </td>
-          </tr>`;
+           </tr>`;
           })
           .join("");
 
@@ -4487,19 +4463,17 @@
       }
 
       // ============================================================
-      // ADMIN - USUÁRIOS
+      // ADMIN - USUÁRIOS (com Desativar/Ativar e Excluir Permanente)
       // ============================================================
 
       async function renderUsersList() {
         try {
           const empId = currentUser?.empresa_id;
           let url = "api/usuarios.php";
-
-          if (currentUser?.perfil === "administrador" && empId) {
+          if (currentUser?.perfil === "administrador" && empId)
             url += "?empresa_id=" + empId;
-          } else if (currentUser?.perfil === "master_operacional" && empId) {
+          else if (currentUser?.perfil === "master_operacional" && empId)
             url += "?empresa_id=" + empId;
-          }
 
           const res = await fetch(url, { headers: authHeaders() });
           const data = await res.json();
@@ -4512,14 +4486,12 @@
               administrador: "Administrador",
               consultor: "Consultor",
             })[p] || p;
-
           const perfilColor = (p) => {
             if (p === "master_total") return "rgba(139,92,246,.15)";
             if (p === "master_operacional") return "rgba(59,130,246,.15)";
             if (p === "administrador") return "rgba(16,185,129,.15)";
             return "rgba(148,163,184,.12)";
           };
-
           const perfilText = (p) => {
             if (p === "master_total") return "var(--purple)";
             if (p === "master_operacional") return "var(--blue-4)";
@@ -4531,40 +4503,146 @@
           const btnNovo = document.getElementById("btn-novo-usuario");
           if (btnNovo) btnNovo.style.display = podeCriar ? "flex" : "none";
 
-          document.getElementById("users-tbody").innerHTML = _cachedUsers
-            .map((u) => {
-              const podeEditar =
-                currentUser?.perfil === "master_total" ||
-                (currentUser?.perfil === "master_operacional" &&
-                  u.perfil !== "master_total") ||
-                (currentUser?.perfil === "administrador" &&
-                  u.perfil !== "master_total" &&
-                  u.perfil !== "master_operacional");
-              const podeDesativar = podeEditar && u.id !== currentUser?.id;
-              const podeExcluirPermanente =
-                currentUser?.perfil === "master_total" && podeDesativar;
-              const statusClass =
-                u.status === "ativo"
-                  ? "status-ativo-small"
-                  : "status-inativo-small";
-              const statusText = u.status === "ativo" ? "Ativo" : "Inativo";
+          const isMaster =
+            currentUser?.perfil === "master_total" ||
+            currentUser?.perfil === "master_operacional";
 
-              return `
-              <tr style="border-bottom:1px solid rgba(30,90,200,.1)">
-                <td style="padding:10px 11px;font-size:13px">${escapeHtml(u.nome)}</td>
-                <td style="padding:10px 11px;font-size:13px;color:var(--text-2);font-family:var(--mono)">${escapeHtml(u.login)}</td>
-                <td style="padding:10px 11px"><span style="padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;background:${perfilColor(u.perfil)};color:${perfilText(u.perfil)};border:1px solid rgba(0,0,0,.05)">${perfilLabel(u.perfil)}</span></td>
-                <td style="padding:10px 11px"><span class="status-badge-small ${statusClass}">${statusText}</span></td>
-                <td style="padding:10px 11px;text-align:right">
-                  ${podeEditar ? `<button class="btn-sm btn-simulate" onclick="editUser(${u.id})" style="margin-right:4px">✏️ Editar</button>` : ""}
-                  ${podeDesativar ? `<button class="btn-sm" onclick="deleteUser(${u.id})" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--danger)">${podeExcluirPermanente ? "🗑️ Excluir" : u.status === "ativo" ? "🔴 Desativar" : "🟢 Ativar"}</button>` : ""}
-                </td>
-              </tr>`;
-            })
-            .join("");
+          const infoIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+          const editIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3l4 4-7 7H10v-4l7-7z"/><path d="M4 20h16"/></svg>`;
+          const deleteIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`;
+          const toggleIconFn = (status) =>
+            status === "ativo"
+              ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>`
+              : `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`;
+
+          const renderRow = (u) => {
+            const podeEditar =
+              currentUser?.perfil === "master_total" ||
+              (currentUser?.perfil === "master_operacional" &&
+                u.perfil !== "master_total") ||
+              (currentUser?.perfil === "administrador" &&
+                u.perfil !== "master_total" &&
+                u.perfil !== "master_operacional");
+            const podeDesativar = podeEditar && u.id !== currentUser?.id;
+            const podeExcluirPermanente =
+              currentUser?.perfil === "master_total" && podeDesativar;
+            // Consultores não podem ver detalhes de usuários
+            const podeVerDetalhes =
+              currentUser?.perfil !== "consultor" && podeEditar;
+            const statusClass =
+              u.status === "ativo"
+                ? "status-ativo-small"
+                : "status-inativo-small";
+            const statusText = u.status === "ativo" ? "Ativo" : "Inativo";
+            return `<tr style="border-bottom:1px solid rgba(30,90,200,.07)">
+              <td style="padding:10px 11px;font-size:13px">${escapeHtml(u.nome)}</td>
+              <td style="padding:10px 11px;font-size:12px;color:var(--text-2);font-family:var(--mono)">${escapeHtml(u.login)}</td>
+              <td style="padding:10px 11px"><span style="padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;background:${perfilColor(u.perfil)};color:${perfilText(u.perfil)};border:1px solid rgba(0,0,0,.05)">${perfilLabel(u.perfil)}</span></td>
+              <td style="padding:10px 11px"><span class="status-badge-small ${statusClass}">${statusText}</span></td>
+              <td style="padding:10px 11px;text-align:right">
+                ${podeVerDetalhes ? `<button class="btn-sm" onclick="viewUserDetails(${u.id})" style="background:rgba(8,145,178,.15);border:1px solid rgba(8,145,178,.3);color:var(--blue-4);margin-right:4px" title="Ver detalhes">${infoIcon}</button>` : ""}
+                ${podeEditar ? `<button class="btn-sm btn-simulate" onclick="editUser(${u.id})" style="margin-right:4px" title="Editar">${editIcon}</button>` : ""}
+                ${podeDesativar ? `<button class="btn-sm" onclick="toggleUserStatus(${u.id}, '${u.status}')" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--danger);margin-right:4px" title="${u.status === "ativo" ? "Desativar" : "Ativar"}">${toggleIconFn(u.status)}</button>` : ""}
+                ${podeExcluirPermanente ? `<button class="btn-sm" onclick="permanentDeleteUser(${u.id})" style="background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:var(--purple)" title="Excluir permanentemente">${deleteIcon}</button>` : ""}
+              </td>
+            </tr>`;
+          };
+
+          const tableHeader = `<table style="width:100%;border-collapse:collapse">
+            <thead><tr style="background:rgba(0,0,0,.15)">
+              <th style="text-align:left;padding:7px 11px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3)">Nome</th>
+              <th style="text-align:left;padding:7px 11px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3)">Login</th>
+              <th style="text-align:left;padding:7px 11px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3)">Perfil</th>
+              <th style="text-align:left;padding:7px 11px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3)">Status</th>
+              <th></th>
+            </tr></thead><tbody>`;
+
+          if (isMaster) {
+            // ── Agrupa por empresa ──────────────────────────────────────
+            const groups = new Map();
+            groups.set("__sistema__", {
+              label: "Sistema",
+              sublabel: "Masters globais",
+              cor: "var(--purple)",
+              icon: "shield",
+              usuarios: [],
+            });
+
+            _cachedUsers.forEach((u) => {
+              const key = u.empresa_id ? String(u.empresa_id) : "__sistema__";
+              if (!groups.has(key)) {
+                groups.set(key, {
+                  label: u.nome_empresa || "Empresa #" + key,
+                  sublabel: "ID " + key,
+                  cor: "var(--blue-3)",
+                  icon: "building",
+                  usuarios: [],
+                });
+              }
+              groups.get(key).usuarios.push(u);
+            });
+
+            let html = "";
+            groups.forEach((group, key) => {
+              if (group.usuarios.length === 0) return;
+              const gid = "ug-" + key.replace(/[^a-z0-9]/gi, "_");
+              const ativos = group.usuarios.filter(
+                (u) => u.status === "ativo",
+              ).length;
+              const total = group.usuarios.length;
+              const isSistema = key === "__sistema__";
+              const corBg = isSistema
+                ? "rgba(139,92,246,.12)"
+                : "rgba(37,99,235,.10)";
+              const corBdr = isSistema
+                ? "rgba(139,92,246,.28)"
+                : "rgba(37,99,235,.22)";
+              const iconPath = isSistema
+                ? `<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>`
+                : `<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>`;
+
+              html += `<div style="margin-bottom:10px;border:1px solid var(--border);border-radius:10px;overflow:hidden">
+                <div onclick="toggleGroup('${gid}')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;background:var(--bg-card2);user-select:none;border-bottom:1px solid var(--border)">
+                  <svg id="chev-${gid}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition:transform .2s;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
+                  <div style="width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;background:${corBg};border:1px solid ${corBdr}">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="${group.cor}" stroke-width="2">${iconPath}</svg>
+                  </div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:13px;font-weight:600;color:var(--text-1)">${escapeHtml(group.label)}</div>
+                    <div style="font-size:11px;color:var(--text-3);margin-top:1px">${escapeHtml(group.sublabel)}</div>
+                  </div>
+                  <div style="display:flex;gap:6px;align-items:center">
+                    <span style="padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(16,185,129,.12);color:var(--success);border:1px solid rgba(16,185,129,.25)">${ativos} ativo${ativos !== 1 ? "s" : ""}</span>
+                    <span style="padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;background:rgba(148,163,184,.1);color:var(--text-3);border:1px solid var(--border)">${total} total</span>
+                  </div>
+                </div>
+                <div id="${gid}">
+                  ${tableHeader}${group.usuarios.map(renderRow).join("")}</tbody></table>
+                </div>
+              </div>`;
+            });
+
+            document.getElementById("users-container").innerHTML =
+              html ||
+              `<div style="text-align:center;padding:32px;color:var(--text-3);font-size:13px">Nenhum usuário encontrado.</div>`;
+          } else {
+            // ── Administrador / Consultor: lista simples ────────────────
+            document.getElementById("users-container").innerHTML =
+              `<div class="table-wrap">${tableHeader}${_cachedUsers.map(renderRow).join("")}</tbody></table></div>`;
+          }
         } catch (e) {
           showToast("Erro ao carregar usuários.", "error");
         }
+      }
+
+      function toggleGroup(id) {
+        const el = document.getElementById(id);
+        const chev = document.getElementById("chev-" + id);
+        if (!el) return;
+        const isOpen = el.style.display !== "none";
+        el.style.display = isOpen ? "none" : "block";
+        if (chev)
+          chev.style.transform = isOpen ? "rotate(-90deg)" : "rotate(0deg)";
       }
 
       function showNewUserForm() {
@@ -4678,19 +4756,43 @@
         }
       }
 
-      async function deleteUser(id) {
-        if (id === currentUser?.id) {
-          showToast("Você não pode excluir sua própria conta.", "error");
+      // Função para desativar/ativar usuário (mantém no banco)
+      async function toggleUserStatus(id, currentStatus) {
+        const userToToggle = _cachedUsers.find((u) => u.id === id);
+        const newStatus = currentStatus === "ativo" ? "inativo" : "ativo";
+        const actionText = newStatus === "ativo" ? "ativar" : "desativar";
+
+        if (
+          !confirm(
+            `Tem certeza que deseja ${actionText} o usuário "${userToToggle?.nome}"?`,
+          )
+        )
           return;
+
+        try {
+          const res = await fetch("api/usuarios.php?id=" + id, {
+            method: "PUT",
+            headers: authHeaders(),
+            body: JSON.stringify({ status: newStatus }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.erro || "Erro.");
+          renderUsersList();
+          showToast(`Usuário ${actionText}do com sucesso!`, "info");
+        } catch (e) {
+          showToast("Erro: " + e.message, "error");
         }
+      }
 
+      // Função para excluir permanentemente (apenas Master Total)
+      async function permanentDeleteUser(id) {
         const userToDelete = _cachedUsers.find((u) => u.id === id);
-        const confirmMsg =
-          currentUser?.perfil === "master_total"
-            ? `Tem certeza que deseja EXCLUIR PERMANENTEMENTE o usuário "${userToDelete?.nome}"? Esta ação não pode ser desfeita.`
-            : `Tem certeza que deseja desativar o usuário "${userToDelete?.nome}"?`;
-
-        if (!confirm(confirmMsg)) return;
+        if (
+          !confirm(
+            `⚠️ ATENÇÃO: Você está prestes a EXCLUIR PERMANENTEMENTE o usuário "${userToDelete?.nome}". Esta ação NÃO pode ser desfeita. Confirmar?`,
+          )
+        )
+          return;
 
         try {
           const res = await fetch("api/usuarios.php?id=" + id, {
@@ -4700,12 +4802,181 @@
           const data = await res.json();
           if (!res.ok) throw new Error(data.erro || "Erro.");
           renderUsersList();
-          showToast(
-            currentUser?.perfil === "master_total"
-              ? "Usuário excluído permanentemente!"
-              : "Usuário desativado!",
-            "info",
-          );
+          showToast("Usuário excluído permanentemente!", "success");
+        } catch (e) {
+          showToast("Erro: " + e.message, "error");
+        }
+      }
+
+      // ── Modal de detalhes do usuário (login, senha, ações) ──────
+      async function viewUserDetails(id) {
+        const u = _cachedUsers.find((x) => x.id === id);
+        if (!u) return;
+
+        const perfil = currentUser?.perfil;
+        const podeEditar =
+          perfil === "master_total" ||
+          (perfil === "master_operacional" && u.perfil !== "master_total") ||
+          (perfil === "administrador" &&
+            u.perfil !== "master_total" &&
+            u.perfil !== "master_operacional");
+        const podeDesativar = podeEditar && u.id !== currentUser?.id;
+        const podeExcluir = perfil === "master_total" && podeDesativar;
+
+        const perfilLabel =
+          {
+            master_total: "Master Total",
+            master_operacional: "Master Operacional",
+            administrador: "Administrador",
+            consultor: "Consultor",
+          }[u.perfil] || u.perfil;
+
+        const statusBadge =
+          u.status === "ativo"
+            ? `<span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(16,185,129,.15);color:var(--success);border:1px solid rgba(16,185,129,.3)">✅ Ativo</span>`
+            : `<span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(239,68,68,.15);color:var(--danger);border:1px solid rgba(239,68,68,.3)">❌ Inativo</span>`;
+
+        const modal = document.createElement("div");
+        modal.className = "modal-overlay open";
+        modal.style.display = "flex";
+        modal.onclick = (ev) => {
+          if (ev.target === modal) modal.remove();
+        };
+
+        modal.innerHTML = `
+          <div class="modal-box" style="max-width:460px;width:100%" onclick="event.stopPropagation()">
+            <div class="modal-header">
+              <h3 style="display:flex;align-items:center;gap:8px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Detalhes do Usuário
+              </h3>
+              <button class="btn-close-modal" onclick="this.closest('.modal-overlay').remove()">×</button>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;padding:4px 0">
+
+              <!-- Info básica -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:12px">
+                  <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);margin-bottom:4px">Nome</div>
+                  <div style="font-size:13px;font-weight:600;color:var(--text-1)">${escapeHtml(u.nome)}</div>
+                </div>
+                <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:12px">
+                  <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);margin-bottom:4px">Perfil</div>
+                  <div style="font-size:13px;font-weight:600;color:var(--text-1)">${perfilLabel}</div>
+                </div>
+              </div>
+
+              <!-- Status -->
+              <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;align-items:center;justify-content:space-between">
+                <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-3)">Status</div>
+                ${statusBadge}
+              </div>
+
+              <!-- Empresa -->
+              ${
+                u.nome_empresa
+                  ? `<div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:12px">
+                <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);margin-bottom:4px">Empresa</div>
+                <div style="font-size:13px;color:var(--text-1)">${escapeHtml(u.nome_empresa)}</div>
+              </div>`
+                  : ""
+              }
+
+              <!-- Login e Senha -->
+              <div style="background:rgba(8,145,178,.06);border:1px solid rgba(8,145,178,.2);border-radius:8px;padding:14px">
+                <div style="font-size:11px;font-weight:600;color:var(--blue-4);margin-bottom:10px;display:flex;align-items:center;gap:6px">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  Credenciais de Acesso
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                  <div>
+                    <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);margin-bottom:4px">Login</div>
+                    <div style="font-family:var(--mono);font-size:13px;color:var(--text-1);background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:6px 10px;display:flex;align-items:center;justify-content:space-between;gap:6px">
+                      <span id="ud-login-${u.id}">${escapeHtml(u.login)}</span>
+                      <button onclick="navigator.clipboard.writeText('${escapeHtml(u.login)}').then(()=>showToast('Login copiado!','info'))" style="background:none;border:none;cursor:pointer;color:var(--text-3);padding:0" title="Copiar">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);margin-bottom:4px">Senha</div>
+                    <div style="font-family:var(--mono);font-size:13px;color:var(--text-3);background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:6px 10px;display:flex;align-items:center;justify-content:space-between;gap:6px">
+                      <span id="ud-senha-val-${u.id}" style="letter-spacing:2px">••••••••</span>
+                      <div style="display:flex;gap:4px">
+                        <button id="ud-senha-btn-${u.id}" onclick="toggleSenhaVisivel(${u.id})" style="background:none;border:none;cursor:pointer;color:var(--text-3);padding:0" title="Redefinir senha">
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Redefinir senha inline -->
+                <div id="ud-reset-wrap-${u.id}" style="display:none;margin-top:10px">
+                  <div style="font-size:11px;color:var(--text-3);margin-bottom:6px">Nova senha (mín. 6 caracteres):</div>
+                  <div style="display:flex;gap:8px">
+                    <input type="password" id="ud-nova-senha-${u.id}" placeholder="Nova senha" style="flex:1;padding:7px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-1);font-size:13px">
+                    <button onclick="redefinirSenhaUsuario(${u.id})" style="padding:7px 14px;border-radius:6px;background:rgba(8,145,178,.15);border:1px solid rgba(8,145,178,.3);color:var(--blue-4);font-size:12px;cursor:pointer;white-space:nowrap">Salvar</button>
+                    <button onclick="document.getElementById('ud-reset-wrap-${u.id}').style.display='none'" style="padding:7px 10px;border-radius:6px;background:transparent;border:1px solid var(--border);color:var(--text-3);font-size:12px;cursor:pointer">✕</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Ações -->
+              ${
+                podeDesativar || podeExcluir
+                  ? `
+              <div style="display:flex;gap:8px;margin-top:4px">
+                ${
+                  podeDesativar
+                    ? `<button onclick="toggleUserStatus(${u.id},'${u.status}');this.closest('.modal-overlay').remove()" style="flex:1;padding:10px;border-radius:8px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                  ${u.status === "ativo" ? "Desativar usuário" : "Reativar usuário"}
+                </button>`
+                    : ""
+                }
+                ${
+                  podeExcluir
+                    ? `<button onclick="this.closest('.modal-overlay').remove();permanentDeleteUser(${u.id})" style="flex:1;padding:10px;border-radius:8px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);color:var(--purple);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  Excluir permanentemente
+                </button>`
+                    : ""
+                }
+              </div>`
+                  : ""
+              }
+
+            </div>
+          </div>`;
+
+        document.body.appendChild(modal);
+      }
+
+      function toggleSenhaVisivel(id) {
+        const wrap = document.getElementById("ud-reset-wrap-" + id);
+        if (wrap)
+          wrap.style.display = wrap.style.display === "none" ? "block" : "none";
+      }
+
+      async function redefinirSenhaUsuario(id) {
+        const input = document.getElementById("ud-nova-senha-" + id);
+        const nova = input?.value || "";
+        if (nova.length < 6) {
+          showToast("Senha precisa ter ≥6 caracteres.", "error");
+          return;
+        }
+        try {
+          const res = await fetch("api/usuarios.php?id=" + id, {
+            method: "PUT",
+            headers: authHeaders(),
+            body: JSON.stringify({ senha: nova }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.erro || "Erro.");
+          showToast("Senha redefinida com sucesso!", "success");
+          document.getElementById("ud-reset-wrap-" + id).style.display = "none";
+          if (input) input.value = "";
         } catch (e) {
           showToast("Erro: " + e.message, "error");
         }
@@ -4761,7 +5032,7 @@
       }
 
       // ============================================================
-      // ADMIN - EMPRESAS
+      // ADMIN - EMPRESAS (com ícones)
       // ============================================================
 
       async function carregarEmpresas() {
@@ -4790,24 +5061,51 @@
             <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
                 <div>
-                  <div style="font-weight:600;font-size:14px">${escapeHtml(e.nome_empresa)}</div>
+                  <div style="font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    ${escapeHtml(e.nome_empresa)}
+                  </div>
                   <div style="font-size:11px;color:var(--text-3)">Slug: ${escapeHtml(e.slug)}</div>
                 </div>
-                <div style="display:flex;gap:8px">
+                  <div style="display:flex;gap:8px">
                   <span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${e.status === "ativo" ? "rgba(16,185,129,.15)" : "rgba(239,68,68,.15)"};color:${e.status === "ativo" ? "var(--success)" : "var(--danger)"}">
                     ${e.status === "ativo" ? "✅ Ativo" : "❌ Inativo"}
                   </span>
-                  <button class="btn-sm btn-simulate" onclick="editarEmpresa(${e.id})" style="padding:4px 10px">✏️ Editar</button>
-                  ${e.status === "ativo" ? `<button class="btn-sm" onclick="desativarEmpresa(${e.id})" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--danger);padding:4px 10px">🔴 Desativar</button>` : ""}
-                  ${currentUser?.perfil === "master_total" && e.status === "inativo" ? `<button class="btn-sm" onclick="reativarEmpresa(${e.id})" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--success);padding:4px 10px">🟢 Reativar</button>` : ""}
+                  <button class="btn-sm btn-simulate" onclick="editarEmpresa(${e.id})" style="padding:4px 10px" title="Editar">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3l4 4-7 7H10v-4l7-7z"/><path d="M4 20h16"/></svg>
+                  </button>
+                  ${
+                    e.status === "ativo" &&
+                    (currentUser?.perfil === "master_total" ||
+                      currentUser?.perfil === "master_operacional")
+                      ? `<button class="btn-sm" onclick="desativarEmpresa(${e.id})" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--danger);padding:4px 10px" title="Desativar">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                  </button>`
+                      : ""
+                  }
+                  ${
+                    currentUser?.perfil === "master_total" &&
+                    e.status === "inativo"
+                      ? `<button class="btn-sm" onclick="reativarEmpresa(${e.id})" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--success);padding:4px 10px" title="Reativar">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                  </button>`
+                      : ""
+                  }
+                  ${
+                    currentUser?.perfil === "master_total"
+                      ? `<button class="btn-sm" onclick="excluirEmpresaPermanente(${e.id})" style="background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:var(--purple);padding:4px 10px" title="Excluir permanentemente">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  </button>`
+                      : ""
+                  }
                 </div>
               </div>
               <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;font-size:12px;margin-top:8px">
-                <div><div style="color:var(--text-3)">📊 Licenças</div>${e.licencas_em_uso}/${e.limite_licencas}</div>
-                <div><div style="color:var(--text-3)">🌐 Domínio</div>${e.tipo_dominio === "cj2" ? (e.subdominio ? e.subdominio + ".cj2tech.com.br" : "CJ2") : e.dominio_personalizado || "—"}</div>
-                <div><div style="color:var(--text-3)">👥 Usuários</div>${e.total_usuarios || 0}</div>
-                ${currentUser?.perfil === "master_total" && e.valor_mensal ? `<div><div style="color:var(--text-3)">💰 Mensalidade</div>${fmt(e.valor_mensal)}</div>` : ""}
-                <div><div style="color:var(--text-3)">🔑 API</div>${e.api_usuario ? "✅ Configurada" : "❌ Não configurada"}</div>
+                <div><div style="color:var(--text-3)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:4px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Licenças</div>${e.licencas_em_uso}/${e.limite_licencas}</div>
+                <div><div style="color:var(--text-3)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:4px"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 0 0 20 15 15 0 0 0 0-20z"/></svg> Domínio</div>${e.tipo_dominio === "cj2" ? (e.subdominio ? e.subdominio + ".cj2tech.com.br" : "CJ2") : e.dominio_personalizado || "—"}</div>
+                <div><div style="color:var(--text-3)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:4px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Usuários</div>${e.total_usuarios || 0}</div>
+                ${currentUser?.perfil === "master_total" && e.valor_mensal ? `<div><div style="color:var(--text-3)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:4px"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Mensalidade</div>${fmt(e.valor_mensal)}</div>` : ""}
+                <div><div style="color:var(--text-3)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:4px"><path d="M4 4v16h16"/><path d="m9 10 3-3 3 3"/><path d="m9 14 3 3 3-3"/></svg> API</div>${e.api_usuario ? "✅ Configurada" : "❌ Não configurada"}</div>
               </div>
             </div>
           `,
@@ -4829,7 +5127,10 @@
         modal.innerHTML = `
           <div class="modal-box wide" style="max-width:600px" onclick="event.stopPropagation()">
             <div class="modal-header">
-              <h3>🏢 Nova Empresa</h3>
+              <h3>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                Nova Empresa
+              </h3>
               <button class="btn-close-modal" onclick="this.closest('.modal-overlay').remove()">×</button>
             </div>
             <form id="form-nova-empresa" onsubmit="event.preventDefault(); criarEmpresa();">
@@ -4867,7 +5168,10 @@
                 </div>
               </div>
               <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
-                <div style="font-size:12px;font-weight:600;margin-bottom:12px">👤 Administrador Principal</div>
+                <div style="font-size:12px;font-weight:600;margin-bottom:12px">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:6px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  Administrador Principal
+                </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
                   <div class="sim-field">
                     <label>Nome do Admin *</label>
@@ -4884,7 +5188,10 @@
                 </div>
               </div>
               <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
-                <div style="font-size:12px;font-weight:600;margin-bottom:12px">🔌 Configuração da API (Opcional)</div>
+                <div style="font-size:12px;font-weight:600;margin-bottom:12px">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:6px"><path d="M4 4v16h16"/><path d="m9 10 3-3 3 3"/><path d="m9 14 3 3 3-3"/></svg>
+                  Configuração da API (Opcional)
+                </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
                   <div class="sim-field">
                     <label>Usuário Promosys</label>
@@ -4897,8 +5204,14 @@
                 </div>
               </div>
               <div style="display:flex;gap:10px;margin-top:20px">
-                <button type="submit" class="btn-calcular" style="flex:1">✅ Criar Empresa</button>
-                <button type="button" class="btn-sm btn-detail" onclick="this.closest('.modal-overlay').remove()" style="padding:12px 20px">Cancelar</button>
+                <button type="submit" class="btn-calcular" style="flex:1">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                  Criar Empresa
+                </button>
+                <button type="button" class="btn-sm btn-detail" onclick="this.closest('.modal-overlay').remove()" style="padding:12px 20px">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  Cancelar
+                </button>
               </div>
             </form>
           </div>
@@ -5007,7 +5320,10 @@
         modal.innerHTML = `
           <div class="modal-box wide" style="max-width:500px" onclick="event.stopPropagation()">
             <div class="modal-header">
-              <h3>✏️ Editar Empresa</h3>
+              <h3>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3l4 4-7 7H10v-4l7-7z"/><path d="M4 20h16"/></svg>
+                Editar Empresa
+              </h3>
               <button class="btn-close-modal" onclick="this.closest('.modal-overlay').remove()">×</button>
             </div>
             <div class="sim-field">
@@ -5040,8 +5356,14 @@
                 : ""
             }
             <div style="display:flex;gap:10px;margin-top:20px">
-              <button class="btn-calcular" onclick="salvarEdicaoEmpresa(${id})" style="flex:1">💾 Salvar</button>
-              <button class="btn-sm btn-detail" onclick="this.closest('.modal-overlay').remove()" style="padding:12px 20px">Cancelar</button>
+              <button class="btn-calcular" onclick="salvarEdicaoEmpresa(${id})" style="flex:1">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                Salvar
+              </button>
+              <button class="btn-sm btn-detail" onclick="this.closest('.modal-overlay').remove()" style="padding:12px 20px">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Cancelar
+              </button>
             </div>
           </div>
         `;
@@ -5076,7 +5398,6 @@
           document.querySelector(".modal-overlay.open")?.remove();
           carregarEmpresas();
 
-          // Se a empresa editada for a do usuário atual, recarrega configurações
           if (currentUser?.empresa_id === id) {
             location.reload();
           }
@@ -5086,9 +5407,10 @@
       }
 
       async function desativarEmpresa(id) {
+        const empresa = _cachedEmpresas.find((e) => e.id === id);
         if (
           !confirm(
-            "Tem certeza que deseja desativar esta empresa? Todos os usuários também serão desativados.",
+            `Tem certeza que deseja desativar a empresa "${empresa?.nome_empresa}"? Todos os usuários também serão desativados.`,
           )
         )
           return;
@@ -5096,6 +5418,7 @@
           const res = await fetch("api/empresas.php?id=" + id, {
             method: "DELETE",
             headers: authHeaders(),
+            body: JSON.stringify({ acao: "desativar" }),
           });
           const data = await res.json();
           if (!res.ok) throw new Error(data.erro || "Erro ao desativar.");
@@ -5116,6 +5439,30 @@
           const data = await res.json();
           if (!res.ok) throw new Error(data.erro || "Erro ao reativar.");
           showToast("Empresa reativada!", "success");
+          carregarEmpresas();
+        } catch (e) {
+          showToast("Erro: " + e.message, "error");
+        }
+      }
+
+      async function excluirEmpresaPermanente(id) {
+        const empresa = _cachedEmpresas.find((e) => e.id === id);
+        if (
+          !confirm(
+            `⚠️ ATENÇÃO: Você está prestes a EXCLUIR PERMANENTEMENTE a empresa "${empresa?.nome_empresa}". Todos os usuários e dados serão removidos. Esta ação NÃO pode ser desfeita. Confirmar?`,
+          )
+        )
+          return;
+
+        try {
+          const res = await fetch("api/empresas.php?id=" + id, {
+            method: "DELETE",
+            headers: authHeaders(),
+            body: JSON.stringify({ acao: "excluir" }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.erro || "Erro ao excluir.");
+          showToast("Empresa excluída permanentemente!", "success");
           carregarEmpresas();
         } catch (e) {
           showToast("Erro: " + e.message, "error");
@@ -5143,16 +5490,19 @@
               (e) => `
             <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-                <div style="font-weight:600;font-size:14px">${escapeHtml(e.nome_empresa)}</div>
+                <div style="font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                  ${escapeHtml(e.nome_empresa)}
+                </div>
                 <span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${e.status_cobranca === "em_dia" ? "rgba(16,185,129,.15)" : "rgba(239,68,68,.15)"};color:${e.status_cobranca === "em_dia" ? "var(--success)" : "var(--danger)"}">${e.status_cobranca?.replace("_", " ") || "—"}</span>
               </div>
               <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:12px">
-                <div><div style="color:var(--text-3)">Licenças</div>${e.licencas_em_uso}/${e.limite_licencas}${e.licencas_excedentes > 0 ? ` <span style="color:var(--danger)">(+${e.licencas_excedentes})</span>` : ""}</div>
-                <div><div style="color:var(--text-3)">Valor Mensal</div>${e.valor_mensal ? fmt(e.valor_mensal) : "—"}</div>
-                <div><div style="color:var(--text-3)">Total Mês</div><span style="color:var(--cyan);font-weight:600">${e.total_mes_calculado ? fmt(e.total_mes_calculado) : "—"}</span></div>
-                <div><div style="color:var(--text-3)">Valor/Licença</div>${e.valor_por_licenca ? fmt(e.valor_por_licenca) : "—"}</div>
-                <div><div style="color:var(--text-3)">Saldo Créditos</div>${e.saldo_creditos ? fmt(e.saldo_creditos) : "R$ 0,00"}</div>
-                <div><div style="color:var(--text-3)">Vencimento</div>Dia ${e.vencimento_dia || "—"}</div>
+                <div><div style="color:var(--text-3)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:4px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Licenças</div>${e.licencas_em_uso}/${e.limite_licencas}${e.licencas_excedentes > 0 ? ` <span style="color:var(--danger)">(+${e.licencas_excedentes})</span>` : ""}</div>
+                <div><div style="color:var(--text-3)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:4px"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Valor Mensal</div>${e.valor_mensal ? fmt(e.valor_mensal) : "—"}</div>
+                <div><div style="color:var(--text-3)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:4px"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg> Total Mês</div><span style="color:var(--cyan);font-weight:600">${e.total_mes_calculado ? fmt(e.total_mes_calculado) : "—"}</span></div>
+                <div><div style="color:var(--text-3)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:4px"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg> Valor/Licença</div>${e.valor_por_licenca ? fmt(e.valor_por_licenca) : "—"}</div>
+                <div><div style="color:var(--text-3)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:4px"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Saldo Créditos</div>${e.saldo_creditos ? fmt(e.saldo_creditos) : "R$ 0,00"}</div>
+                <div><div style="color:var(--text-3)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:4px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Vencimento</div>Dia ${e.vencimento_dia || "—"}</div>
               </div>
             </div>
           `,

@@ -15,6 +15,40 @@ $db     = getDB();
 
 // ── GET ───────────────────────────────────────────────────────
 if ($method === 'GET') {
+    // Busca usuário específico com detalhes (login/senha visível)
+    if ($id) {
+        // Consultores não podem ver detalhes de outros usuários
+        if ($user['perfil'] === 'consultor') jsonError('Acesso negado.', 403);
+
+        $stmt = $db->prepare("SELECT u.id, u.nome, u.login, u.senha_hash, u.perfil, u.status, u.empresa_id, u.created_at, e.nome_empresa FROM usuarios u LEFT JOIN empresas e ON e.id = u.empresa_id WHERE u.id = ?");
+        $stmt->execute([$id]);
+        $alvo = $stmt->fetch();
+        if (!$alvo) jsonError('Usuário não encontrado.', 404);
+
+        // Verifica permissão para ver este usuário
+        $podeVer = false;
+        switch ($user['perfil']) {
+            case 'master_total':
+                $podeVer = true;
+                break;
+            case 'master_operacional':
+                $podeVer = ($alvo['perfil'] !== 'master_total');
+                break;
+            case 'administrador':
+                $podeVer = ((int)$alvo['empresa_id'] === (int)$user['empresa_id'] &&
+                    $alvo['perfil'] !== 'master_total' &&
+                    $alvo['perfil'] !== 'master_operacional');
+                break;
+        }
+        if (!$podeVer) jsonError('Acesso negado.', 403);
+
+        // Retorna dados sem expor senha_hash diretamente
+        // Apenas indica que senha existe (a senha real não é exposta por segurança)
+        $alvo['tem_senha'] = !empty($alvo['senha_hash']);
+        unset($alvo['senha_hash']);
+        jsonOk(['usuario' => $alvo]);
+    }
+
     $sql  = "SELECT u.id, u.nome, u.login, u.perfil, u.status, u.empresa_id, u.created_at, e.nome_empresa
              FROM usuarios u 
              LEFT JOIN empresas e ON e.id = u.empresa_id";
@@ -27,7 +61,7 @@ if ($method === 'GET') {
                 $vals[] = (int)$_GET['empresa_id'];
             }
             break;
-            
+
         case 'master_operacional':
             $sql   .= " WHERE u.perfil NOT IN ('master_total', 'master_operacional')";
             if (isset($_GET['empresa_id'])) {
@@ -35,12 +69,12 @@ if ($method === 'GET') {
                 $vals[] = (int)$_GET['empresa_id'];
             }
             break;
-            
+
         case 'administrador':
             $sql   .= " WHERE u.empresa_id = ? AND u.perfil NOT IN ('master_total', 'master_operacional')";
             $vals[] = (int)$user['empresa_id'];
             break;
-            
+
         case 'consultor':
             jsonOk(['usuarios' => []]);
             break;
@@ -72,11 +106,11 @@ if ($method === 'POST') {
     if ($user['perfil'] === 'administrador') {
         $empresaId = (int)$user['empresa_id'];
     }
-    
+
     if ($user['perfil'] === 'master_operacional' && $perfil === 'master_total') {
         jsonError('Master Operacional não pode criar Master Total.');
     }
-    
+
     if ($user['perfil'] === 'master_operacional' && $perfil === 'master_operacional') {
         jsonError('Master Operacional não pode criar outro Master Operacional.');
     }
@@ -86,7 +120,7 @@ if ($method === 'POST') {
         $checkEmp->execute([$empresaId]);
         $empresa = $checkEmp->fetch();
         if (!$empresa) jsonError('Empresa não encontrada ou inativa.');
-        
+
         if ($perfil === 'consultor' && $empresa['licencas_em_uso'] >= $empresa['limite_licencas']) {
             jsonError('Limite de licenças atingido para esta empresa.');
         }
@@ -98,13 +132,13 @@ if ($method === 'POST') {
 
     $db->prepare("INSERT INTO usuarios (empresa_id, nome, login, senha_hash, perfil, status) 
                   VALUES (?, ?, ?, ?, ?, 'ativo')")
-       ->execute([$empresaId, $nome, $login, hashSenha($senha), $perfil]);
+        ->execute([$empresaId, $nome, $login, hashSenha($senha), $perfil]);
 
     $novoId = (int)$db->lastInsertId();
-    
+
     if ($empresaId && $perfil === 'consultor') {
         $db->prepare("UPDATE empresas SET licencas_em_uso = licencas_em_uso + 1 WHERE id = ?")
-           ->execute([$empresaId]);
+            ->execute([$empresaId]);
     }
 
     jsonOk(['mensagem' => 'Usuário criado com sucesso.', 'id' => $novoId], 201);
@@ -113,14 +147,14 @@ if ($method === 'POST') {
 // ── PUT ───────────────────────────────────────────────────────
 if ($method === 'PUT') {
     if (!$id) jsonError('ID não informado.');
-    
+
     $alvoStmt = $db->prepare("SELECT * FROM usuarios WHERE id = ?");
     $alvoStmt->execute([$id]);
     $alvo = $alvoStmt->fetch();
     if (!$alvo) jsonError('Usuário não encontrado.', 404);
 
     $podeEditar = false;
-    
+
     switch ($user['perfil']) {
         case 'master_total':
             $podeEditar = true;
@@ -129,16 +163,18 @@ if ($method === 'PUT') {
             if ($alvo['perfil'] !== 'master_total') $podeEditar = true;
             break;
         case 'administrador':
-            if ((int)$alvo['empresa_id'] === (int)$user['empresa_id'] && 
-                $alvo['perfil'] !== 'master_total' && 
-                $alvo['perfil'] !== 'master_operacional') {
+            if (
+                (int)$alvo['empresa_id'] === (int)$user['empresa_id'] &&
+                $alvo['perfil'] !== 'master_total' &&
+                $alvo['perfil'] !== 'master_operacional'
+            ) {
                 $podeEditar = true;
             }
             break;
         default:
             $podeEditar = false;
     }
-    
+
     if (!$podeEditar) jsonError('Acesso negado para editar este usuário.', 403);
 
     $body   = getBody();
@@ -146,21 +182,21 @@ if ($method === 'PUT') {
     $vals   = [];
 
     $editaveis = ['nome', 'login', 'status'];
-    
+
     if ($user['perfil'] === 'master_total' && isset($body['perfil'])) {
         $permitidos = getPerfisPermitidosCriacao($user['perfil']);
         if (in_array($body['perfil'], $permitidos)) {
             $editaveis[] = 'perfil';
         }
     }
-    
+
     foreach ($editaveis as $c) {
         if (isset($body[$c])) {
             $campos[] = "$c = ?";
             $vals[] = $body[$c];
         }
     }
-    
+
     if (!empty($body['senha']) && strlen($body['senha']) >= 6) {
         $campos[] = 'senha_hash = ?';
         $vals[] = hashSenha($body['senha']);
@@ -169,38 +205,38 @@ if ($method === 'PUT') {
     if (!empty($campos)) {
         $vals[] = $id;
         $db->prepare("UPDATE usuarios SET " . implode(', ', $campos) . " WHERE id = ?")
-           ->execute($vals);
-        
+            ->execute($vals);
+
         if (isset($body['status']) && $body['status'] === 'inativo' && $alvo['perfil'] === 'consultor' && $alvo['empresa_id']) {
             $db->prepare("UPDATE empresas SET licencas_em_uso = GREATEST(0, licencas_em_uso - 1) WHERE id = ?")
-               ->execute([$alvo['empresa_id']]);
+                ->execute([$alvo['empresa_id']]);
         } elseif (isset($body['status']) && $body['status'] === 'ativo' && $alvo['perfil'] === 'consultor' && $alvo['empresa_id']) {
             $checkLimite = $db->prepare("SELECT limite_licencas, licencas_em_uso FROM empresas WHERE id = ?");
             $checkLimite->execute([$alvo['empresa_id']]);
             $emp = $checkLimite->fetch();
             if ($emp && $emp['licencas_em_uso'] < $emp['limite_licencas']) {
                 $db->prepare("UPDATE empresas SET licencas_em_uso = licencas_em_uso + 1 WHERE id = ?")
-                   ->execute([$alvo['empresa_id']]);
+                    ->execute([$alvo['empresa_id']]);
             }
         }
     }
-    
+
     jsonOk(['mensagem' => 'Usuário atualizado com sucesso.']);
 }
 
 // ── DELETE ────────────────────────────────────────────────────
 if ($method === 'DELETE') {
     if (!$id) jsonError('ID não informado.');
-    
+
     $alvoStmt = $db->prepare("SELECT * FROM usuarios WHERE id = ?");
     $alvoStmt->execute([$id]);
     $alvo = $alvoStmt->fetch();
     if (!$alvo) jsonError('Usuário não encontrado.', 404);
-    
+
     if ($id === (int)$user['usuario_id']) jsonError('Você não pode desativar sua própria conta.');
-    
+
     $podeDesativar = false;
-    
+
     switch ($user['perfil']) {
         case 'master_total':
             $podeDesativar = true;
@@ -209,18 +245,20 @@ if ($method === 'DELETE') {
             if ($alvo['perfil'] !== 'master_total') $podeDesativar = true;
             break;
         case 'administrador':
-            if ((int)$alvo['empresa_id'] === (int)$user['empresa_id'] && 
-                $alvo['perfil'] !== 'master_total' && 
-                $alvo['perfil'] !== 'master_operacional') {
+            if (
+                (int)$alvo['empresa_id'] === (int)$user['empresa_id'] &&
+                $alvo['perfil'] !== 'master_total' &&
+                $alvo['perfil'] !== 'master_operacional'
+            ) {
                 $podeDesativar = true;
             }
             break;
         default:
             $podeDesativar = false;
     }
-    
+
     if (!$podeDesativar) jsonError('Acesso negado para desativar este usuário.', 403);
-    
+
     // Master Total pode excluir permanentemente, outros apenas desativam
     if ($user['perfil'] === 'master_total') {
         // Exclui permanentemente
@@ -230,12 +268,12 @@ if ($method === 'DELETE') {
         // Apenas desativa
         $db->prepare("UPDATE usuarios SET status = 'inativo' WHERE id = ?")->execute([$id]);
     }
-    
+
     if ($alvo['perfil'] === 'consultor' && $alvo['empresa_id']) {
         $db->prepare("UPDATE empresas SET licencas_em_uso = GREATEST(0, licencas_em_uso - 1) WHERE id = ?")
-           ->execute([$alvo['empresa_id']]);
+            ->execute([$alvo['empresa_id']]);
     }
-    
+
     jsonOk(['mensagem' => $user['perfil'] === 'master_total' ? 'Usuário excluído permanentemente.' : 'Usuário desativado com sucesso.']);
 }
 
