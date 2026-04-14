@@ -1922,7 +1922,7 @@
                     <circle cx="12" cy="12" r="10" />
                     <polyline points="12 6 12 12 16 14" />
                   </svg>
-                  Nascimento
+                  Nascimento / Idade
                 </div>
                 <div class="value" id="c-nascimento">—</div>
               </div>
@@ -2077,6 +2077,31 @@
                   class="value"
                   id="c-representante"
                   style="font-weight: 700"
+                >
+                  —
+                </div>
+              </div>
+              <div class="client-field">
+                <div class="label">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <line x1="12" y1="1" x2="12" y2="23" />
+                    <path
+                      d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+                    />
+                  </svg>
+                  Valor do Benefício
+                </div>
+                <div
+                  class="value"
+                  id="c-valor-beneficio"
+                  style="font-weight: 700; color: var(--cyan)"
                 >
                   —
                 </div>
@@ -3436,7 +3461,6 @@
           if (dataUrl) {
             el.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:contain">`;
           } else {
-            // Restaura SVG padrão se não houver imagem
             if (mode === "dark") {
               el.innerHTML = `<svg viewBox="0 0 200 200" fill="none"><circle cx="100" cy="100" r="88" stroke="white" stroke-width="4" fill="none" stroke-dasharray="460 100" stroke-linecap="round"/><circle cx="100" cy="100" r="65" stroke="white" stroke-width="3" fill="none" stroke-dasharray="320 90" stroke-linecap="round" stroke-dashoffset="50"/><circle cx="100" cy="12" r="11" fill="white"/><circle cx="126" cy="38" r="7" fill="white"/><circle cx="24" cy="110" r="8" fill="white"/><circle cx="95" cy="165" r="13" fill="white"/><text x="55" y="120" font-family="'Exo 2',sans-serif" font-weight="800" font-size="48" fill="white">CJ2</text><text x="115" y="143" font-family="'Exo 2',sans-serif" font-weight="700" font-size="18" fill="white" font-style="italic">TECH</text></svg>`;
             } else {
@@ -3922,6 +3946,285 @@
         return "—";
       }
 
+      // ============================================================
+      // FUNÇÃO PARA FORMATAR NOME DO BANCO COM CÓDIGO REAL
+      // ============================================================
+
+      // Mapeamento de códigos de banco para nomes (fallback caso a API não retorne o nome)
+      const BANCO_MAP = {
+        "001": "Banco do Brasil",
+        "033": "Santander",
+        104: "Caixa Econômica Federal",
+        237: "Bradesco",
+        341: "Itaú Unibanco",
+        260: "Nu Pagamentos S.A. (Nubank)",
+        212: "Banco Original",
+        "077": "Banco Inter",
+        422: "Banco Safra",
+        208: "Banco BTG Pactual",
+        755: "Banco Morgan Stanley",
+        389: "Banco Mercantil do Brasil",
+        756: "Banco Cooperativo do Brasil (Sicoob)",
+        136: "Banco Cooperativo Sicredi",
+        "084": "Uniprime Norte do Paraná",
+        641: "Banco Alfa",
+        707: "Banco Daycoval",
+        "079": "Banco JBS",
+        "081": "Banco Bonsucesso",
+        487: "Banco Deutsche Bank",
+        495: "Banco La Nación Argentina",
+        120: "Banco Rodobens",
+        218: "Banco B.S.2 S.A.",
+        394: "Banco Bradesco Financiamentos",
+        "000": "Banco Central do Brasil",
+        "002": "Banco Central do Brasil",
+        "003": "Banco da Amazônia",
+        "004": "Banco do Nordeste",
+        "021": "Banestes",
+        "025": "Banco Alfa",
+        "047": "Banco do Estado de Sergipe",
+        "070": "Banco de Brasília (BRB)",
+        "085": "Ailos",
+        "097": "Cooperativa Central de Crédito Noroeste",
+        "099": "Uniprime Central",
+        114: "Central Cooperativa de Crédito Norte",
+        121: "Banco Agibank",
+        133: "Cresol",
+        197: "Stone Pagamentos",
+        290: "Pagseguro Internet S.A.",
+        301: "Dock Solucoes em Meios de Pagamento",
+        318: "Banco BMG",
+        320: "China Construction Bank",
+        336: "Banco C6",
+        380: "PicPay",
+        383: "Ebanx",
+        403: "Cora Sociedade de Crédito",
+        412: "Banco Capital",
+        435: "Delcred",
+        450: "FitBank",
+        461: "Asaas",
+        473: "Banco Caixa Geral",
+        505: "Banco Credit Suisse",
+        600: "Banco Luso Brasileiro",
+        604: "Banco Industrial do Brasil",
+        610: "Banco VR",
+        611: "Banco Paulista",
+        612: "Banco Guanabara",
+        613: "Omni Banco",
+        623: "Banco Panamericano",
+        626: "Banco Ficsa",
+        630: "Banco Intercap",
+        633: "Banco Rendimento",
+        634: "Banco Triângulo",
+        637: "Banco Sofisa",
+        643: "Banco Pine",
+        652: "Itaú Unibanco Holding",
+        654: "Banco A.J. Renner",
+        655: "Banco Votorantim",
+        707: "Banco Daycoval",
+        712: "Banco Ourinvest",
+        739: "Banco Cetelem",
+        741: "Banco Ribeirão Preto",
+        743: "Banco Semear",
+        745: "Citibank",
+        748: "Banco Cooperativo Sicredi",
+        752: "BNP Paribas Brasil",
+        753: "Banco NBC Bank Brasil",
+        757: "KEB Hana do Brasil",
+        422: "Banco Safra",
+      };
+
+      // Mapeamento reverso: nome (lowercase parcial) → código
+      const BANCO_NOME_PARA_CODIGO = {
+        "banco do brasil": "001",
+        bb: "001",
+        santander: "033",
+        caixa: "104",
+        cef: "104",
+        "caixa economica": "104",
+        bradesco: "237",
+        itau: "341",
+        itaú: "341",
+        nubank: "260",
+        "nu ": "260",
+        original: "212",
+        inter: "077",
+        safra: "422",
+        btg: "208",
+        mercantil: "389",
+        sicoob: "756",
+        sicredi: "136",
+        alfa: "641",
+        daycoval: "707",
+        bonsucesso: "081",
+        bmg: "318",
+        c6: "336",
+        picpay: "380",
+        stone: "197",
+        pagseguro: "290",
+        agibank: "121",
+        votorantim: "655",
+        panamericano: "623",
+        pine: "643",
+        sofisa: "637",
+        rendimento: "633",
+        cetelem: "739",
+        citibank: "745",
+        banrisul: "041",
+        brb: "070",
+        cresol: "133",
+      };
+
+      function formatarNomeBancoComCodigo(contrato) {
+        let codigo = null;
+        let nome = null;
+
+        // Possíveis nomes de campos para código do banco
+        const camposCodigo = [
+          "Codigo_Banco",
+          "cd_banco",
+          "codigo_banco",
+          "Numero_Banco",
+          "numero_banco",
+          "CodigoBanco",
+          "codigoBanco",
+          "banco_codigo",
+          "banco_cod",
+          "banco_id",
+          "Banco_Codigo",
+          "ID_BANCO",
+          "CODBANCO",
+          "NumeroBanco",
+          "NumBanco",
+          "num_banco",
+          "cod_banco",
+          "CodBanco",
+        ];
+
+        // Possíveis nomes de campos para nome do banco
+        const camposNome = [
+          "Banco_Nome",
+          "nome_banco",
+          "banco_nome",
+          "Nome_Banco",
+          "banco",
+          "Banco",
+          "banco_nome_completo",
+          "NOME_BANCO",
+          "NomeBanco",
+          "nomeBanco",
+          "Banco_Descricao",
+          "banco_descricao",
+        ];
+
+        // Busca código
+        for (const campo of camposCodigo) {
+          if (contrato[campo] != null && contrato[campo] !== "") {
+            let val = String(contrato[campo]).trim();
+            if (/^\d+$/.test(val)) {
+              // Padeia com zeros à esquerda para 3 dígitos
+              val = val.padStart(3, "0");
+              if (val.length >= 3) {
+                codigo = val.substring(0, 3);
+                break;
+              }
+            }
+          }
+        }
+
+        // Busca nome
+        for (const campo of camposNome) {
+          if (contrato[campo] != null && contrato[campo] !== "") {
+            nome = String(contrato[campo]).trim();
+            break;
+          }
+        }
+
+        // Se nome contém código no início (ex: "341 - Itaú"), extrai
+        if (nome && !codigo) {
+          const match = nome.match(/^(\d{1,3})\s*[-–—]\s*(.+)/i);
+          if (match) {
+            codigo = match[1].padStart(3, "0");
+            nome = match[2].trim();
+          }
+        }
+
+        // Se tem código mas não tem nome, busca no mapa
+        if (codigo && !nome) {
+          nome = BANCO_MAP[codigo] || null;
+        }
+
+        // Se tem nome mas não tem código, tenta lookup reverso pelo nome
+        if (nome && !codigo) {
+          const nomeLower = nome.toLowerCase();
+          for (const [chave, cod] of Object.entries(BANCO_NOME_PARA_CODIGO)) {
+            if (nomeLower.includes(chave)) {
+              codigo = cod;
+              break;
+            }
+          }
+        }
+
+        // Formata o resultado final
+        if (codigo && nome) {
+          return `${codigo} - ${nome}`;
+        }
+        if (codigo && !nome) {
+          return `${codigo} - ${BANCO_MAP[codigo] || "Banco"}`;
+        }
+        if (!codigo && nome) {
+          return nome;
+        }
+        return "—";
+      }
+
+      // Função para calcular idade a partir da data de nascimento
+      function calcularIdade(dataNascStr) {
+        if (!dataNascStr || dataNascStr === "—") return null;
+        try {
+          let dataNasc = null;
+          if (dataNascStr.includes("/")) {
+            const partes = dataNascStr.split("/");
+            if (partes.length === 3) {
+              // formato DD/MM/YYYY
+              dataNasc = new Date(
+                parseInt(partes[2]),
+                parseInt(partes[1]) - 1,
+                parseInt(partes[0]),
+              );
+            }
+          } else if (dataNascStr.includes("-")) {
+            // formato YYYY-MM-DD
+            const parts = dataNascStr.split("T")[0].split("-");
+            dataNasc = new Date(
+              parseInt(parts[0]),
+              parseInt(parts[1]) - 1,
+              parseInt(parts[2]),
+            );
+          } else if (/^\d{8}$/.test(dataNascStr)) {
+            // formato DDMMYYYY ou YYYYMMDD
+            const d = dataNascStr;
+            dataNasc = new Date(
+              parseInt(d.substring(4)),
+              parseInt(d.substring(2, 4)) - 1,
+              parseInt(d.substring(0, 2)),
+            );
+          }
+          if (dataNasc && !isNaN(dataNasc.getTime())) {
+            const hoje = new Date();
+            let idade = hoje.getFullYear() - dataNasc.getFullYear();
+            const mes = hoje.getMonth() - dataNasc.getMonth();
+            if (mes < 0 || (mes === 0 && hoje.getDate() < dataNasc.getDate())) {
+              idade--;
+            }
+            if (idade >= 0 && idade <= 130) return idade;
+          }
+        } catch (e) {
+          return null;
+        }
+        return null;
+      }
+
       function renderCliente(data) {
         const c = data.Consulta || data;
         const ben = c.BENEFICIO || {};
@@ -3932,6 +4235,14 @@
         const nasc = c.NASCTO
           ? formatNascto(c.NASCTO)
           : g(c, "DataNascimento", "dataNascimento", "DtNascimento") || "—";
+
+        // Calcular idade
+        let idade = calcularIdade(nasc);
+        let nascComIdade = nasc;
+        if (idade !== null && idade !== "—") {
+          nascComIdade = `${nasc} (${idade} anos)`;
+        }
+
         const mae = g(c, "NomeMae", "nomeMae", "Mae", "mae") || "—";
         const pai = g(c, "NomePai", "nomePai", "Pai", "pai") || "—";
         const sit =
@@ -3940,6 +4251,42 @@
           "—";
         const esp =
           c.ESP || g(c, "EspecieBeneficio", "especie", "Especie") || "—";
+
+        // Valor do benefício — busca em todos os campos possíveis da API Promosys
+        let valorBeneficio = null;
+        const _vbCandidatos = [
+          ben.valor_beneficio,
+          ben.ValorBeneficio,
+          ben.Vl_Beneficio,
+          ben.vl_beneficio,
+          ben.ValorBruto,
+          ben.valorBruto,
+          ben.valor_bruto,
+          ben.Valor,
+          ben.valor,
+          ben.VlBeneficio,
+          ben.vlBeneficio,
+          ben.VALOR_BENEFICIO,
+          ben.ValorLiquido,
+          ben.valor_liquido,
+          c.VALOR_BENEFICIO,
+          c.valor_beneficio,
+          c.VL_BENEFICIO,
+          c.Vl_Beneficio,
+          c.ValorBeneficio,
+          c.VLBENEFICIO,
+        ];
+        for (const v of _vbCandidatos) {
+          if (
+            v !== undefined &&
+            v !== null &&
+            v !== "" &&
+            !isNaN(parseFloat(v))
+          ) {
+            valorBeneficio = parseFloat(v);
+            if (valorBeneficio > 0) break;
+          }
+        }
 
         // Margem Novo = MaximoComprometimentoPermitido - TotalComprometido
         const maxComp = ben.MaximoComprometimentoPermitido ?? null;
@@ -3957,13 +4304,20 @@
         document.getElementById("c-nome").textContent = nome;
         document.getElementById("c-cpf").textContent = cpf;
         document.getElementById("c-beneficio").textContent = nb;
-        document.getElementById("c-nascimento").textContent = nasc;
+        document.getElementById("c-nascimento").textContent = nascComIdade;
         document.getElementById("c-mae").textContent = mae;
         document.getElementById("c-pai").textContent = pai;
         document.getElementById("c-situacao").textContent = sit;
         document.getElementById("c-especie").textContent = esp;
         document.getElementById("c-margem").textContent =
           margemNovo !== null ? fmt(margemNovo) : "—";
+
+        // Exibir valor do benefício
+        const valorBenEl = document.getElementById("c-valor-beneficio");
+        if (valorBenEl) {
+          valorBenEl.textContent =
+            valorBeneficio !== null ? fmt(valorBeneficio) : "—";
+        }
 
         const totalCompEl = document.getElementById("c-total-comprometido");
         if (totalCompEl)
@@ -3999,7 +4353,6 @@
         if (endEl)
           endEl.textContent = endParts.length ? endParts.join(" - ") : "—";
 
-        // Campos adicionais
         const bloqEl = document.getElementById("c-bloqueado");
         const pensaoEl = document.getElementById("c-pensao");
         const repEl = document.getElementById("c-representante");
@@ -4043,7 +4396,6 @@
         if (pensaoEl) colorSimNao(pensaoEl, pensao);
         if (repEl) colorSimNao(repEl, rep);
 
-        // Dados bancários
         const db = c.DADOS_BANCARIOS || {};
         const banco = db.NOME_BANCO_PAGTO || db.NOME_BANCO || null;
         const meio = db.NOME_TIPO_PAGTO || null;
@@ -4084,29 +4436,20 @@
         document.getElementById("client-block").style.display = "block";
         document.getElementById("simulation-block").style.display = "none";
 
-        // Card RESUMO - CORRIGIDO COM OS CAMPOS CORRETOS
         const secResumo = document.getElementById("section-resumo");
         if (secResumo) {
           const margNovoValue = margemNovo;
 
-          // Margem RMC (cartão de crédito consignado)
-          // margemdispcartao = margem disponível para RMC
-          // ValorRMC = valor total da margem RMC (inclui já comprometido)
           const margRMC =
             ben.margemdispcartao != null
               ? ben.margemdispcartao
               : (ben.ValorRMC ?? ben.MargemRMC ?? ben.margemRMC ?? null);
 
-          // Margem RCC (cartão de débito consignado)
-          // margemdispcartaoBen = margem disponível para RCC
-          // ValorRCC = valor total da margem RCC (inclui já comprometido)
           const margRCC =
             ben.margemdispcartaoBen != null
               ? ben.margemdispcartaoBen
               : (ben.ValorRCC ?? ben.MargemRCC ?? ben.margemRCC ?? null);
 
-          // Possui Cartão RMC - detectado pelos contratos (Tipo_Emprestimo 76)
-          // ou campo direto da API caso exista
           const contratosAll = c.CONTRATO || [];
           const posCartaoRMC =
             ben.PossuiCartaoRMC ??
@@ -4121,8 +4464,6 @@
               ? "S"
               : null);
 
-          // Possui Cartão RCC - detectado pelos contratos (Tipo_Emprestimo 44)
-          // ou campo direto da API caso exista
           const posCartaoRCC =
             ben.PossuiCartaoRCC ??
             ben.possuiCartaoRCC ??
@@ -4251,8 +4592,9 @@
 
         tbody.innerHTML = contratos
           .map((c, i) => {
-            const banco =
-              c.Banco_Nome || gc(c, "Banco", "banco", "NomeBanco") || "—";
+            // Formatar nome do banco com código real
+            const bancoFormatado = formatarNomeBancoComCodigo(c);
+
             const contrato =
               c.Contrato || gc(c, "NrContrato", "NumeroContrato") || "—";
             const inicio =
@@ -4287,21 +4629,21 @@
             }
 
             return `<tr>
-            <td class="td-banco">${escapeHtml(banco)}</td>
-            <td class="td-contrato">${escapeHtml(contrato)}</td>
-            <td>${fmtDate(inicio) || "—"}</td>
-            <td>${fmtDate(fim) || "—"}</td>
-            <td>${valor ? fmt(valor) : "—"}</td>
-            <td class="td-taxa">${taxa ? taxa.toFixed(2) + "%" : "—"}</td>
-            <td class="td-parcela">${parcela ? fmt(parcela) : "—"}</td>
-            <td><span class="badge-restantes">${restStr}</span></td>
-            <td class="td-parcelas-pagas">${pagas > 0 ? pagas : "—"}</td>
-            <td class="td-quitacao">${quitFinal}</td>
-            <td>
-              <button class="btn-sm btn-simulate" onclick="openSim(${i})"> Simular</button>
-              <button class="btn-sm btn-detail" onclick="openDetail(${i})" style="margin-left:4px">Detalhar</button>
-            </td>
-           </tr>`;
+              <td class="td-banco">${escapeHtml(bancoFormatado)}</td>
+              <td class="td-contrato">${escapeHtml(contrato)}</td>
+              <td>${fmtDate(inicio) || "—"}</td>
+              <td>${fmtDate(fim) || "—"}</td>
+              <td>${valor ? fmt(valor) : "—"}</td>
+              <td class="td-taxa">${taxa ? taxa.toFixed(2) + "%" : "—"}</td>
+              <td class="td-parcela">${parcela ? fmt(parcela) : "—"}</td>
+              <td><span class="badge-restantes">${restStr}</span></td>
+              <td class="td-parcelas-pagas">${pagas > 0 ? pagas : "—"}</td>
+              <td class="td-quitacao">${quitFinal}</td>
+              <td>
+                <button class="btn-sm btn-simulate" onclick="openSim(${i})"> Simular</button>
+                <button class="btn-sm btn-detail" onclick="openDetail(${i})" style="margin-left:4px">Detalhar</button>
+               </td>
+            </tr>`;
           })
           .join("");
 
@@ -4322,12 +4664,12 @@
           gc(c, "DataInicio", "dataInicio");
         const fim =
           converterDataPromosys(c.FinalDesconto) || gc(c, "DataFim", "dataFim");
-        const banco = c.Banco_Nome || gc(c, "Banco", "NomeBanco") || "—";
+        const bancoFormatado = formatarNomeBancoComCodigo(c);
         const contrato = c.Contrato || gc(c, "NrContrato") || "";
 
         document.getElementById("sim-titulo").textContent =
           "Contrato " + (contrato || idx + 1);
-        document.getElementById("sim-banco").textContent = banco;
+        document.getElementById("sim-banco").textContent = bancoFormatado;
         document.getElementById("sim-parcela").value = parcela || "";
         document.getElementById("sim-taxa").value = taxa || "";
         document.getElementById("sim-inicio").value = inicio || "";
@@ -4397,7 +4739,7 @@
             .join(" - ") || "—";
         const telExibir = tel1 !== "—" ? tel1 : tel2;
 
-        const banco = c.Banco_Nome || gc(c, "Banco", "NomeBanco") || "—";
+        const bancoFormatado = formatarNomeBancoComCodigo(c);
         const contrato = c.Contrato || gc(c, "NrContrato") || "—";
         const valor = parseFloat(c.Vl_Emprestimo || 0);
         const parcela = parseFloat(c.Vl_Parcela || 0);
@@ -4442,7 +4784,7 @@
           <div class="modal-field"><div class="label">Telefone 2</div><div class="value">${escapeHtml(tel2 !== tel1 ? tel2 : "—")}</div></div>
           <div class="modal-field" style="grid-column:1/-1"><div class="label">Endereço</div><div class="value">${escapeHtml(endereco)}</div></div>
           <div style="grid-column:1/-1;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);margin:12px 0 6px;padding-bottom:8px;border-bottom:1px solid var(--border)"><svg width="14" height="14" style="display:inline;margin-right:6px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg> Dados do Contrato</div>
-          <div class="modal-field"><div class="label">Banco</div><div class="value">${escapeHtml(banco)}</div></div>
+          <div class="modal-field"><div class="label">Banco</div><div class="value">${escapeHtml(bancoFormatado)}</div></div>
           <div class="modal-field"><div class="label">Contrato</div><div class="value">${escapeHtml(contrato)}</div></div>
           <div class="modal-field"><div class="label">Valor Financiado</div><div class="value">${valor ? fmt(valor) : "—"}</div></div>
           <div class="modal-field"><div class="label">Parcela Mensal</div><div class="value">${parcela ? fmt(parcela) : "—"}</div></div>
@@ -4469,7 +4811,7 @@
       }
 
       // ============================================================
-      // ADMIN - USUÁRIOS (com Desativar/Ativar e Excluir Permanente)
+      // ADMIN - USUÁRIOS (MANTIDO DO ARQUIVO ORIGINAL)
       // ============================================================
 
       async function renderUsersList() {
@@ -4532,7 +4874,6 @@
             const podeDesativar = podeEditar && u.id !== currentUser?.id;
             const podeExcluirPermanente =
               currentUser?.perfil === "master_total" && podeDesativar;
-            // Consultores não podem ver detalhes de usuários
             const podeVerDetalhes =
               currentUser?.perfil !== "consultor" && podeEditar;
             const statusClass =
@@ -4564,7 +4905,6 @@
             </tr></thead><tbody>`;
 
           if (isMaster) {
-            // ── Agrupa por empresa ──────────────────────────────────────
             const groups = new Map();
             groups.set("__sistema__", {
               label: "Sistema",
@@ -4632,7 +4972,6 @@
               html ||
               `<div style="text-align:center;padding:32px;color:var(--text-3);font-size:13px">Nenhum usuário encontrado.</div>`;
           } else {
-            // ── Administrador / Consultor: lista simples ────────────────
             document.getElementById("users-container").innerHTML =
               `<div class="table-wrap">${tableHeader}${_cachedUsers.map(renderRow).join("")}</tbody></table></div>`;
           }
@@ -4694,7 +5033,6 @@
         const u = _cachedUsers.find((x) => x.id === userId);
         if (!u) return;
 
-        // Cria mini-modal
         const modal = document.createElement("div");
         modal.className = "modal-overlay open";
         modal.style.display = "flex";
@@ -4729,7 +5067,6 @@
           </div>`;
         document.body.appendChild(modal);
 
-        // Carrega lista de empresas
         try {
           const res = await fetch("api/empresas.php", {
             headers: authHeaders(),
@@ -4783,7 +5120,6 @@
 
         wrap.style.display = "block";
 
-        // Só carrega se ainda estiver com placeholder
         if (
           sel.options.length === 1 &&
           sel.options[0].text === "Carregando..."
@@ -4828,10 +5164,8 @@
           const data = await res.json();
           if (!res.ok) throw new Error(data.erro || "Erro ao salvar.");
           showToast("Empresa atualizada!", "success");
-          // Atualiza o texto sem fechar o modal
           if (nomeEl) nomeEl.textContent = nomeEmpresa;
           if (wrap) wrap.style.display = "none";
-          // Atualiza cache local
           const u = _cachedUsers.find((x) => x.id === userId);
           if (u) {
             u.empresa_id = novaEmpresaId;
@@ -4862,7 +5196,6 @@
           `;
         }
 
-        // Mostrar campo de empresa apenas para master_total ao editar
         const empresaWrap = document.getElementById("uf-empresa-wrap");
         const empresaSelect = document.getElementById("uf-empresa");
         if (currentUser?.perfil === "master_total") {
@@ -4908,7 +5241,6 @@
           if (editId) {
             const body = { nome, login, perfil };
             if (pass.length >= 6) body.senha = pass;
-            // Master Total pode mudar a empresa do usuário
             if (currentUser?.perfil === "master_total") {
               const empWrap = document.getElementById("uf-empresa-wrap");
               if (empWrap && empWrap.style.display !== "none") {
@@ -4951,7 +5283,6 @@
         }
       }
 
-      // Função para desativar/ativar usuário (mantém no banco)
       async function toggleUserStatus(id, currentStatus) {
         const userToToggle = _cachedUsers.find((u) => u.id === id);
         const newStatus = currentStatus === "ativo" ? "inativo" : "ativo";
@@ -4979,7 +5310,6 @@
         }
       }
 
-      // Função para excluir permanentemente (apenas Master Total)
       async function permanentDeleteUser(id) {
         const userToDelete = _cachedUsers.find((u) => u.id === id);
         if (
@@ -5003,12 +5333,10 @@
         }
       }
 
-      // ── Modal de detalhes do usuário (login, senha, ações) ──────
       async function viewUserDetails(id) {
         const uCache = _cachedUsers.find((x) => x.id === id);
         if (!uCache) return;
 
-        // Abre modal com loading enquanto busca dados completos da API
         const modal = document.createElement("div");
         modal.className = "modal-overlay open";
         modal.style.display = "flex";
@@ -5028,7 +5356,6 @@
           </div>`;
         document.body.appendChild(modal);
 
-        // Busca dados completos via API (inclui senha_texto)
         let u = uCache;
         try {
           const res = await fetch("api/usuarios.php?id=" + id, {
@@ -5036,9 +5363,7 @@
           });
           const data = await res.json();
           if (res.ok && data.usuario) u = { ...uCache, ...data.usuario };
-        } catch (e) {
-          /* usa cache se falhar */
-        }
+        } catch (e) {}
 
         const perfil = currentUser?.perfil;
         const podeEditar =
@@ -5073,8 +5398,6 @@
         bodyEl.style.padding = "4px 0";
         bodyEl.innerHTML = `
           <div style="display:flex;flex-direction:column;gap:12px">
-
-            <!-- Info básica -->
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
               <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:12px">
                 <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);margin-bottom:4px">Nome</div>
@@ -5086,13 +5409,11 @@
               </div>
             </div>
 
-            <!-- Status -->
             <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;align-items:center;justify-content:space-between">
               <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-3)">Status</div>
               ${statusBadge}
             </div>
 
-            <!-- Empresa -->
             <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:12px">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
                 <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-3)">Empresa</div>
@@ -5118,14 +5439,12 @@
               </div>
             </div>
 
-            <!-- Credenciais -->
             <div style="background:rgba(8,145,178,.06);border:1px solid rgba(8,145,178,.2);border-radius:8px;padding:14px">
               <div style="font-size:11px;font-weight:600;color:var(--blue-4);margin-bottom:10px;display:flex;align-items:center;gap:6px">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 Credenciais de Acesso
               </div>
 
-              <!-- Login -->
               <div style="margin-bottom:10px">
                 <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);margin-bottom:4px">Login</div>
                 <div style="font-family:var(--mono);font-size:13px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:6px">
@@ -5136,7 +5455,6 @@
                 </div>
               </div>
 
-              <!-- Senha -->
               <div>
                 <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);margin-bottom:4px">Senha</div>
                 ${
@@ -5169,7 +5487,6 @@
                 }
               </div>
 
-              <!-- Redefinir senha -->
               ${
                 podeEditar
                   ? `
@@ -5191,7 +5508,6 @@
               }
             </div>
 
-            <!-- Ações: Desativar / Reativar / Excluir -->
             ${
               podeDesativar || podeExcluir
                 ? `
@@ -5201,16 +5517,8 @@
                   ? `
               <button onclick="toggleUserStatus(${u.id},'${u.status}');this.closest('.modal-overlay').remove()"
                 style="flex:1;padding:10px;border-radius:8px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:500;
-                  ${
-                    statusAtivo
-                      ? "background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger)"
-                      : "background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--success)"
-                  }">
-                ${
-                  statusAtivo
-                    ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> Desativar usuário`
-                    : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Reativar usuário`
-                }
+                  ${statusAtivo ? "background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger)" : "background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--success)"}">
+                ${statusAtivo ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> Desativar usuário` : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Reativar usuário`}
               </button>`
                   : ""
               }
@@ -5227,14 +5535,7 @@
             </div>`
                 : ""
             }
-
           </div>`;
-      }
-
-      function toggleSenhaVisivel(id) {
-        const wrap = document.getElementById("ud-reset-wrap-" + id);
-        if (wrap)
-          wrap.style.display = wrap.style.display === "none" ? "block" : "none";
       }
 
       async function redefinirSenhaUsuario(id) {
@@ -5310,7 +5611,7 @@
       }
 
       // ============================================================
-      // ADMIN - EMPRESAS (com ícones)
+      // ADMIN - EMPRESAS
       // ============================================================
 
       async function carregarEmpresas() {
