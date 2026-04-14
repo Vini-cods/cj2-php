@@ -2106,6 +2106,31 @@
                   —
                 </div>
               </div>
+              <div class="client-field">
+                <div class="label">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                  DDB / DIB
+                </div>
+                <div
+                  class="value"
+                  id="c-ddb-main"
+                  style="font-weight: 600; color: var(--blue-4)"
+                >
+                  —
+                </div>
+              </div>
               <div class="client-field" style="grid-column: span 2">
                 <div class="label">
                   <svg
@@ -2212,6 +2237,25 @@
                     font-weight: 700;
                     color: var(--text-1);
                   "
+                >
+                  —
+                </div>
+              </div>
+              <div>
+                <div
+                  style="
+                    font-size: 11px;
+                    color: var(--text-2);
+                    margin-bottom: 4px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                  "
+                >
+                  Valor Benefício Real
+                </div>
+                <div
+                  id="r-valor-beneficio-real"
+                  style="font-size: 17px; font-weight: 700; color: var(--cyan)"
                 >
                   —
                 </div>
@@ -2341,7 +2385,7 @@
               <div class="value" id="c-numero-conta">—</div>
             </div>
             <div class="client-field">
-              <div class="label">DDB</div>
+              <div class="label">DDB / DIB</div>
               <div class="value" id="c-ddb">—</div>
             </div>
             <div class="client-field">
@@ -4083,6 +4127,10 @@
         const camposCodigo = [
           "Codigo_Banco",
           "cd_banco",
+          "Cd_Banco",
+          "CD_BANCO",
+          "CdBanco",
+          "cdBanco",
           "codigo_banco",
           "Numero_Banco",
           "numero_banco",
@@ -4099,6 +4147,23 @@
           "num_banco",
           "cod_banco",
           "CodBanco",
+          "Nr_Banco",
+          "nr_banco",
+          "NrBanco",
+          "BANCO",
+          // Promosys específicos
+          "Cd_Bco",
+          "cd_bco",
+          "CdBco",
+          "CD_BCO",
+          "NR_BANCO",
+          "Nr_Bco",
+          "nr_bco",
+          "Num_Banco",
+          "NUM_BANCO",
+          "Banco_Cd",
+          "banco_cd",
+          "COD_BANCO",
         ];
 
         // Possíveis nomes de campos para nome do banco
@@ -4115,19 +4180,44 @@
           "nomeBanco",
           "Banco_Descricao",
           "banco_descricao",
+          "Ds_Banco",
+          "ds_banco",
+          "DsBanco",
+          "Descricao_Banco",
+          "descricao_banco",
+          "Nome_Banco_Completo",
+          // Promosys específicos
+          "Nm_Banco",
+          "NM_BANCO",
+          "nm_banco",
+          "NmBanco",
+          "nmBanco",
+          "Nm_Bco",
+          "nm_bco",
+          "NmBco",
+          "DS_BANCO",
+          "Ds_Bco",
+          "NomeBco",
+          "nome_bco",
         ];
 
         // Busca código
         for (const campo of camposCodigo) {
           if (contrato[campo] != null && contrato[campo] !== "") {
             let val = String(contrato[campo]).trim();
+            // Valor puramente numérico
             if (/^\d+$/.test(val)) {
-              // Padeia com zeros à esquerda para 3 dígitos
               val = val.padStart(3, "0");
               if (val.length >= 3) {
                 codigo = val.substring(0, 3);
                 break;
               }
+            }
+            // Formato "341 - Itaú" ou "341-Itau" já no campo de código
+            const matchEmb = val.match(/^(\d{1,3})\s*[-–—\s]/);
+            if (matchEmb) {
+              codigo = matchEmb[1].padStart(3, "0");
+              break;
             }
           }
         }
@@ -4267,14 +4357,45 @@
           ben.VlBeneficio,
           ben.vlBeneficio,
           ben.VALOR_BENEFICIO,
+          ben.VL_BENEFICIO,
+          // Promosys — salário/valor líquido
+          ben.Salario,
+          ben.SALARIO,
+          ben.salario,
+          ben.SalarioBeneficio,
+          ben.salario_beneficio,
+          ben.VlSalario,
+          ben.vl_salario,
+          // Campos de valor líquido / real (Promosys)
           ben.ValorLiquido,
           ben.valor_liquido,
+          ben.Vl_Liquido,
+          ben.vl_liquido,
+          ben.VlLiquido,
+          ben.vlLiquido,
+          ben.VL_LIQUIDO,
+          ben.ValorBeneficioLiquido,
+          ben.valor_beneficio_liquido,
+          ben.Vl_BeneficioLiquido,
+          ben.VlBeneficioLiquido,
+          ben.vlBeneficioLiquido,
+          ben.ValorReal,
+          ben.valor_real,
+          ben.VlReal,
+          ben.vlReal,
+          ben.VL_REAL,
+          // Campos na raiz da consulta
           c.VALOR_BENEFICIO,
           c.valor_beneficio,
           c.VL_BENEFICIO,
           c.Vl_Beneficio,
           c.ValorBeneficio,
           c.VLBENEFICIO,
+          c.VL_LIQUIDO,
+          c.Valor_Liquido,
+          c.SALARIO,
+          c.Salario,
+          c.salario,
         ];
         for (const v of _vbCandidatos) {
           if (
@@ -4401,7 +4522,71 @@
         const meio = db.NOME_TIPO_PAGTO || null;
         const agenc = db.AGENCIA_COMPLETO || db.AGENCIA || null;
         const conta = db.CONTA_PAGTO || db.CONTA || null;
-        const ddb = db.DIB_FORMATADO || null;
+
+        // DDB — cobre todos os nomes possíveis retornados pela Promosys
+        const _ddbRaw =
+          db.DIB_FORMATADO ||
+          db.DDB ||
+          db.ddb ||
+          db.DIB ||
+          db.dib ||
+          db.Dib ||
+          db.DataInicioDesconto ||
+          db.data_inicio_desconto ||
+          db.DT_DIB ||
+          db.dt_dib ||
+          db.DT_DDB ||
+          db.dt_ddb ||
+          db.DT_INICIO_BENEFICIO ||
+          db.Dt_Inicio_Beneficio ||
+          c.DIB_FORMATADO ||
+          c.DDB ||
+          c.ddb ||
+          c.DIB ||
+          c.dib ||
+          c.DT_DIB ||
+          c.dt_dib ||
+          c.DT_DDB ||
+          c.dt_ddb ||
+          c.DataInicioDesconto ||
+          c.DataDespacho ||
+          c.DT_DESPACHO ||
+          ben.dib ||
+          ben.DIB ||
+          ben.ddb ||
+          ben.DDB ||
+          ben.DataInicioDesconto ||
+          ben.data_inicio_desconto ||
+          ben.DT_DIB ||
+          ben.DataDespacho ||
+          ben.DT_DESPACHO ||
+          ben.dt_despacho ||
+          null;
+
+        // Converte DDB para formato legível se vier em YYYYMM ou YYYYMMDD
+        function formatarDDB(raw) {
+          if (!raw) return null;
+          const s = String(raw).trim();
+          if (!s || s === "000000" || s === "00000000") return null;
+          // Já está formatado (DD/MM/YYYY ou similar)
+          if (/\D/.test(s)) return s;
+          // Formato YYYYMMDD
+          if (/^\d{8}$/.test(s)) {
+            return (
+              s.substring(6, 8) +
+              "/" +
+              s.substring(4, 6) +
+              "/" +
+              s.substring(0, 4)
+            );
+          }
+          // Formato YYYYMM (mês de início)
+          if (/^\d{6}$/.test(s)) {
+            return s.substring(4, 6) + "/" + s.substring(0, 4);
+          }
+          return s;
+        }
+        const ddb = formatarDDB(_ddbRaw);
         const sitBanco = ben.situacao || null;
 
         const secBancario = document.getElementById("section-bancario");
@@ -4416,6 +4601,7 @@
           setBanco("c-agencia", agenc);
           setBanco("c-numero-conta", conta);
           setBanco("c-ddb", ddb);
+          setBanco("c-ddb-main", ddb);
           const sitBancoEl = document.getElementById("c-situacao-banco");
           if (sitBancoEl) {
             sitBancoEl.textContent = sitBanco || "—";
@@ -4426,6 +4612,9 @@
           }
         } else {
           if (secBancario) secBancario.style.display = "none";
+          // Mesmo sem dados bancários, preenche DDB no card principal
+          const ddbMainEl = document.getElementById("c-ddb-main");
+          if (ddbMainEl) ddbMainEl.textContent = ddb || "—";
         }
 
         const badge = document.getElementById("c-status-badge");
@@ -4513,6 +4702,12 @@
                   ? "var(--success)"
                   : "var(--text-2)";
           }
+
+          // Valor Benefício Real no resumo (espelha c-valor-beneficio)
+          const elVBReal = document.getElementById("r-valor-beneficio-real");
+          if (elVBReal)
+            elVBReal.textContent =
+              valorBeneficio !== null ? fmt(valorBeneficio) : "—";
 
           secResumo.style.display = "";
         }
