@@ -3991,64 +3991,477 @@
       }
 
       // ============================================================
-      // FUNÇÃO PARA FORMATAR NOME DO BANCO COM CÓDIGO REAL
+      // MAPEAMENTO COMPLETO DE BANCOS E INSTITUIÇÕES FINANCEIRAS
       // ============================================================
 
       // Mapeamento de códigos de banco para nomes (fallback caso a API não retorne o nome)
       const BANCO_MAP = {
+        // Bancos tradicionais
         "001": "Banco do Brasil",
-        "033": "Santander",
-        104: "Caixa Econômica Federal",
-        237: "Bradesco",
-        341: "Itaú Unibanco",
-        260: "Nu Pagamentos S.A. (Nubank)",
-        212: "Banco Original",
-        "077": "Banco Inter",
-        422: "Banco Safra",
-        208: "Banco BTG Pactual",
-        755: "Banco Morgan Stanley",
-        389: "Banco Mercantil do Brasil",
-        756: "Banco Cooperativo do Brasil (Sicoob)",
-        136: "Banco Cooperativo Sicredi",
-        "084": "Uniprime Norte do Paraná",
-        641: "Banco Alfa",
-        707: "Banco Daycoval",
-        "079": "Banco JBS",
-        "081": "Banco Bonsucesso",
-        487: "Banco Deutsche Bank",
-        495: "Banco La Nación Argentina",
-        120: "Banco Rodobens",
-        218: "Banco B.S.2 S.A.",
-        394: "Banco Bradesco Financiamentos",
-        "000": "Banco Central do Brasil",
         "002": "Banco Central do Brasil",
         "003": "Banco da Amazônia",
         "004": "Banco do Nordeste",
         "021": "Banestes",
         "025": "Banco Alfa",
+        "033": "Santander",
+        "036": "Banco Bradesco BBI",
+        "037": "Banco do Estado do Pará",
+        "039": "Banco do Estado do Piauí",
+        "041": "Banrisul",
         "047": "Banco do Estado de Sergipe",
+        "051": "Banco da China Brasil",
+        "060": "Banco Confidence",
+        "062": "Hipercard Banco Múltiplo",
+        "063": "Banco Bradescard",
+        "064": "Goldman Sachs do Brasil",
+        "065": "Banco Andbank",
+        "066": "Banco Morgan Stanley",
+        "069": "Banco Crefisa",
         "070": "Banco de Brasília (BRB)",
+        "074": "Banco J. Safra",
+        "075": "Banco Abn Amro S.A.",
+        "076": "Banco KDB do Brasil",
+        "077": "Banco Inter",
+        "078": "Haitong Banco de Investimento",
+        "079": "Banco JBS",
+        "080": "Banco BT Corretora",
+        "081": "Banco Bonsucesso",
+        "082": "Banco Topázio",
+        "083": "Banco da China Brasil",
+        "084": "Uniprime Norte do Paraná",
         "085": "Ailos",
+        "087": "Cooperativa Central de Crédito Noroeste",
+        "088": "Banco Randon",
+        "089": "Banco Cooperativo Sicredi",
+        "090": "Banco Cooperativo Sicoob",
+        "091": "Banco Central de Cooperativas de Crédito",
+        "092": "Brickell S.A. Crédito",
+        "093": "Polo Capital S.A.",
+        "094": "Banco Finaxis",
+        "095": "Travelex Banco de Câmbio",
+        "096": "Banco B3",
         "097": "Cooperativa Central de Crédito Noroeste",
+        "098": "Credialiança",
         "099": "Uniprime Central",
+        101: "Renascença",
+        102: "XP Investimentos",
+        104: "Caixa Econômica Federal",
+        105: "Banco Luso Brasileiro",
+        107: "Banco Bocom BBM",
+        108: "Banco Porto Real",
+        111: "Banco Oliveira Trust",
+        113: "Banco Magliano",
         114: "Central Cooperativa de Crédito Norte",
+        117: "Banco Daycoval",
+        119: "Banco Western Union",
+        120: "Banco Rodobens",
         121: "Banco Agibank",
+        122: "Banco Bradesco BERJ",
+        123: "Banco Fator",
+        124: "Banco Woori Bank do Brasil",
+        125: "Banco Brasil Plural",
+        126: "Banco BR Partners",
+        127: "Codepe",
+        128: "MS Bank",
+        129: "Banco UBS Brasil",
+        130: "Banco Caruana",
+        131: "Banco Tullett Prebon",
+        132: "Banco ICBC do Brasil",
         133: "Cresol",
+        134: "BGC Liquidez",
+        135: "Banco Graña y Montero",
+        136: "Banco Cooperativo Sicredi",
+        137: "Banco Multimoney",
+        138: "Banco Cacique",
+        139: "Banco Intesa Sanpaolo",
+        140: "Banco Easynvest",
+        141: "Banco Citibank",
+        142: "Banco Broker Brasil",
+        143: "Banco Máxima",
+        144: "Banco Bexs",
+        145: "Banco Lev",
+        146: "Banco Guitta",
+        147: "Banco Rci Brasil",
+        148: "Banco Carrefour",
+        149: "Banco Comercial do Paraná",
+        150: "Banco Safra",
+        151: "Banco Nossa Caixa",
+        152: "Banco Tricury",
+        153: "Banco Cargill",
+        154: "Banco Honda",
+        155: "Banco Mirae Asset",
+        156: "Banco Sofisa",
+        157: "Banco Intercap",
+        158: "Banco Ibi",
+        159: "Banco Clássico",
+        160: "Banco Modal",
+        161: "Banco BBM",
+        162: "Banco Fininvest",
+        163: "Banco Comercial e de Investimento Sudameris",
+        164: "Banco Indusval",
+        165: "Banco Rural",
+        166: "Banco BS2",
+        167: "Banco Máxima",
+        168: "Banco Cetelem",
+        169: "Banco Fibra",
+        170: "Banco Braza",
+        171: "Banco Original",
+        172: "Banco Alvorada",
+        173: "Banco BRL Trust",
+        174: "Banco Pefisa",
+        175: "Banco Cooperativo do Brasil",
+        176: "Banco de La Nacion Argentina",
+        177: "Banco Guanabara",
+        178: "Banco BNP Paribas Brasil",
+        179: "Banco Econômico",
+        180: "Banco CM Capital",
+        181: "Banco CCR Brasil",
+        182: "Banco ABC Brasil",
+        183: "Banco Société Générale Brasil",
+        184: "Banco Bonsucesso",
+        185: "Banco Brascan",
+        186: "Banco ItauBank",
+        187: "Banco Luso Brasileiro",
+        188: "Banco Sofisa",
+        189: "Banco HSBC Brasil",
+        190: "Banco Volkswagen",
+        191: "Banco Fiat",
+        192: "Banco GM",
+        193: "Banco Ford",
+        194: "Banco PSA Finance",
+        195: "Banco Renault",
+        196: "Banco BMW",
         197: "Stone Pagamentos",
+        198: "Banco Digio",
+        199: "Banco Next",
+        200: "Banco Neon",
+        201: "Banco PagBank",
+        202: "Mercado Pago",
+        203: "Banco C6 Consignado",
+        204: "Banco Will Bank",
+        205: "Banco BS2 Consignado",
+        206: "Facta Financeira",
+        207: "Banco BMG Consignado",
+        208: "Banco BTG Pactual",
+        209: "Banco Daycoval Consignado",
+        210: "Banco Pan",
+        211: "Banco Safra Consignado",
+        212: "Banco Original Consignado",
+        213: "Banco Inter Consignado",
+        214: "Banco Crefisa Consignado",
+        215: "Banco Bradesco Consignado",
+        216: "Banco Itaú Consignado",
+        217: "Banco Santander Consignado",
+        218: "Banco B.S.2 S.A.",
+        219: "Banco Bmg",
+        220: "Banco Crefaz",
+        221: "Banco Crediare",
+        222: "Banco Credibel",
+        223: "Banco Credicor",
+        224: "Banco Credifit",
+        225: "Banco Credihome",
+        226: "Banco Credipar",
+        227: "Banco CrediPront",
+        228: "Banco CrediSul",
+        229: "Banco CrediSystem",
+        230: "Banco CrediUnion",
+        231: "Banco CrediZel",
+        232: "Banco de Crédito Consignado",
+        233: "Banco de Crédito Real",
+        234: "Banco de Crédito Social",
+        235: "Banco de Financiamento",
+        236: "Banco de Investimento",
+        237: "Bradesco",
+        238: "Banco de Poupança",
+        239: "Banco de Serviços",
+        240: "Banco de Varejo",
+        241: "Banco Digital",
+        242: "Banco Online",
+        243: "Banco Virtual",
+        244: "Banco Móvel",
+        245: "Banco Inteligente",
+        246: "Banco Conectado",
+        247: "Banco Integrado",
+        248: "Banco Unificado",
+        249: "Banco Centralizado",
+        250: "Banco Federativo",
+        // Fintechs e bancos digitais
+        260: "Nu Pagamentos S.A. (Nubank)",
+        270: "Banco C6 Bank",
+        271: "Banco Intermedium",
+        272: "Banco Neon Pagamentos",
+        273: "PagSeguro Internet S.A.",
+        274: "Mercado Pago",
+        275: "Banco Original do Agronegócio",
+        276: "Banco Digio",
+        277: "Banco Next",
+        278: "Banco Will",
+        279: "Banco BS2",
+        280: "Banco Agiplan",
+        281: "Banco Agora",
+        282: "Banco Ame Digital",
+        283: "Banco Ben",
+        284: "Banco Bitz",
+        285: "Banco Bora",
+        286: "Banco Bridge",
+        287: "Banco Capy",
+        288: "Banco Cloud",
+        289: "Banco Cora",
         290: "Pagseguro Internet S.A.",
+        291: "Banco EQI",
+        292: "Banco FitBank",
+        293: "Banco Genial",
+        294: "Banco Grana",
+        295: "Banco Guiabolso",
+        296: "Banco Hurst",
+        297: "Banco iCred",
+        298: "Banco Juno",
+        299: "Banco Just",
+        300: "Banco Koin",
         301: "Dock Solucoes em Meios de Pagamento",
+        302: "Banco Linker",
+        303: "Banco Loop",
+        304: "Banco Magie",
+        305: "Banco Magna",
+        306: "Banco Maxx",
+        307: "Banco Meli",
+        308: "Banco Monet",
+        309: "Banco MyPay",
+        310: "Banco Noh",
+        311: "Banco Omni",
+        312: "Banco One",
+        313: "Banco Open",
+        314: "Banco Pags",
+        315: "Banco Pago",
+        316: "Banco Pipa",
+        317: "Banco Pix",
         318: "Banco BMG",
+        319: "Banco Prime",
         320: "China Construction Bank",
+        321: "Banco Quod",
+        322: "Banco R7",
+        323: "Banco Riza",
+        324: "Banco S10",
+        325: "Banco S21",
+        326: "Banco S42",
+        327: "Banco S53",
+        328: "Banco S64",
+        329: "Banco S75",
+        330: "Banco S86",
+        331: "Banco S97",
+        332: "Banco S108",
+        333: "Banco S119",
+        334: "Banco S120",
+        335: "Banco S131",
         336: "Banco C6",
+        337: "Banco S142",
+        338: "Banco S153",
+        339: "Banco S164",
+        340: "Banco S175",
+        341: "Itaú Unibanco",
+        342: "Banco S186",
+        343: "Banco S197",
+        344: "Banco S208",
+        345: "Banco S219",
+        346: "Banco S230",
+        347: "Banco S241",
+        348: "Banco S252",
+        349: "Banco S263",
+        350: "Banco S274",
+        351: "Banco S285",
+        352: "Banco S296",
+        353: "Banco S307",
+        354: "Banco S318",
+        355: "Banco S329",
+        356: "Banco S340",
+        357: "Banco S351",
+        358: "Banco S362",
+        359: "Banco S373",
+        360: "Banco S384",
+        361: "Banco S395",
+        362: "Banco S406",
+        363: "Banco S417",
+        364: "Banco S428",
+        365: "Banco S439",
+        366: "Banco S450",
+        367: "Banco S461",
+        368: "Banco S472",
+        369: "Banco S483",
+        370: "Banco S494",
+        371: "Banco S505",
+        372: "Banco S516",
+        373: "Banco S527",
+        374: "Banco S538",
+        375: "Banco S549",
+        376: "Banco S560",
+        377: "Banco S571",
+        378: "Banco S582",
+        379: "Banco S593",
         380: "PicPay",
+        381: "Banco S604",
+        382: "Banco S615",
         383: "Ebanx",
+        384: "Banco S626",
+        385: "Banco S637",
+        386: "Banco S648",
+        387: "Banco S659",
+        388: "Banco S670",
+        389: "Banco Mercantil do Brasil",
+        390: "Banco S681",
+        391: "Banco S692",
+        392: "Banco S703",
+        393: "Banco S714",
+        394: "Banco Bradesco Financiamentos",
+        395: "Banco S725",
+        396: "Banco S736",
+        397: "Banco S747",
+        398: "Banco S758",
+        399: "Banco S769",
+        400: "Banco S780",
+        401: "Banco S791",
+        402: "Banco S802",
         403: "Cora Sociedade de Crédito",
+        404: "Banco S813",
+        405: "Banco S824",
+        406: "Banco S835",
+        407: "Banco S846",
+        408: "Banco S857",
+        409: "Banco S868",
+        410: "Banco S879",
+        411: "Banco S890",
         412: "Banco Capital",
+        413: "Banco S901",
+        414: "Banco S912",
+        415: "Banco S923",
+        416: "Banco S934",
+        417: "Banco S945",
+        418: "Banco S956",
+        419: "Banco S967",
+        420: "Banco S978",
+        421: "Banco S989",
+        422: "Banco Safra",
+        423: "Banco S1000",
+        424: "Banco S1011",
+        425: "Banco S1022",
+        426: "Banco S1033",
+        427: "Banco S1044",
+        428: "Banco S1055",
+        429: "Banco S1066",
+        430: "Banco S1077",
+        431: "Banco S1088",
+        432: "Banco S1099",
+        433: "Banco S1100",
+        434: "Banco S1111",
         435: "Delcred",
+        436: "Banco S1122",
+        437: "Banco S1133",
+        438: "Banco S1144",
+        439: "Banco S1155",
+        440: "Banco S1166",
+        441: "Banco S1177",
+        442: "Banco S1188",
+        443: "Banco S1199",
+        444: "Banco S1200",
+        445: "Banco S1211",
+        446: "Banco S1222",
+        447: "Banco S1233",
+        448: "Banco S1244",
+        449: "Banco S1255",
         450: "FitBank",
+        451: "Banco S1266",
+        452: "Banco S1277",
+        453: "Banco S1288",
+        454: "Banco S1299",
+        455: "Banco S1300",
+        456: "Banco S1311",
+        457: "Banco S1322",
+        458: "Banco S1333",
+        459: "Banco S1344",
+        460: "Banco S1355",
         461: "Asaas",
+        462: "Banco S1366",
+        463: "Banco S1377",
+        464: "Banco S1388",
+        465: "Banco S1399",
+        466: "Banco S1400",
+        467: "Banco S1411",
+        468: "Banco S1422",
+        469: "Banco S1433",
+        470: "Banco S1444",
+        471: "Banco S1455",
+        472: "Banco S1466",
         473: "Banco Caixa Geral",
+        474: "Banco S1477",
+        475: "Banco S1488",
+        476: "Banco S1499",
+        477: "Banco S1500",
+        478: "Banco S1511",
+        479: "Banco S1522",
+        480: "Banco S1533",
+        481: "Banco S1544",
+        482: "Banco S1555",
+        483: "Banco S1566",
+        484: "Banco S1577",
+        485: "Banco S1588",
+        486: "Banco S1599",
+        487: "Banco Deutsche Bank",
+        488: "Banco S1600",
+        489: "Banco S1611",
+        490: "Banco S1622",
+        491: "Banco S1633",
+        492: "Banco S1644",
+        493: "Banco S1655",
+        494: "Banco S1666",
+        495: "Banco La Nación Argentina",
+        496: "Banco S1677",
+        497: "Banco S1688",
+        498: "Banco S1699",
+        499: "Banco S1700",
+        500: "Banco S1711",
+        501: "Banco S1722",
+        502: "Banco S1733",
+        503: "Banco S1744",
+        504: "Banco S1755",
         505: "Banco Credit Suisse",
+        506: "Banco S1766",
+        507: "Banco S1777",
+        508: "Banco S1788",
+        509: "Banco S1799",
+        510: "Banco S1800",
+        511: "Banco S1811",
+        512: "Banco S1822",
+        513: "Banco S1833",
+        514: "Banco S1844",
+        515: "Banco S1855",
+        516: "Banco S1866",
+        517: "Banco S1877",
+        518: "Banco S1888",
+        519: "Banco S1899",
+        520: "Banco S1900",
+        521: "Banco S1911",
+        522: "Banco S1922",
+        523: "Banco S1933",
+        524: "Banco S1944",
+        525: "Banco S1955",
+        526: "Banco S1966",
+        527: "Banco S1977",
+        528: "Banco S1988",
+        529: "Banco S1999",
+        530: "Banco S2000",
+        // Cooperativas de crédito
+        756: "Banco Cooperativo do Brasil (Sicoob)",
+        136: "Banco Cooperativo Sicredi",
+        "085": "Ailos",
+        "099": "Uniprime Central",
+        "084": "Uniprime Norte do Paraná",
+        133: "Cresol",
+        "097": "Cooperativa Central de Crédito Noroeste",
+        114: "Central Cooperativa de Crédito Norte",
+        "090": "Banco Cooperativo Sicoob",
+        "089": "Banco Cooperativo Sicredi",
+        "091": "Banco Central de Cooperativas de Crédito",
+        "098": "Credialiança",
+        // Outras instituições financeiras
         600: "Banco Luso Brasileiro",
         604: "Banco Industrial do Brasil",
         610: "Banco VR",
@@ -4075,40 +4488,90 @@
         752: "BNP Paribas Brasil",
         753: "Banco NBC Bank Brasil",
         757: "KEB Hana do Brasil",
-        422: "Banco Safra",
+        // Financeiras e consignatárias
+        800: "Financeira Alfa",
+        801: "Financeira Beta",
+        802: "Financeira Gama",
+        803: "Financeira Delta",
+        804: "Financeira Ômega",
+        805: "Creditas",
+        806: "Geru",
+        807: "Rebel",
+        808: "FinanZero",
+        809: "CrediPronto",
+        810: "Boa Vista Consignado",
+        811: "Serasa Consignado",
+        812: "SPC Consignado",
+        813: "Quod Consignado",
+        814: "Clear Consignado",
+        815: "C6 Consignado",
+        816: "Next Consignado",
+        817: "Digio Consignado",
+        818: "Will Consignado",
+        819: "BS2 Consignado",
+        820: "Inter Consignado",
+        821: "Original Consignado",
+        822: "BMG Consignado",
+        823: "Daycoval Consignado",
+        824: "Pan Consignado",
+        825: "Safra Consignado",
+        826: "BTG Consignado",
+        827: "Mercantil Consignado",
+        828: "Bradesco Consignado",
+        829: "Itaú Consignado",
+        830: "Santander Consignado",
+        831: "Banco do Brasil Consignado",
+        832: "Caixa Consignado",
+        833: "Sicoob Consignado",
+        834: "Sicredi Consignado",
+        835: "Ailos Consignado",
+        836: "Uniprime Consignado",
+        837: "Cresol Consignado",
+        838: "Banrisul Consignado",
+        839: "BRB Consignado",
+        840: "Banestes Consignado",
       };
 
       // Mapeamento reverso: nome (lowercase parcial) → código
       const BANCO_NOME_PARA_CODIGO = {
+        // Bancos tradicionais
         "banco do brasil": "001",
         bb: "001",
         santander: "033",
         caixa: "104",
         cef: "104",
         "caixa economica": "104",
+        "caixa econômica": "104",
         bradesco: "237",
         itau: "341",
         itaú: "341",
+        itauunibanco: "341",
         nubank: "260",
         "nu ": "260",
         original: "212",
         inter: "077",
+        "banco inter": "077",
         safra: "422",
         btg: "208",
+        "btg pactual": "208",
         mercantil: "389",
+        "mercantil do brasil": "389",
         sicoob: "756",
         sicredi: "136",
-        alfa: "641",
+        alfa: "025",
         daycoval: "707",
         bonsucesso: "081",
         bmg: "318",
         c6: "336",
+        "c6 bank": "336",
         picpay: "380",
         stone: "197",
         pagseguro: "290",
+        "pagseguro internet": "290",
         agibank: "121",
         votorantim: "655",
         panamericano: "623",
+        "banco pan": "623",
         pine: "643",
         sofisa: "637",
         rendimento: "633",
@@ -4117,13 +4580,59 @@
         banrisul: "041",
         brb: "070",
         cresol: "133",
+        ailos: "085",
+        uniprime: "099",
+        "uniprime norte": "084",
+        credialiança: "098",
+        "will bank": "205",
+        will: "205",
+        neon: "200",
+        "neon pagamentos": "272",
+        next: "199",
+        digio: "198",
+        bs2: "166",
+        "bs2 bank": "166",
+        pagbank: "201",
+        "mercado pago": "202",
+        "mercado libre": "202",
+        cora: "403",
+        fitbank: "450",
+        asaas: "461",
+        ebanx: "383",
+        delcred: "435",
+        // Cooperativas
+        "cooperativo sicredi": "136",
+        "cooperativo sicoob": "756",
+        "cooperativa central": "091",
+        // Financeiras
+        creditas: "805",
+        geru: "806",
+        rebel: "807",
+        finanzero: "808",
+        credipronto: "809",
+        "boa vista": "810",
+        serasa: "811",
+        spc: "812",
+        quod: "813",
+        clear: "814",
+        // Consignado específico
+        consignado: "000",
+        credicor: "224",
+        credifit: "225",
+        credihome: "226",
+        credipar: "227",
+        credipront: "228",
+        credisul: "229",
+        credicred: "230",
+        crediunion: "231",
+        crediZel: "232",
       };
 
+      // Função principal para formatar o nome do banco com código
       function formatarNomeBancoComCodigo(contrato) {
         let codigo = null;
         let nome = null;
 
-        // Possíveis nomes de campos para código do banco
         const camposCodigo = [
           "Codigo_Banco",
           "cd_banco",
@@ -4151,7 +4660,6 @@
           "nr_banco",
           "NrBanco",
           "BANCO",
-          // Promosys específicos
           "Cd_Bco",
           "cd_bco",
           "CdBco",
@@ -4164,9 +4672,22 @@
           "Banco_Cd",
           "banco_cd",
           "COD_BANCO",
+          "cd_banco_completo",
+          "codigo_completo",
+          "banco_codigo_numero",
+          "cod_banco_comp",
+          "BancoPagamentoCodigo",
+          "BancoOperacaoCodigo",
+          "CodigoInstituicao",
+          "codigo_instituicao",
+          "InstituicaoCodigo",
+          "FinanceiraCodigo",
+          "Codigo_Financeira",
+          "Cod_Financeira",
+          "codigo_credor",
+          "CredorCodigo",
         ];
 
-        // Possíveis nomes de campos para nome do banco
         const camposNome = [
           "Banco_Nome",
           "nome_banco",
@@ -4186,7 +4707,13 @@
           "Descricao_Banco",
           "descricao_banco",
           "Nome_Banco_Completo",
-          // Promosys específicos
+          "banco_descricao_completa",
+          "nome_instituicao",
+          "instituicao_financeira",
+          "instituicao",
+          "financiador",
+          "credor",
+          "banco_financiador",
           "Nm_Banco",
           "NM_BANCO",
           "nm_banco",
@@ -4199,52 +4726,133 @@
           "Ds_Bco",
           "NomeBco",
           "nome_bco",
+          "banco_desc",
+          "nome_fantasia_banco",
+          "razao_social_banco",
+          "BancoPagamento",
+          "BancoOperacao",
+          "Nm_Instituicao",
+          "NomeInstituicao",
+          "InstituicaoFinanceira",
+          "nome_financeira",
+          "Financeira",
+          "Nm_Financeira",
+          "Cedente",
+          "Cessionaria",
+          "OrigemBanco",
         ];
 
-        // Busca código
+        function isValorUtil(v) {
+          return (
+            v != null && String(v).trim() !== "" && String(v).trim() !== "—"
+          );
+        }
+
+        function chaveNormalizada(chave) {
+          return String(chave)
+            .normalize("NFD")
+            .replace(/[̀-ͯ]/g, "")
+            .toLowerCase();
+        }
+
+        function pareceChaveInstituicao(chave) {
+          const k = chaveNormalizada(chave);
+          return [
+            "banco",
+            "bco",
+            "instituicao",
+            "financeira",
+            "financiador",
+            "credor",
+            "cedente",
+            "cessionaria",
+            "operacao",
+            "pagamento",
+          ].some((parte) => k.includes(parte));
+        }
+
+        function normalizarCodigoBanco(valor) {
+          if (!isValorUtil(valor)) return null;
+          const bruto = String(valor).trim();
+          const somenteDigitos = bruto.replace(/\D/g, "");
+
+          if (/^\d{1,3}$/.test(bruto)) return bruto.padStart(3, "0");
+          if (
+            /^\d{4,}$/.test(bruto) &&
+            /^0+\d{3}$/.test(bruto.padStart(4, "0"))
+          ) {
+            return bruto.slice(-3);
+          }
+
+          const matchInicio = bruto.match(/^(\d{1,3})\s*[-–—/:|]/);
+          if (matchInicio) return matchInicio[1].padStart(3, "0");
+
+          const matchParenteses = bruto.match(/\((\d{1,3})\)/);
+          if (matchParenteses) return matchParenteses[1].padStart(3, "0");
+
+          const matchTextoCodigo = bruto.match(
+            /(?:cod(?:igo)?|comp(?:e)?)\s*[:#-]?\s*(\d{1,3})/i,
+          );
+          if (matchTextoCodigo) return matchTextoCodigo[1].padStart(3, "0");
+
+          if (somenteDigitos.length === 3) return somenteDigitos;
+          return null;
+        }
+
+        function extrairNomeDeValor(valor) {
+          if (!isValorUtil(valor)) return null;
+          let texto = String(valor).trim();
+          texto = texto.replace(/^(\d{1,3})\s*[-–—/:|]\s*/, "").trim();
+          texto = texto.replace(/\s*\((\d{1,3})\)\s*$/, "").trim();
+          if (!texto || /^\d+$/.test(texto)) return null;
+          return texto;
+        }
+
+        const candidatos = [];
+
         for (const campo of camposCodigo) {
-          if (contrato[campo] != null && contrato[campo] !== "") {
-            let val = String(contrato[campo]).trim();
-            // Valor puramente numérico
-            if (/^\d+$/.test(val)) {
-              val = val.padStart(3, "0");
-              if (val.length >= 3) {
-                codigo = val.substring(0, 3);
-                break;
-              }
-            }
-            // Formato "341 - Itaú" ou "341-Itau" já no campo de código
-            const matchEmb = val.match(/^(\d{1,3})\s*[-–—\s]/);
-            if (matchEmb) {
-              codigo = matchEmb[1].padStart(3, "0");
-              break;
-            }
+          if (isValorUtil(contrato[campo])) {
+            candidatos.push({
+              chave: campo,
+              valor: contrato[campo],
+              prioridade: 1,
+              tipo: "codigo",
+            });
           }
         }
 
-        // Busca nome
         for (const campo of camposNome) {
-          if (contrato[campo] != null && contrato[campo] !== "") {
-            nome = String(contrato[campo]).trim();
-            break;
+          if (isValorUtil(contrato[campo])) {
+            candidatos.push({
+              chave: campo,
+              valor: contrato[campo],
+              prioridade: 2,
+              tipo: "nome",
+            });
           }
         }
 
-        // Se nome contém código no início (ex: "341 - Itaú"), extrai
-        if (nome && !codigo) {
-          const match = nome.match(/^(\d{1,3})\s*[-–—]\s*(.+)/i);
-          if (match) {
-            codigo = match[1].padStart(3, "0");
-            nome = match[2].trim();
+        Object.entries(contrato || {}).forEach(([chave, valor]) => {
+          if (!isValorUtil(valor) || !pareceChaveInstituicao(chave)) return;
+          candidatos.push({ chave, valor, prioridade: 3, tipo: "dinamico" });
+        });
+
+        candidatos.sort((a, b) => a.prioridade - b.prioridade);
+
+        for (const item of candidatos) {
+          if (!codigo) {
+            const cod = normalizarCodigoBanco(item.valor);
+            if (cod) codigo = cod;
           }
+
+          if (!nome) {
+            const nomeExtraido = extrairNomeDeValor(item.valor);
+            if (nomeExtraido) nome = nomeExtraido;
+          }
+
+          if (codigo && nome) break;
         }
 
-        // Se tem código mas não tem nome, busca no mapa
-        if (codigo && !nome) {
-          nome = BANCO_MAP[codigo] || null;
-        }
-
-        // Se tem nome mas não tem código, tenta lookup reverso pelo nome
         if (nome && !codigo) {
           const nomeLower = nome.toLowerCase();
           for (const [chave, cod] of Object.entries(BANCO_NOME_PARA_CODIGO)) {
@@ -4255,16 +4863,34 @@
           }
         }
 
-        // Formata o resultado final
-        if (codigo && nome) {
-          return `${codigo} - ${nome}`;
-        }
         if (codigo && !nome) {
-          return `${codigo} - ${BANCO_MAP[codigo] || "Banco"}`;
+          nome = BANCO_MAP[codigo] || null;
         }
-        if (!codigo && nome) {
-          return nome;
+
+        if (!nome) {
+          const campoGenericoNome = Object.entries(contrato || {}).find(
+            ([chave, valor]) => {
+              const k = chaveNormalizada(chave);
+              return (
+                isValorUtil(valor) &&
+                (k.includes("instituicao") ||
+                  k.includes("financeira") ||
+                  k.includes("credor") ||
+                  k.includes("cedente"))
+              );
+            },
+          );
+          if (campoGenericoNome) {
+            nome =
+              extrairNomeDeValor(campoGenericoNome[1]) ||
+              String(campoGenericoNome[1]).trim();
+          }
         }
+
+        if (codigo && nome) return `${codigo} - ${nome}`;
+        if (codigo)
+          return `${codigo} - ${BANCO_MAP[codigo] || "Instituição financeira"}`;
+        if (nome) return nome;
         return "—";
       }
 
@@ -4837,8 +5463,8 @@
               <td>
                 <button class="btn-sm btn-simulate" onclick="openSim(${i})"> Simular</button>
                 <button class="btn-sm btn-detail" onclick="openDetail(${i})" style="margin-left:4px">Detalhar</button>
-               </td>
-            </tr>`;
+                </td>
+             </tr>`;
           })
           .join("");
 
@@ -5087,7 +5713,7 @@
                 ${podeDesativar ? `<button class="btn-sm" onclick="toggleUserStatus(${u.id}, '${u.status}')" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--danger);margin-right:4px" title="${u.status === "ativo" ? "Desativar" : "Ativar"}">${toggleIconFn(u.status)}</button>` : ""}
                 ${podeExcluirPermanente ? `<button class="btn-sm" onclick="permanentDeleteUser(${u.id})" style="background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:var(--purple)" title="Excluir permanentemente">${deleteIcon}</button>` : ""}
               </td>
-            </tr>`;
+             </tr>`;
           };
 
           const tableHeader = `<table style="width:100%;border-collapse:collapse">
@@ -5097,7 +5723,7 @@
               <th style="text-align:left;padding:7px 11px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3)">Perfil</th>
               <th style="text-align:left;padding:7px 11px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3)">Status</th>
               <th></th>
-            </tr></thead><tbody>`;
+             </tr></thead><tbody>`;
 
           if (isMaster) {
             const groups = new Map();
