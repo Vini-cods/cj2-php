@@ -2121,12 +2121,37 @@
                     <line x1="8" y1="2" x2="8" y2="6" />
                     <line x1="3" y1="10" x2="21" y2="10" />
                   </svg>
-                  DDB / DIB
+                  DDB (Despacho)
                 </div>
                 <div
                   class="value"
                   id="c-ddb-main"
                   style="font-weight: 600; color: var(--blue-4)"
+                >
+                  —
+                </div>
+              </div>
+              <div class="client-field">
+                <div class="label">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                  DIB (Início Benefício)
+                </div>
+                <div
+                  class="value"
+                  id="c-dib-main"
+                  style="font-weight: 600; color: var(--cyan)"
                 >
                   —
                 </div>
@@ -2385,8 +2410,12 @@
               <div class="value" id="c-numero-conta">—</div>
             </div>
             <div class="client-field">
-              <div class="label">DDB / DIB</div>
+              <div class="label">DDB (Despacho)</div>
               <div class="value" id="c-ddb">—</div>
+            </div>
+            <div class="client-field">
+              <div class="label">DIB (Início Benefício)</div>
+              <div class="value" id="c-dib">—</div>
             </div>
             <div class="client-field">
               <div class="label">Situação</div>
@@ -3946,6 +3975,7 @@
           }),
         });
         const data = await res.json();
+        console.log("✅ Resposta completa da Promosys:", data);
         if (data.Code !== "000")
           throw new Error(data.Msg || "Erro na consulta do benefício");
         document
@@ -3988,6 +4018,15 @@
           if (obj[k] != null && obj[k] !== "") return obj[k];
         }
         return "—";
+      }
+
+      function pickPromosysValue(obj, ...keys) {
+        if (!obj || typeof obj !== "object") return null;
+        for (const k of keys) {
+          if (obj[k] !== undefined && obj[k] !== null && obj[k] !== "")
+            return obj[k];
+        }
+        return null;
       }
 
       // ============================================================
@@ -4968,9 +5007,129 @@
         const esp =
           c.ESP || g(c, "EspecieBeneficio", "especie", "Especie") || "—";
 
-        // Valor do benefício — busca em todos os campos possíveis da API Promosys
+        // Normalizadores genéricos para valores e busca profunda em objetos
+        function parseNumeroFlex(v) {
+          if (v === undefined || v === null || v === "") return null;
+          if (typeof v === "number") return isFinite(v) ? v : null;
+          const s0 = String(v).trim();
+          if (!s0) return null;
+          const s = s0.replace(/R\$\s*/gi, "").replace(/\s+/g, "");
+          if (/^-?\d{1,3}(\.\d{3})*,\d+$/.test(s)) {
+            const n = Number(s.replace(/\./g, "").replace(/,/g, "."));
+            return isFinite(n) ? n : null;
+          }
+          if (/^-?\d+,\d+$/.test(s)) {
+            const n = Number(s.replace(/,/g, "."));
+            return isFinite(n) ? n : null;
+          }
+          if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) {
+            const n = Number(s.replace(/\./g, ""));
+            return isFinite(n) ? n : null;
+          }
+          const limpo = s.replace(/[^\d,.-]/g, "");
+          const hasDot = limpo.includes(".");
+          const hasComma = limpo.includes(",");
+          let normalizado = limpo;
+          if (hasDot && hasComma) {
+            normalizado = limpo.replace(/\./g, "").replace(/,/g, ".");
+          } else if (hasComma) {
+            normalizado = limpo.replace(/,/g, ".");
+          }
+          const n = Number(normalizado);
+          return isFinite(n) ? n : null;
+        }
+
+        function coletarValoresPorChaves(
+          obj,
+          regexes,
+          acc = [],
+          visitados = new WeakSet(),
+        ) {
+          if (!obj || typeof obj !== "object") return acc;
+          if (visitados.has(obj)) return acc;
+          visitados.add(obj);
+
+          if (Array.isArray(obj)) {
+            for (const item of obj)
+              coletarValoresPorChaves(item, regexes, acc, visitados);
+            return acc;
+          }
+
+          for (const [k, v] of Object.entries(obj)) {
+            if (regexes.some((rx) => rx.test(k))) acc.push(v);
+            if (v && typeof v === "object")
+              coletarValoresPorChaves(v, regexes, acc, visitados);
+          }
+          return acc;
+        }
+
+        // Valor do benefício real — tenta líquido/real primeiro, depois bruto/salário
+        // Inclui também campos diretos da raiz da resposta Promosys
         let valorBeneficio = null;
-        const _vbCandidatos = [
+        const _vbPrioritario = [
+          // Campos diretos do objeto raiz (Promosys retorna alguns aqui)
+          data.ValorBeneficioReal,
+          data.valor_beneficio_real,
+          data.ValorReal,
+          data.valor_real,
+          data.salario,
+          data.Salario,
+          data.SALARIO,
+          // Campos no objeto ben (BENEFICIO)
+          ben.ValorBeneficioReal,
+          ben.valorBeneficioReal,
+          ben.valor_beneficio_real,
+          ben.VALOR_BENEFICIO_REAL,
+          ben.ValorReal,
+          ben.valor_real,
+          ben.VL_REAL,
+          ben.VlReal,
+          ben.vlReal,
+          ben.ValorLiquido,
+          ben.valor_liquido,
+          ben.VL_LIQUIDO,
+          ben.Vl_Liquido,
+          ben.vl_liquido,
+          ben.VlLiquido,
+          ben.vlLiquido,
+          ben.ValorBeneficioLiquido,
+          ben.valor_beneficio_liquido,
+          ben.Vl_BeneficioLiquido,
+          ben.VlBeneficioLiquido,
+          ben.vlBeneficioLiquido,
+          // Campos no objeto c (Consulta)
+          c.ValorBeneficioReal,
+          c.valorBeneficioReal,
+          c.valor_beneficio_real,
+          c.VALOR_BENEFICIO_REAL,
+          c.ValorReal,
+          c.valorReal,
+          c.valor_real,
+          c.VL_REAL,
+          c.VlReal,
+          c.vlrReal,
+          c.VL_LIQUIDO,
+          c.Valor_Liquido,
+          c.valor_liquido,
+          c.valor_liquido_real,
+          c.salarioLiquido,
+          c.rendaReal,
+          c.SALARIO,
+          c.Salario,
+          c.salario,
+          // Campos Promosys: valormr = valor do benefício (Maior Remuneração), vlbasecalc = base de cálculo
+          ben.valormr,
+          ben.ValorMR,
+          ben.VALORMR,
+          ben.vlbasecalc,
+          ben.VlBaseCalc,
+          ben.VLBASECALC,
+          ben.vl_base_calc,
+          // Campo MR no objeto raiz da Consulta (ex: c.MR = "1621")
+          c.MR,
+          c.mr,
+        ];
+        const _vbSecundario = [
           ben.valor_beneficio,
           ben.ValorBeneficio,
           ben.Vl_Beneficio,
@@ -4984,7 +5143,8 @@
           ben.vlBeneficio,
           ben.VALOR_BENEFICIO,
           ben.VL_BENEFICIO,
-          // Promosys — salário/valor líquido
+          ben.salarioLiquido,
+          ben.rendaReal,
           ben.Salario,
           ben.SALARIO,
           ben.salario,
@@ -4992,46 +5152,45 @@
           ben.salario_beneficio,
           ben.VlSalario,
           ben.vl_salario,
-          // Campos de valor líquido / real (Promosys)
-          ben.ValorLiquido,
-          ben.valor_liquido,
-          ben.Vl_Liquido,
-          ben.vl_liquido,
-          ben.VlLiquido,
-          ben.vlLiquido,
-          ben.VL_LIQUIDO,
-          ben.ValorBeneficioLiquido,
-          ben.valor_beneficio_liquido,
-          ben.Vl_BeneficioLiquido,
-          ben.VlBeneficioLiquido,
-          ben.vlBeneficioLiquido,
-          ben.ValorReal,
-          ben.valor_real,
-          ben.VlReal,
-          ben.vlReal,
-          ben.VL_REAL,
-          // Campos na raiz da consulta
           c.VALOR_BENEFICIO,
           c.valor_beneficio,
+          c.valorBeneficio,
           c.VL_BENEFICIO,
           c.Vl_Beneficio,
           c.ValorBeneficio,
           c.VLBENEFICIO,
-          c.VL_LIQUIDO,
-          c.Valor_Liquido,
           c.SALARIO,
           c.Salario,
           c.salario,
         ];
-        for (const v of _vbCandidatos) {
-          if (
-            v !== undefined &&
-            v !== null &&
-            v !== "" &&
-            !isNaN(parseFloat(v))
-          ) {
-            valorBeneficio = parseFloat(v);
-            if (valorBeneficio > 0) break;
+        const _vbDeepPrioritario = coletarValoresPorChaves({ data, c, ben }, [
+          /beneficio.*real/i,
+          /valor.*real/i,
+          /vl.*real/i,
+          /beneficio.*liquido/i,
+          /valor.*liquido/i,
+          /vl.*liquido/i,
+        ]);
+        const _vbDeepSecundario = coletarValoresPorChaves({ data, c, ben }, [
+          /valor.*beneficio/i,
+          /beneficio.*valor/i,
+          /vl.*beneficio/i,
+          /salario/i,
+          /valor.*bruto/i,
+          /valormr/i,
+          /vlbasecalc/i,
+          /vl.*base/i,
+        ]);
+        for (const v of [
+          ..._vbPrioritario,
+          ..._vbDeepPrioritario,
+          ..._vbSecundario,
+          ..._vbDeepSecundario,
+        ]) {
+          const n = parseNumeroFlex(v);
+          if (n !== null && n > 0) {
+            valorBeneficio = n;
+            break;
           }
         }
 
@@ -5149,47 +5308,120 @@
         const agenc = db.AGENCIA_COMPLETO || db.AGENCIA || null;
         const conta = db.CONTA_PAGTO || db.CONTA || null;
 
-        // DDB — cobre todos os nomes possíveis retornados pela Promosys
-        const _ddbRaw =
-          db.DIB_FORMATADO ||
-          db.DDB ||
-          db.ddb ||
-          db.DIB ||
-          db.dib ||
-          db.Dib ||
-          db.DataInicioDesconto ||
-          db.data_inicio_desconto ||
-          db.DT_DIB ||
-          db.dt_dib ||
-          db.DT_DDB ||
-          db.dt_ddb ||
-          db.DT_INICIO_BENEFICIO ||
-          db.Dt_Inicio_Beneficio ||
-          c.DIB_FORMATADO ||
-          c.DDB ||
-          c.ddb ||
-          c.DIB ||
-          c.dib ||
-          c.DT_DIB ||
-          c.dt_dib ||
-          c.DT_DDB ||
-          c.dt_ddb ||
-          c.DataInicioDesconto ||
-          c.DataDespacho ||
-          c.DT_DESPACHO ||
-          ben.dib ||
-          ben.DIB ||
-          ben.ddb ||
-          ben.DDB ||
-          ben.DataInicioDesconto ||
-          ben.data_inicio_desconto ||
-          ben.DT_DIB ||
-          ben.DataDespacho ||
-          ben.DT_DESPACHO ||
-          ben.dt_despacho ||
+        // ── DDB (Data de Despacho do Benefício) ─────────────────────────
+        const _ddbDeepDDB = coletarValoresPorChaves({ c, ben, db }, [
+          /^ddb$/i,
+          /data.*despacho/i,
+          /dt.*despacho/i,
+          /despacho/i,
+          /dt.*ddb/i,
+          /data.*ddb/i,
+        ]);
+        const _ddbRawDDB =
+          pickPromosysValue(
+            db,
+            "DDB",
+            "ddb",
+            "DT_DDB",
+            "dt_ddb",
+            "DataDespacho",
+            "DT_DESPACHO",
+            "Dt_Despacho",
+            "dt_despacho",
+            "dataDespacho",
+          ) ||
+          pickPromosysValue(
+            c,
+            "DDB",
+            "ddb",
+            "DT_DDB",
+            "dt_ddb",
+            "DataDespacho",
+            "DT_DESPACHO",
+            "Dt_Despacho",
+            "dt_despacho",
+            "dataDespacho",
+          ) ||
+          pickPromosysValue(
+            ben,
+            "ddb",
+            "DDB",
+            "DT_DDB",
+            "dt_ddb",
+            "DataDespacho",
+            "DT_DESPACHO",
+            "dt_despacho",
+            "dataDespacho",
+          ) ||
+          _ddbDeepDDB.find((v) => v !== undefined && v !== null && v !== "") ||
           null;
 
-        // Converte DDB para formato legível se vier em YYYYMM ou YYYYMMDD
+        // ── DIB (Data de Início do Benefício) ───────────────────────────
+        const _ddbDeepDIB = coletarValoresPorChaves({ c, ben, db }, [
+          /^dib$/i,
+          /data.*dib/i,
+          /dt.*dib/i,
+          /inicio.*beneficio/i,
+          /inicio.*desconto/i,
+          /data.*inicio/i,
+        ]);
+        const _ddbRawDIB =
+          pickPromosysValue(
+            db,
+            "DIB_FORMATADO",
+            "DIB",
+            "dib",
+            "Dib",
+            "DT_DIB",
+            "dt_dib",
+            "DataInicioDesconto",
+            "data_inicio_desconto",
+            "DT_INICIO_BENEFICIO",
+            "Dt_Inicio_Beneficio",
+            "diaDesconto",
+            "diaDescontoBeneficio",
+            "dd",
+            "dataDesconto",
+            "dataInicio",
+            "dtInicio",
+            "dataInicioBeneficio",
+          ) ||
+          pickPromosysValue(
+            c,
+            "DIB_FORMATADO",
+            "DIB",
+            "dib",
+            "DT_DIB",
+            "dt_dib",
+            "DataInicioDesconto",
+            "diaDesconto",
+            "diaDescontoBeneficio",
+            "dd",
+            "dataDesconto",
+            "dataInicio",
+            "dtInicio",
+            "dataInicioBeneficio",
+          ) ||
+          pickPromosysValue(
+            ben,
+            "dib",
+            "DIB",
+            "DIB_FORMATADO",
+            "DataInicioDesconto",
+            "data_inicio_desconto",
+            "DT_DIB",
+            "diaDesconto",
+            "diaDescontoBeneficio",
+            "dd",
+            "dataDesconto",
+            "dataInicio",
+            "dtInicio",
+            "dataInicioBeneficio",
+          ) ||
+          _ddbDeepDIB.find((v) => v !== undefined && v !== null && v !== "") ||
+          null;
+
+        // Converte DDB/DIB para formato legível se vier em YYYYMM ou YYYYMMDD
         function formatarDDB(raw) {
           if (!raw) return null;
           const s = String(raw).trim();
@@ -5212,11 +5444,12 @@
           }
           return s;
         }
-        const ddb = formatarDDB(_ddbRaw);
+        const ddb = formatarDDB(_ddbRawDDB);
+        const dib = formatarDDB(_ddbRawDIB);
         const sitBanco = ben.situacao || null;
 
         const secBancario = document.getElementById("section-bancario");
-        if (banco || meio || agenc || conta || ddb) {
+        if (banco || meio || agenc || conta || ddb || dib) {
           if (secBancario) secBancario.style.display = "";
           const setBanco = (id, val) => {
             const el = document.getElementById(id);
@@ -5227,7 +5460,9 @@
           setBanco("c-agencia", agenc);
           setBanco("c-numero-conta", conta);
           setBanco("c-ddb", ddb);
+          setBanco("c-dib", dib);
           setBanco("c-ddb-main", ddb);
+          setBanco("c-dib-main", dib);
           const sitBancoEl = document.getElementById("c-situacao-banco");
           if (sitBancoEl) {
             sitBancoEl.textContent = sitBanco || "—";
@@ -5238,9 +5473,11 @@
           }
         } else {
           if (secBancario) secBancario.style.display = "none";
-          // Mesmo sem dados bancários, preenche DDB no card principal
+          // Mesmo sem dados bancários, preenche DDB/DIB no card principal
           const ddbMainEl = document.getElementById("c-ddb-main");
           if (ddbMainEl) ddbMainEl.textContent = ddb || "—";
+          const dibMainEl = document.getElementById("c-dib-main");
+          if (dibMainEl) dibMainEl.textContent = dib || "—";
         }
 
         const badge = document.getElementById("c-status-badge");
