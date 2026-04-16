@@ -1999,23 +1999,7 @@
                 </div>
                 <div class="value" id="c-mae">—</div>
               </div>
-              <div class="client-field">
-                <div class="label">
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
-                  Nome do Pai
-                </div>
-                <div class="value" id="c-pai">—</div>
-              </div>
+
               <div class="client-field">
                 <div class="label">
                   <svg
@@ -5145,8 +5129,21 @@
           nascComIdade = `${nasc} (${idade} anos)`;
         }
 
-        const mae = g(c, "NomeMae", "nomeMae", "Mae", "mae") || "—";
-        const pai = g(c, "NomePai", "nomePai", "Pai", "pai") || "—";
+        const mae =
+          g(
+            c,
+            "NomeMae",
+            "nomeMae",
+            "Mae",
+            "mae",
+            "NOME_MAE",
+            "NM_MAE",
+            "NomeDaMae",
+            "nome_mae",
+            "nm_mae",
+            "NOMEMAE",
+            "NomeMae2",
+          ) || "—";
         const sit =
           ben.situacao ||
           g(c, "SituacaoBeneficio", "situacao", "Situacao") ||
@@ -5359,7 +5356,6 @@
         document.getElementById("c-beneficio").textContent = nb;
         document.getElementById("c-nascimento").textContent = nascComIdade;
         document.getElementById("c-mae").textContent = mae;
-        document.getElementById("c-pai").textContent = pai;
         document.getElementById("c-situacao").textContent = sit;
         document.getElementById("c-especie").textContent = esp;
         document.getElementById("c-margem").textContent =
@@ -5450,7 +5446,55 @@
         if (repEl) colorSimNao(repEl, rep);
 
         const db = c.DADOS_BANCARIOS || {};
-        const banco = db.NOME_BANCO_PAGTO || db.NOME_BANCO || null;
+        const banco = (() => {
+          const nome = db.NOME_BANCO_PAGTO || db.NOME_BANCO || null;
+          // tenta código em campo separado
+          const _dbCodCampos = [
+            "BANCO_PAGTO",
+            "BANCO",
+            "CD_BANCO",
+            "COD_BANCO",
+            "NR_BANCO",
+            "NUM_BANCO",
+            "cd_banco",
+            "cod_banco",
+            "nr_banco",
+            "num_banco",
+            "CdBanco",
+            "CodBanco",
+            "CodigoBanco",
+          ];
+          let cod = null;
+          for (const k of _dbCodCampos) {
+            const v = db[k];
+            if (
+              v !== undefined &&
+              v !== null &&
+              String(v).trim() !== "" &&
+              /^\d+$/.test(String(v).trim())
+            ) {
+              cod = String(v).trim().padStart(3, "0");
+              break;
+            }
+          }
+          // se não achou código, busca pelo nome no mapa reverso
+          if (!cod && nome) {
+            const nl = nome.toLowerCase();
+            for (const [chave, codMapa] of Object.entries(
+              BANCO_NOME_PARA_CODIGO,
+            )) {
+              if (nl.includes(chave)) {
+                cod = codMapa;
+                break;
+              }
+            }
+          }
+          if (cod && nome) return `${cod} - ${nome}`;
+          if (cod)
+            return `${cod} - ${BANCO_MAP[cod] || "Instituição financeira"}`;
+          if (nome) return nome;
+          return null;
+        })();
         const meio = db.NOME_TIPO_PAGTO || null;
         const agenc = db.AGENCIA_COMPLETO || db.AGENCIA || null;
         const conta = db.CONTA_PAGTO || db.CONTA || null;
