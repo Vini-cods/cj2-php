@@ -4,11 +4,50 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title id="page-title">CJ2Tech Sistema de Consulta</title>
+    <!-- Favicon para tema ESCURO (logo com fundo preto - o atual) -->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="favicon-32x32.png"
+      media="(prefers-color-scheme: dark)"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="favicon-16x16.png"
+      media="(prefers-color-scheme: dark)"
+    />
+    <link
+      rel="shortcut icon"
+      href="favicon.ico"
+      media="(prefers-color-scheme: dark)"
+    />
+
+    <!-- Favicon para tema CLARO (logo com fundo branco/transparente) -->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="favicon-32x32-light.png"
+      media="(prefers-color-scheme: light)"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="favicon-16x16-light.png"
+      media="(prefers-color-scheme: light)"
+    />
+    <link
+      rel="shortcut icon"
+      href="favicon-light.ico"
+      media="(prefers-color-scheme: light)"
+    />
+
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
     <link rel="manifest" href="site.webmanifest" />
-    <link rel="shortcut icon" href="favicon.ico" />
     <link
       href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
@@ -3566,11 +3605,42 @@
       let _logoTempDark = null,
         _logoTempLight = null;
 
+      // Comprime imagem para base64 antes de enviar ao banco
+      async function comprimirImagem(
+        dataUrl,
+        maxW = 800,
+        maxH = 400,
+        quality = 0.78,
+      ) {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            let w = img.width,
+              h = img.height;
+            if (w > maxW) {
+              h = Math.round((h * maxW) / w);
+              w = maxW;
+            }
+            if (h > maxH) {
+              w = Math.round((w * maxH) / h);
+              h = maxH;
+            }
+            const c = document.createElement("canvas");
+            c.width = w;
+            c.height = h;
+            c.getContext("2d").drawImage(img, 0, 0, w, h);
+            resolve(c.toDataURL("image/png"));
+          };
+          img.onerror = () => resolve(dataUrl); // fallback sem compressão
+          img.src = dataUrl;
+        });
+      }
+
       function previewLogo(input, mode) {
         if (!input.files || !input.files[0]) return;
         const reader = new FileReader();
-        reader.onload = (e) => {
-          const dataUrl = e.target.result;
+        reader.onload = async (e) => {
+          const dataUrl = await comprimirImagem(e.target.result);
           if (mode === "dark") {
             _logoTempDark = dataUrl;
             document.getElementById("preview-logo-dark").innerHTML =
@@ -3615,6 +3685,12 @@
               headers: authHeaders(),
               body: JSON.stringify(body),
             });
+            const ct = res.headers.get("Content-Type") || "";
+            if (!ct.includes("application/json")) {
+              throw new Error(
+                `Servidor retornou HTML (HTTP ${res.status}). Verifique os logs PHP ou execute o SQL de migração MEDIUMTEXT.`,
+              );
+            }
             const data = await res.json();
             if (!res.ok)
               throw new Error(data.erro || "Erro ao salvar no banco.");
@@ -3624,6 +3700,75 @@
           }
         } else {
           showToast("Identidade salva localmente!", "success");
+        }
+      }
+
+      // ============================================================
+      // SYNC DE IDENTIDADE — propaga mudanças do admin para todos
+      // ============================================================
+      let _syncIdentidadeTimer = null;
+
+      function iniciarSyncIdentidade() {
+        if (_syncIdentidadeTimer) clearInterval(_syncIdentidadeTimer);
+        _syncIdentidadeTimer = setInterval(
+          async () => {
+            if (!sessionToken || !currentUser?.empresa_id) return;
+            try {
+              const res = await fetch("api/config.php");
+              if (!res.ok) return;
+              const ct = res.headers.get("Content-Type") || "";
+              if (!ct.includes("application/json")) return;
+              const { config: cfg } = await res.json();
+              if (!cfg) return;
+              let mudou = false;
+              if (
+                cfg.logo_dark !== undefined &&
+                cfg.logo_dark !== IDENTITY.logoDark
+              ) {
+                IDENTITY.logoDark = cfg.logo_dark || null;
+                mudou = true;
+              }
+              if (
+                cfg.logo_light !== undefined &&
+                cfg.logo_light !== IDENTITY.logoLight
+              ) {
+                IDENTITY.logoLight = cfg.logo_light || null;
+                mudou = true;
+              }
+              if (
+                cfg.nome_sistema &&
+                cfg.nome_sistema !== IDENTITY.nomeSistema
+              ) {
+                IDENTITY.nomeSistema = cfg.nome_sistema;
+                mudou = true;
+              }
+              if (cfg.titulo_login && cfg.titulo_login !== IDENTITY.titulo) {
+                IDENTITY.titulo = cfg.titulo_login;
+                mudou = true;
+              }
+              if (
+                cfg.subtitulo_login &&
+                cfg.subtitulo_login !== IDENTITY.subtitulo
+              ) {
+                IDENTITY.subtitulo = cfg.subtitulo_login;
+                mudou = true;
+              }
+              if (mudou) {
+                localStorage.setItem("cj2-identity", JSON.stringify(IDENTITY));
+                applyIdentity();
+              }
+            } catch (e) {
+              /* silencioso */
+            }
+          },
+          3 * 60 * 1000,
+        ); // a cada 3 minutos
+      }
+
+      function pararSyncIdentidade() {
+        if (_syncIdentidadeTimer) {
+          clearInterval(_syncIdentidadeTimer);
+          _syncIdentidadeTimer = null;
         }
       }
 
@@ -3768,6 +3913,7 @@
               currentUser.perfil !== "consultor" ? "flex" : "none";
 
           updateApiBadge();
+          iniciarSyncIdentidade();
           showToast("Bem-vindo, " + currentUser.nome + "!", "success");
         } catch (e) {
           errEl.style.display = "block";
@@ -3785,6 +3931,7 @@
         sessionToken = null;
         currentUser = null;
         sessionStorage.removeItem("cj2-token");
+        pararSyncIdentidade();
         document.getElementById("screen-app").style.display = "none";
         document.getElementById("screen-login").style.display = "flex";
         document.getElementById("login-user").value = "";
@@ -7203,6 +7350,12 @@
                 imagem_fundo: bgDataUrl,
               }),
             });
+            const ct = res.headers.get("Content-Type") || "";
+            if (!ct.includes("application/json")) {
+              throw new Error(
+                `Servidor retornou HTML (HTTP ${res.status}). Execute o SQL de migração MEDIUMTEXT no banco.`,
+              );
+            }
             const data = await res.json();
             if (!res.ok) throw new Error(data.erro || "Erro.");
             showToast("Imagem salva no banco!", "success");

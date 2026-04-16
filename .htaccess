@@ -20,11 +20,16 @@ RewriteEngine On
     Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
 </FilesMatch>
 
-# ── Protege arquivos sensíveis ────────────────────────────────
-<FilesMatch "(config\.php|db\.php|auth\.php|response\.php|\.sql)$">
+# ── Protege arquivos sensíveis (apenas os includes internos) ──
+<FilesMatch "(db\.php|auth\.php|response\.php|\.sql)$">
     Order allow,deny
     Deny from all
 </FilesMatch>
+
+# Protege a pasta includes/ inteira (mais robusto)
+<IfModule mod_rewrite.c>
+    RewriteRule ^includes/ - [F,L]
+</IfModule>
 
 # ── Cache para assets estáticos ──────────────────────────────
 <FilesMatch "\.(html|css|js)$">
